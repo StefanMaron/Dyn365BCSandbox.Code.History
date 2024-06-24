@@ -103,7 +103,7 @@ report 407 "Purchase - Credit Memo"
                 DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = sorting(Number) WHERE(Number = const(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(DocumentCaption; StrSubstNo(DocumentCaption(), CopyText))
                     {
                     }
@@ -260,7 +260,7 @@ report 407 "Purchase - Credit Memo"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purch. Cr. Memo Hdr.";
-                        DataItemTableView = sorting(Number) WHERE(Number = filter(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText_DimensionLoop1; DimText)
                         {
                         }
@@ -461,7 +461,7 @@ report 407 "Purchase - Credit Memo"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = sorting(Number) WHERE(Number = filter(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_DimensionLoop2; DimText)
                             {
                             }
@@ -674,7 +674,7 @@ report 407 "Purchase - Credit Memo"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(BuyfromVendNo_PurchCrMemoHdr; "Purch. Cr. Memo Hdr."."Buy-from Vendor No.")
                         {
                         }
@@ -690,7 +690,7 @@ report 407 "Purchase - Credit Memo"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShipToAddr1; ShipToAddr[1])
                         {
                         }
@@ -716,6 +716,9 @@ report 407 "Purchase - Credit Memo"
                         {
                         }
                         column(ShipToAddressCaption; ShipToAddressCaptionLbl)
+                        {
+                        }
+                        column(ShipToPhoneNo; "Purch. Cr. Memo Hdr."."Ship-to Phone No.")
                         {
                         }
 
@@ -863,8 +866,12 @@ report 407 "Purchase - Credit Memo"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text003: Label '(Applies to %1 %2)';
+#pragma warning restore AA0470
         Text005: Label 'Purchase - Credit Memo %1', Comment = '%1 = Document No.';
+#pragma warning restore AA0074
         GLSetup: Record "General Ledger Setup";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
@@ -879,7 +886,6 @@ report 407 "Purchase - Credit Memo"
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
         VendAddr: array[8] of Text[100];
-        ShipToAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
         ReturnOrderNoText: Text[80];
         PurchaserText: Text[50];
@@ -906,14 +912,22 @@ report 407 "Purchase - Credit Memo"
         VALVATAmountLCY: Decimal;
         VALSpecLCYHeader: Text[80];
         VALExchRate: Text[50];
+#pragma warning disable AA0074
         Text008: Label 'VAT Amount Specification in ';
         Text009: Label 'Local Currency';
+#pragma warning disable AA0470
         Text010: Label 'Exchange rate: %1/%2';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CalculatedExchRate: Decimal;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text011: Label 'Purchase - Prepmt. Credit Memo %1';
         Text012: Label '%1% VAT';
+#pragma warning restore AA0470
         Text013: Label 'VAT Amount';
         RegNoText: Text[20];
+#pragma warning restore AA0074
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -960,6 +974,7 @@ report 407 "Purchase - Credit Memo"
 
     protected var
         CompanyInfo: Record "Company Information";
+        ShipToAddr: array[8] of Text[100];
 
     procedure InitLogInteraction()
     begin

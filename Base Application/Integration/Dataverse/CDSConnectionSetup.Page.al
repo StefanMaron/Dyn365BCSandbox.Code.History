@@ -408,6 +408,7 @@ page 7200 "CDS Connection Setup"
                     TempCDSConnectionSetup: Record "CDS Connection Setup" temporary;
                     CRMConnectionSetup: Record "CRM Connection Setup";
                     CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
+                    EmptySecretText: SecretText;
                 begin
                     TempCDSConnectionSetup."Server Address" := Rec."Server Address";
                     TempCDSConnectionSetup."User Name" := Rec."User Name";
@@ -420,13 +421,13 @@ page 7200 "CDS Connection Setup"
                     if (TempCDSConnectionSetup."Connection String".IndexOf('{CERTIFICATE}') > 0) and (TempCDSConnectionSetup."User Name" <> Rec."User Name") then begin
                         if CRMConnectionSetup.IsEnabled() then begin
                             CRMConnectionSetup."User Name" := TempCDSConnectionSetup."User Name";
-                            CRMConnectionSetup.SetPassword('');
+                            CRMConnectionSetup.SetPassword(EmptySecretText);
                             CRMConnectionSetup."Proxy Version" := TempCDSConnectionSetup."Proxy Version";
                             CRMConnectionSetup.SetConnectionString(TempCDSConnectionSetup."Connection String");
                         end;
 
                         Rec."User Name" := TempCDSConnectionSetup."User Name";
-                        Rec.SetPassword('');
+                        Rec.SetPassword(EmptySecretText);
                         Rec."Proxy Version" := TempCDSConnectionSetup."Proxy Version";
                         Rec."Connection String" := TempCDSConnectionSetup."Connection String";
                         Rec.Modify();
@@ -943,8 +944,8 @@ page 7200 "CDS Connection Setup"
             Rec.Insert();
             Rec.LoadConnectionStringElementsFromCRMConnectionSetup();
         end else begin
-            UserPassword := Rec.GetPassword();
-            ClientSecret := Rec.GetClientSecret();
+            UserPassword := '**********';
+            ClientSecret := '**********';
             if Rec."Redirect URL" = '' then
                 InitializeDefaultRedirectUrl();
             if (not IsValidAuthenticationType()) or (not IsValidProxyVersion()) or (not IsValidOwnershipModel() or (not IsValidBusinessUnit())) then begin

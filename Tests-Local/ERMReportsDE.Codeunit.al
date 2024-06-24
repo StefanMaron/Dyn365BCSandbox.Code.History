@@ -384,9 +384,7 @@ codeunit 144051 "ERM Reports DE"
         // Request Page handled by VATVIESDeclarationDiskRequestPageHandler
 
         // [THEN] Error pops up: Country/Region Code must have a value in Customer: No.=%1. It cannot be zero or empty.
-        Assert.ExpectedErrorCode('TestField');
-        Assert.ExpectedError(StrSubstNo(
-            'Country/Region Code must have a value in Customer: No.=%1. It cannot be zero or empty.', Customer."No."));
+        Assert.ExpectedTestFieldError(Customer.FieldCaption("Country/Region Code"), '');
     end;
 
     [Test]
@@ -425,9 +423,7 @@ codeunit 144051 "ERM Reports DE"
         // Request Page handled by VATVIESDeclarationDiskRequestPageHandler
 
         // [THEN] Error pops up: VAT Registration No. must have a value in Customer: No.=%1. It cannot be zero or empty.
-        Assert.ExpectedErrorCode('TestField');
-        Assert.ExpectedError(StrSubstNo(
-            'VAT Registration No. must have a value in Customer: No.=%1. It cannot be zero or empty.', Customer."No."));
+        Assert.ExpectedTestFieldError(Customer.FieldCaption("VAT Registration No."), '');
     end;
 
     local procedure Initialize()
@@ -581,17 +577,15 @@ codeunit 144051 "ERM Reports DE"
 
     local procedure CreateVATEntryForCustomer(Customer: Record Customer; var VATEntry: Record "VAT Entry")
     begin
-        with VATEntry do begin
-            Init();
-            "Entry No." := LibraryUtility.GetNewRecNo(VATEntry, FieldNo("Entry No."));
-            Type := Type::Sale;
-            "Posting Date" := WorkDate();
-            "Bill-to/Pay-to No." := Customer."No.";
-            "VAT Registration No." := Customer."VAT Registration No.";
-            "Country/Region Code" := Customer."Country/Region Code";
-            Base := LibraryRandom.RandDecInRange(10, 20, 2);
-            Insert();
-        end;
+        VATEntry.Init();
+        VATEntry."Entry No." := LibraryUtility.GetNewRecNo(VATEntry, VATEntry.FieldNo("Entry No."));
+        VATEntry.Type := VATEntry.Type::Sale;
+        VATEntry."Posting Date" := WorkDate();
+        VATEntry."Bill-to/Pay-to No." := Customer."No.";
+        VATEntry."VAT Registration No." := Customer."VAT Registration No.";
+        VATEntry."Country/Region Code" := Customer."Country/Region Code";
+        VATEntry.Base := LibraryRandom.RandDecInRange(10, 20, 2);
+        VATEntry.Insert();
     end;
 
     local procedure CreateSalesLineWithUnitPrice(SalesHeader: Record "Sales Header"; ItemNo: Code[20]; Quantity: Decimal)
@@ -759,18 +753,6 @@ codeunit 144051 "ERM Reports DE"
         InventoryValue.StatusDate.SetValue(WorkDate());
         InventoryValue.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
-
-#if not CLEAN22
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-#pragma warning disable AS0072
-    [Obsolete('Intrastat related functionalities are moved to Intrastat extensions.', '22.0')]
-#pragma warning restore AS0072
-    procedure IntrastatFormDERequestHandler(var IntrastatFormDE: TestRequestPage "Intrastat - Form DE")
-    begin
-        IntrastatFormDE.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-#endif
 
     [RequestPageHandler]
     [Scope('OnPrem')]

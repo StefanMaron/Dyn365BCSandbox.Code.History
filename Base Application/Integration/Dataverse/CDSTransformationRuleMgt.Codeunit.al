@@ -26,12 +26,9 @@ codeunit 5397 "CDS Transformation Rule Mgt."
     var
         IntegrationFieldMapping: Record "Integration Field Mapping";
     begin
-        IntegrationFieldMapping.SetFilter("Transformation Rule", Rec.Code);
-        repeat
-            if IntegrationFieldMapping.FindFirst() then
-                if IntegrationFieldMapping.SystemId <> Rec.SystemId then
-                    exit(true);
-        until IntegrationFieldMapping.Next() <= 0;
+        IntegrationFieldMapping.ReadIsolation := IsolationLevel::ReadCommitted;
+        IntegrationFieldMapping.SetRange("Transformation Rule", Rec.Code);
+        exit(not IntegrationFieldMapping.IsEmpty());
     end;
 
     procedure ApplyTransformations(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)

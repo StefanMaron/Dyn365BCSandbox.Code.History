@@ -347,17 +347,17 @@ table 313 "Inventory Setup"
         {
             Caption = 'Phys. Inv. Order Nos.';
             ObsoleteReason = 'Merged to W1';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             TableRelation = "No. Series";
-            ObsoleteTag = '15.0';
+            ObsoleteTag = '25.0';
         }
         field(5005352; "Posted Phys. Inv. Order Nos."; Code[20])
         {
             Caption = 'Posted Phys. Inv. Order Nos.';
             ObsoleteReason = 'Merged to W1';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             TableRelation = "No. Series";
-            ObsoleteTag = '15.0';
+            ObsoleteTag = '25.0';
         }
     }
 
@@ -380,9 +380,13 @@ table 313 "Inventory Setup"
         ObjTransl: Record "Object Translation";
         RecordHasBeenRead: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'Some unadjusted value entries will not be covered with the new setting. You must run the Adjust Cost - Item Entries batch job once to adjust these.';
         Text004: Label 'The program has cancelled the change that would have caused an adjustment of all items.';
+#pragma warning disable AA0470
         Text005: Label '%1 has been changed to %2. You should now run %3.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ItemEntriesAdjustQst: Label 'If you change the %1, the program must adjust all item entries.The adjustment of all entries can take several hours.\Do you really want to change the %1?', Comment = '%1 - field caption';
 
     procedure GetRecordOnce()

@@ -107,7 +107,9 @@ using Microsoft.HumanResources.Payables;
 using Microsoft.HumanResources.Setup;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+#if not CLEAN25
 using Microsoft.Integration.FieldService;
+#endif
 using Microsoft.Integration.Entity;
 using Microsoft.Integration.Graph;
 using Microsoft.Integration.SyncEngine;
@@ -279,6 +281,8 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Add-in" = imd,
                   tabledata "Aggregate Permission Set" = Rm,
                   tabledata "All Profile" = m,
+                  tabledata "All Profile Extension" = m,
+                  tabledata "All Profile Page Metadata" = m,
                   tabledata AllObj = m,
                   tabledata AllObjWithCaption = Rm,
                   tabledata "Alloc. Acc. Manual Override" = RIMD,
@@ -294,19 +298,6 @@ permissionset 7931 "D365 TEAM MEMBER"
 #if not CLEAN24
                   tabledata "Deposits Page Setup" = R,
 #endif
-                  tabledata "Designed Query" = R,
-                  tabledata "Designed Query Caption" = R,
-                  tabledata "Designed Query Category" = R,
-                  tabledata "Designed Query Column" = R,
-                  tabledata "Designed Query Column Filter" = R,
-                  tabledata "Designed Query Data Item" = R,
-                  tabledata "Designed Query Filter" = R,
-                  tabledata "Designed Query Group" = RM,
-                  tabledata "Designed Query Join" = R,
-                  tabledata "Designed Query Management" = RM,
-                  tabledata "Designed Query Obj" = Rm,
-                  tabledata "Designed Query Order By" = R,
-                  tabledata "Designed Query Permission" = RM,
                   tabledata "Dispute Status" = R,
                   tabledata Device = Rm,
                   tabledata "Document Service" = m,
@@ -347,9 +338,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Table Information" = Rm,
                   tabledata "Table Metadata" = m,
                   tabledata "Table Synch. Setup" = Rm,
-#pragma warning disable AL0432
                   tabledata "Tenant Profile" = m,
-#pragma warning restore AL0432
                   tabledata "Tenant Profile Extension" = m,
                   tabledata "Tenant Profile Page Metadata" = m,
                   tabledata "Tenant Profile Setting" = m,
@@ -509,9 +498,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "CDS Connection Setup" = RM,
                   tabledata "CDS Coupled Business Unit" = RM,
                   tabledata "CDS Environment" = RM,
-#if not CLEAN22
-                  tabledata "CDS Failed Option Mapping" = RM,
-#endif
                   tabledata "CDS Solution" = RM,
                   tabledata "CDS Teammembership" = RM,
                   tabledata "CDS Teamroles" = RM,
@@ -598,9 +584,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Cost Type" = RM,
                   tabledata "Country/Region" = RM,
                   tabledata "Country/Region Translation" = RM,
-#if not CLEAN22
-                  tabledata "Coupling Field Buffer" = RM,
-#endif
                   tabledata "Coupling Record Buffer" = RM,
                   tabledata "Credit Trans Re-export History" = RM,
                   tabledata "Credit Transfer Entry" = RM,
@@ -657,6 +640,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "CRM Transactioncurrency" = RM,
                   tabledata "CRM Uom" = RM,
                   tabledata "CRM Uomschedule" = RM,
+#if not CLEAN25
                   tabledata "FS Connection Setup" = RM,
                   tabledata "FS Bookable Resource" = RM,
                   tabledata "FS Bookable Resource Booking" = RM,
@@ -671,6 +655,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "FS Work Order Service" = RM,
                   tabledata "FS Work Order Substatus" = RM,
                   tabledata "FS Work Order Type" = RM,
+#endif
                   tabledata "CSV Buffer" = RM,
                   tabledata "Curr. Exch. Rate Update Setup" = RM,
                   tabledata Currency = RM,
@@ -956,13 +941,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Intermediate Data Import" = RM,
                   tabledata "Internal Movement Header" = RM,
                   tabledata "Internal Movement Line" = RM,
-#if not CLEAN22
-                  tabledata "Advanced Intrastat Checklist" = RIMD,
-                  tabledata "Intrastat Jnl. Batch" = RM,
-                  tabledata "Intrastat Jnl. Line" = RM,
-                  tabledata "Intrastat Jnl. Template" = RM,
-                  tabledata "Intrastat Setup" = RIMD,
-#endif
                   tabledata "Invalidated Dim Correction" = R,
                   tabledata "Inventory Adjmt. Entry (Order)" = Rm,
                   tabledata "Inventory Adjustment Buffer" = Rm,
@@ -1171,9 +1149,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Payable Employee Ledger Entry" = RM,
                   tabledata "Payable Vendor Ledger Entry" = RM,
                   tabledata "Payment Application Proposal" = RM,
-#if not CLEAN22
-                  tabledata "Payment Buffer" = RM,
-#endif
                   tabledata "Vendor Payment Buffer" = RM,
                   tabledata "Payment Export Data" = Rm,
                   tabledata "Payment Export Remittance Text" = RM,
@@ -1242,9 +1217,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Posted Whse. Receipt Line" = RM,
                   tabledata "Posted Whse. Shipment Header" = RM,
                   tabledata "Posted Whse. Shipment Line" = RM,
-#if not CLEAN22
-                  tabledata "Power BI Service Status Setup" = RIMD,
-#endif
 #if not CLEAN23
                   tabledata "Power BI User Configuration" = RIMD,
                   tabledata "Power BI Report Configuration" = RIMD,
@@ -1335,6 +1307,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Relationship Mgmt. Cue" = RM,
                   tabledata Relative = RM,
                   tabledata "Reminder Attachment Text" = RM,
+                  tabledata "Reminder Attachment Text Line" = RM,
                   tabledata "Reminder Comment Line" = RM,
                   tabledata "Reminder Email Text" = RM,
                   tabledata "Reminder Header" = RM,
@@ -1565,13 +1538,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Unlinked Attachment" = RIMD,
                   tabledata "Unplanned Demand" = RM,
                   tabledata "Untracked Planning Element" = RM,
-#if not CLEAN22
-                  tabledata "User Group" = R,
-                  tabledata "User Group Access Control" = R,
-                  tabledata "User Group Member" = Rimd,
-                  tabledata "User Group Permission Set" = R,
-                  tabledata "User Group Plan" = Rm,
-#endif
                   tabledata "User Preference" = RIMD,
                   tabledata "User Security Status" = RM,
                   tabledata "User Setup" = RM,

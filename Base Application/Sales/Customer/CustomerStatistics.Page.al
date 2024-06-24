@@ -750,8 +750,12 @@ page 151 "Customer Statistics"
     var
         DateFilterCalc: Codeunit "DateFilter-Calc";
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Overdue Amounts (LCY) as of %1';
+#pragma warning restore AA0470
         Text001: Label 'Placeholder';
+#pragma warning restore AA0074
 
     protected var
         CustDateFilter: array[4] of Text[30];

@@ -749,6 +749,9 @@ report 406 "Purchase - Invoice"
                         column(ShiptoAddressCaption; ShiptoAddressCaptionLbl)
                         {
                         }
+                        column(ShipToPhoneNo; "Purch. Inv. Header"."Ship-to Phone No.")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -973,12 +976,17 @@ report 406 "Purchase - Invoice"
         TotalInvoiceDiscountAmount: Decimal;
         TotalPaymentDiscountOnVAT: Decimal;
 
+#pragma warning disable AA0074
         Text004: Label 'Purchase - Invoice %1', Comment = '%1 = Document No.';
         Text007: Label 'VAT Amount Specification in ';
         Text008: Label 'Local Currency';
+#pragma warning disable AA0470
         Text009: Label 'Exchange rate: %1/%2';
+#pragma warning restore AA0470
         Text010: Label 'Purchase - Prepayment Invoice %1', Comment = '%1 = Document No.';
+#pragma warning disable AA0470
         Text011: Label '%1% VAT';
+#pragma warning restore AA0470
         Text012: Label 'VAT Amount';
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoVATRegistrationNoCaptionLbl: Label 'VAT Registration No.';
@@ -986,6 +994,7 @@ report 406 "Purchase - Invoice"
         CompanyInfoBankNameCaptionLbl: Label 'Bank';
         CompanyInfoBankAccountNoCaptionLbl: Label 'Account No.';
         PurchInvHeaderDueDateCaptionLbl: Label 'Due Date';
+#pragma warning restore AA0074
         InvoiceNoCaptionLbl: Label 'Invoice No.';
         PurchInvHeaderPostingDateCaptionLbl: Label 'Posting Date';
         PageCaptionLbl: Label 'Page';

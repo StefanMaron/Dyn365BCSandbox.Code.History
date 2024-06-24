@@ -111,7 +111,9 @@ using Microsoft.HumanResources.Payables;
 using Microsoft.HumanResources.Setup;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+#if not CLEAN25
 using Microsoft.Integration.FieldService;
+#endif
 using Microsoft.Integration.Entity;
 using Microsoft.Integration.Graph;
 using Microsoft.Integration.SyncEngine;
@@ -280,23 +282,12 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Add-in" = imd,
                   tabledata "Aggregate Permission Set" = R,
                   tabledata "All Profile" = IMD,
+                  tabledata "All Profile Extension" = IMD,
+                  tabledata "All Profile Page Metadata" = IMD,
                   tabledata AllObjWithCaption = R,
                   tabledata Chart = m,
                   tabledata "Code Coverage" = R,
                   tabledata "Data Sensitivity" = RM,
-                  tabledata "Designed Query" = R,
-                  tabledata "Designed Query Caption" = R,
-                  tabledata "Designed Query Category" = R,
-                  tabledata "Designed Query Column" = R,
-                  tabledata "Designed Query Column Filter" = R,
-                  tabledata "Designed Query Data Item" = R,
-                  tabledata "Designed Query Filter" = R,
-                  tabledata "Designed Query Group" = R,
-                  tabledata "Designed Query Join" = R,
-                  tabledata "Designed Query Management" = R,
-                  tabledata "Designed Query Obj" = R,
-                  tabledata "Designed Query Order By" = R,
-                  tabledata "Designed Query Permission" = R,
                   tabledata "Dispute Status" = R,
                   tabledata Device = Rm,
                   tabledata "Document Service" = m,
@@ -330,9 +321,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "SID - Account ID" = R,
                   tabledata "Table Information" = R,
                   tabledata "Table Synch. Setup" = R,
-#pragma warning disable AL0432
                   tabledata "Tenant Profile" = IMD,
-#pragma warning restore AL0432
                   tabledata "Tenant Profile Extension" = IMD,
                   tabledata "Tenant Profile Page Metadata" = IMD,
                   tabledata "Tenant Profile Setting" = IMD,
@@ -511,9 +500,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "CDS Connection Setup" = R,
                   tabledata "CDS Coupled Business Unit" = R,
                   tabledata "CDS Environment" = R,
-#if not CLEAN22
-                  tabledata "CDS Failed Option Mapping" = R,
-#endif
                   tabledata "CDS Solution" = R,
                   tabledata "CDS Teammembership" = R,
                   tabledata "CDS Teamroles" = R,
@@ -601,9 +587,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Cost Type" = R,
                   tabledata "Country/Region" = R,
                   tabledata "Country/Region Translation" = R,
-#if not CLEAN22
-                  tabledata "Coupling Field Buffer" = R,
-#endif
                   tabledata "Coupling Record Buffer" = R,
                   tabledata "Credit Trans Re-export History" = R,
                   tabledata "Credit Transfer Entry" = R,
@@ -660,6 +643,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "CRM Transactioncurrency" = R,
                   tabledata "CRM Uom" = R,
                   tabledata "CRM Uomschedule" = R,
+#if not CLEAN25
                   tabledata "FS Connection Setup" = R,
                   tabledata "FS Bookable Resource" = R,
                   tabledata "FS Bookable Resource Booking" = R,
@@ -674,6 +658,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "FS Work Order Service" = R,
                   tabledata "FS Work Order Substatus" = R,
                   tabledata "FS Work Order Type" = R,
+#endif
                   tabledata "CSV Buffer" = R,
                   tabledata "Curr. Exch. Rate Update Setup" = R,
                   tabledata Currency = R,
@@ -964,13 +949,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Intermediate Data Import" = R,
                   tabledata "Internal Movement Header" = R,
                   tabledata "Internal Movement Line" = R,
-#if not CLEAN22
-                  tabledata "Advanced Intrastat Checklist" = R,
-                  tabledata "Intrastat Jnl. Batch" = R,
-                  tabledata "Intrastat Jnl. Line" = R,
-                  tabledata "Intrastat Jnl. Template" = R,
-                  tabledata "Intrastat Setup" = R,
-#endif
                   tabledata "Invalidated Dim Correction" = R,
                   tabledata "Inventory Adjmt. Entry (Order)" = R,
                   tabledata "Inventory Adjustment Buffer" = R,
@@ -1185,9 +1163,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Payable Employee Ledger Entry" = R,
                   tabledata "Payable Vendor Ledger Entry" = R,
                   tabledata "Payment Application Proposal" = R,
-#if not CLEAN22
-                  tabledata "Payment Buffer" = R,
-#endif
                   tabledata "Vendor Payment Buffer" = R,
                   tabledata "Payment Export Data" = R,
                   tabledata "Payment Export Remittance Text" = R,
@@ -1257,9 +1232,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Posted Whse. Receipt Line" = R,
                   tabledata "Posted Whse. Shipment Header" = R,
                   tabledata "Posted Whse. Shipment Line" = R,
-#if not CLEAN22
-                  tabledata "Power BI Service Status Setup" = R,
-#endif
 #if not CLEAN23
                   tabledata "Power BI User Configuration" = RIMD,
                   tabledata "Power BI Report Configuration" = RIMD,
@@ -1370,6 +1342,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Relationship Mgmt. Cue" = RIMD,
                   tabledata Relative = R,
                   tabledata "Reminder Attachment Text" = R,
+                  tabledata "Reminder Attachment Text Line" = R,
                   tabledata "Reminder Comment Line" = R,
                   tabledata "Reminder Email Text" = R,
                   tabledata "Reminder Header" = R,
@@ -1654,13 +1627,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Unlinked Attachment" = R,
                   tabledata "Unplanned Demand" = R,
                   tabledata "Untracked Planning Element" = R,
-#if not CLEAN22
-                  tabledata "User Group" = R,
-                  tabledata "User Group Access Control" = R,
-                  tabledata "User Group Member" = R,
-                  tabledata "User Group Permission Set" = R,
-                  tabledata "User Group Plan" = R,
-#endif
                   tabledata "User Preference" = R,
                   tabledata "User Security Status" = RIMD,
                   tabledata "User Setup" = R,

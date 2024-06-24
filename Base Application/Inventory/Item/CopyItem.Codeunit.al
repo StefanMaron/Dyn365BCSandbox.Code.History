@@ -13,8 +13,6 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Pricing;
 #endif
-using Microsoft.Service.Maintenance;
-using Microsoft.Service.Resources;
 using System.Environment.Configuration;
 
 codeunit 730 "Copy Item"
@@ -139,8 +137,6 @@ codeunit 730 "Copy Item"
         CopyItemComments(SourceItem."No.", TargetItem."No.");
         CopyBOMComponents(SourceItem."No.", TargetItem."No.");
         CopyItemVendors(SourceItem."No.", TargetItem."No.");
-        CopyTroubleshootingSetup(SourceItem."No.", TargetItem."No.");
-        CopyItemResourceSkills(SourceItem."No.", TargetItem."No.");
         CopyItemPriceListLines(SourceItem."No.", TargetItem."No.");
 #if not CLEAN23
         CopyItemSalesPrices(SourceItem."No.", TargetItem."No.");
@@ -351,34 +347,6 @@ codeunit 730 "Copy Item"
             ToItem."Global Dimension 1 Code" := '';
             ToItem."Global Dimension 2 Code" := '';
         end;
-    end;
-
-    local procedure CopyTroubleshootingSetup(FromItemNo: Code[20]; ToItemNo: Code[20])
-    var
-        TroubleshootingSetup: Record "Troubleshooting Setup";
-        RecRef: RecordRef;
-    begin
-        if not TempCopyItemBuffer.Troubleshooting then
-            exit;
-
-        TroubleshootingSetup.SetRange(Type, TroubleshootingSetup.Type::Item);
-
-        RecRef.GetTable(TroubleshootingSetup);
-        CopyItemRelatedTableFromRecRef(RecRef, TroubleshootingSetup.FieldNo("No."), FromItemNo, ToItemNo);
-    end;
-
-    local procedure CopyItemResourceSkills(FromItemNo: Code[20]; ToItemNo: Code[20])
-    var
-        ResourceSkill: Record "Resource Skill";
-        RecRef: RecordRef;
-    begin
-        if not TempCopyItemBuffer."Resource Skills" then
-            exit;
-
-        ResourceSkill.SetRange(Type, ResourceSkill.Type::Item);
-
-        RecRef.GetTable(ResourceSkill);
-        CopyItemRelatedTableFromRecRef(RecRef, ResourceSkill.FieldNo("No."), FromItemNo, ToItemNo);
     end;
 
     local procedure CopyItemPriceListLines(FromItemNo: Code[20]; ToItemNo: Code[20])

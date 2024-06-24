@@ -86,29 +86,6 @@ page 9802 "Permission Sets"
         }
         area(factboxes)
         {
-#if not CLEAN22
-            part("System Permissions"; "Permissions FactBox")
-            {
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced with Expanded Permissions factbox';
-                ObsoleteTag = '22.0';
-                ApplicationArea = Basic, Suite;
-                Caption = 'System Permissions';
-                Editable = false;
-                SubPageLink = "Role ID" = field("Role ID");
-                Visible = false;
-            }
-            part("Tenant Permissions"; "Tenant Permissions FactBox")
-            {
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced with Expanded Permissions factbox';
-                ObsoleteTag = '22.0';
-                ApplicationArea = Basic, Suite;
-                Caption = 'Custom Permissions';
-                Editable = false;
-                Visible = false;
-            }
-#endif
             part(ExpandedPermissions; "Expanded Permissions FactBox")
             {
                 ApplicationArea = Basic, Suite;
@@ -168,20 +145,6 @@ page 9802 "Permission Sets"
                     RunObject = Page "Permission Set by User";
                     ToolTip = 'View or edit the available permission sets and apply permission sets to existing users.';
                 }
-#if not CLEAN22
-                action("Permission Set by User Group")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Permission Set by User Group';
-                    Image = Permission;
-                    RunObject = Page "Permission Set by User Group";
-                    ToolTip = 'View or edit the available permission sets and apply permission sets to existing user groups.';
-                    Visible = LegacyUserGroupsVisible;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the Permission Set By Security Group action.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 action("Permission Set By Security Group")
                 {
                     ApplicationArea = Basic, Suite;
@@ -220,32 +183,6 @@ page 9802 "Permission Sets"
             {
                 Caption = 'Security Groups';
                 Image = Users;
-#if not CLEAN22
-                action("User by User Group")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'User by User Group';
-                    Image = User;
-                    RunObject = Page "User by User Group";
-                    ToolTip = 'View and assign user groups to users.';
-                    Visible = LegacyUserGroupsVisible;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Adding users to user groups is done in M365 admin center in the new user group system.';
-                    ObsoleteTag = '22.0';
-                }
-                action(UserGroups)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'User Groups';
-                    Image = Users;
-                    RunObject = Page "User Groups";
-                    ToolTip = 'Set up or modify user groups as a fast way of giving users access to the functionality that is relevant to their work.';
-                    Visible = LegacyUserGroupsVisible;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the SecurityGroups action.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 action(SecurityGroups)
                 {
                     ApplicationArea = Basic, Suite;
@@ -552,13 +489,7 @@ page 9802 "Permission Sets"
     var
         PermissionPagesMgt: Codeunit "Permission Pages Mgt.";
         EnvironmentInfo: Codeunit "Environment Information";
-#if not CLEAN22
-        LegacyUserGroups: Codeunit "Legacy User Groups";
-#endif
     begin
-#if not CLEAN22
-        LegacyUserGroupsVisible := LegacyUserGroups.UiElementsVisible();
-#endif
         IsSaas := EnvironmentInfo.IsSaaS();
 
         PermissionPagesMgt.CheckAndRaiseNotificationIfAppDBPermissionSetsChanged();
@@ -671,8 +602,5 @@ page 9802 "Permission Sets"
         PermissionSetsLbl: Label 'PermissionSets.zip', Locked = true;
         PermissionSetsTenantLbl: Label 'UserDefinedPermissionSets.xml', Locked = true;
         PermissionSetsSystemLbl: Label 'SystemPermissionSets.xml', Locked = true;
-#if not CLEAN22
-        LegacyUserGroupsVisible: Boolean;
-#endif
 }
 

@@ -27,6 +27,7 @@ using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
 using Microsoft.Utilities;
@@ -1146,7 +1147,7 @@ table 1003 "Job Planning Line"
                     WMSManagement.FindBin("Location Code", "Bin Code", '');
                     BinCodeCaption := CopyStr(FieldCaption("Bin Code"), 1, 30);
                     WhseIntegrationMgt.CheckBinTypeAndCode(
-                        DATABASE::"Job Planning Line", BinCodeCaption, "Location Code", "Bin Code", 0);
+                        Database::"Job Planning Line", BinCodeCaption, "Location Code", "Bin Code", 0);
                     CheckBin();
                 end;
 
@@ -1239,10 +1240,6 @@ table 1003 "Job Planning Line"
             begin
                 Validate("Planning Date", "Planned Delivery Date");
             end;
-        }
-        field(5900; "Service Order No."; Code[20])
-        {
-            Caption = 'Service Order No.';
         }
         field(6515; "Package No."; Code[50])
         {
@@ -1508,12 +1505,16 @@ table 1003 "Job Planning Line"
         SkipCheckForMultipleJobsOnSalesLine: Boolean;
         CalledFromHeader: Boolean;
         LinkedJobLedgerErr: Label 'You cannot change this value because linked project ledger entries exist.';
+#pragma warning disable AA0470
         LineTypeErr: Label 'The %1 cannot be of %2 %3 because it is transferred to an invoice.', Comment = 'The Project Planning Line cannot be of Line Type Schedule, because it is transferred to an invoice.';
+#pragma warning restore AA0470
         QtyToTransferToInvoiceErr: Label '%1 may not be lower than %2 and may not exceed %3.', Comment = '%1 = Qty. to Transfer to Invoice field name; %2 = First value in comparison; %3 = Second value in comparison';
         AutoReserveQst: Label 'Automatic reservation is not possible.\Do you want to reserve items manually?';
         NoContractLineErr: Label '%1 cannot be set on a %2 of type %3.', Comment = '%1 = Qty. to Transfer to Invoice field name; %2 = Project Planning Line table name; %3 = The project''s line type';
         QtyAlreadyTransferredErr: Label 'The %1 has already been completely transferred.', Comment = '%1 = Project Planning Line table name';
+#pragma warning disable AA0470
         UsageLinkErr: Label '%1 cannot be enabled on a %2 with %3 %4.', Comment = 'Usage Link cannot be enabled on a Project Planning Line with Line Type Schedule';
+#pragma warning restore AA0470
         QtyGreaterErr: Label '%1 cannot be higher than %2.', Comment = '%1 = Caption for field Quantity; %2 = Captiion for field Qty. Transferred to Invoice';
         RequestedDeliveryDateErr: Label 'You cannot change the %1 when the %2 has been filled in.', Comment = '%1 = Caption for field Requested Delivery Date; %2 = Captiion for field Promised Delivery Date';
         NotPossibleJobPlanningLineErr: Label 'It is not possible to deleted project planning line transferred to an invoice.';
@@ -1578,7 +1579,17 @@ table 1003 "Job Planning Line"
         end;
     end;
 
-    local procedure CopyFieldsFromJob()
+    /// <summary>
+    /// Use this method to set the global Job variable.
+    /// This is useful for passing unsaved job record changes.
+    /// </summary>
+    /// <param name="NewJob">The job record</param>
+    procedure SetJob(NewJob: Record Job)
+    begin
+        Job := NewJob;
+    end;
+
+    procedure CopyFieldsFromJob()
     begin
         GetJob();
         Rec."Customer Price Group" := Job."Customer Price Group";
@@ -1795,8 +1806,8 @@ table 1003 "Job Planning Line"
 
     procedure Caption(): Text
     var
-        Job: Record Job;
-        JobTask: Record "Job Task";
+        JobForCaption: Record Job;
+        JobTaskForCaption: Record "Job Task";
         Result: Text;
         IsHandled: Boolean;
     begin
@@ -1806,15 +1817,17 @@ table 1003 "Job Planning Line"
         if IsHandled then
             exit(Result);
 
-        if not Job.Get("Job No.") then
+        JobForCaption.SetLoadFields("No.", Description);
+        if not JobForCaption.Get("Job No.") then
             exit('');
-        if not JobTask.Get("Job No.", "Job Task No.") then
+        JobTaskForCaption.SetLoadFields("Job No.", "Job Task No.", Description);
+        if not JobTaskForCaption.Get("Job No.", "Job Task No.") then
             exit('');
         exit(StrSubstNo('%1 %2 %3 %4',
-            Job."No.",
-            Job.Description,
-            JobTask."Job Task No.",
-            JobTask.Description));
+            JobForCaption."No.",
+            JobForCaption.Description,
+            JobTaskForCaption."Job Task No.",
+            JobTaskForCaption.Description));
     end;
 
     procedure SetUpNewLine(LastJobPlanningLine: Record "Job Planning Line")
@@ -1954,7 +1967,7 @@ table 1003 "Job Planning Line"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(DATABASE::"Job Planning Line", Status.AsInteger(), "Job No.", "Job Contract Entry No.", '', 0);
+        ReservEntry.SetSource(Database::"Job Planning Line", Status.AsInteger(), "Job No.", "Job Contract Entry No.", '', 0);
         ReservEntry.SetItemData("No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         if Type <> Type::Item then
             ReservEntry."Item No." := '';
@@ -1964,7 +1977,7 @@ table 1003 "Job Planning Line"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(DATABASE::"Job Planning Line", Status.AsInteger(), "Job No.", "Job Contract Entry No.", false);
+        ReservEntry.SetSourceFilter(Database::"Job Planning Line", Status.AsInteger(), "Job No.", "Job Contract Entry No.", false);
         ReservEntry.SetSourceFilter('', 0);
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -2609,9 +2622,9 @@ table 1003 "Job Planning Line"
         ReservEntry.InitSortingAndFilters(true);
         SetReservationFilters(ReservEntry);
         if Modal then
-            PAGE.RunModal(PAGE::"Reservation Entries", ReservEntry)
+            Page.RunModal(Page::"Reservation Entries", ReservEntry)
         else
-            PAGE.Run(PAGE::"Reservation Entries", ReservEntry);
+            Page.Run(Page::"Reservation Entries", ReservEntry);
     end;
 
     procedure AutoReserve()
@@ -2644,10 +2657,10 @@ table 1003 "Job Planning Line"
 
     procedure ShowTracking()
     var
-        OrderTrackingForm: Page "Order Tracking";
+        OrderTracking: Page "Order Tracking";
     begin
-        OrderTrackingForm.SetJobPlanningLine(Rec);
-        OrderTrackingForm.RunModal();
+        OrderTracking.SetVariantRec(Rec, Rec."No.", Rec."Remaining Qty. (Base)", Rec."Planning Date", Rec."Planning Date");
+        OrderTracking.RunModal();
     end;
 
     procedure ShowOrderPromisingLine()
@@ -2948,8 +2961,11 @@ table 1003 "Job Planning Line"
 
     local procedure FindBinFromJobTask(var NewBinCode: Code[20]): Boolean
     begin
-        if JobTask.Get(Rec."Job No.", Rec."Job Task No.") and (JobTask."Bin Code" <> '')
-            and ("Location Code" = JobTask."Location Code") then begin
+        JobTask.SetLoadFields("Location Code", "Bin Code");
+        if not JobTask.Get(Rec."Job No.", Rec."Job Task No.") then
+            exit(false);
+
+        if ("Location Code" = JobTask."Location Code") and (JobTask."Bin Code" <> '') then begin
             NewBinCode := JobTask."Bin Code";
             exit(true);
         end;
@@ -3282,6 +3298,15 @@ table 1003 "Job Planning Line"
     procedure SuspendDeletionCheck(Suspend: Boolean)
     begin
         CalledFromHeader := Suspend;
+    end;
+
+    procedure SetPurchLineFilters(var PurchaseLine: Record "Purchase Line")
+    begin
+        PurchaseLine.SetCurrentKey("Document Type", "Job No.", "Job Task No.", "Job Planning Line No.");
+        PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+        PurchaseLine.SetRange("Job No.", "Job No.");
+        PurchaseLine.SetRange("Job Task No.", "Job Task No.");
+        PurchaseLine.SetRange("Job Planning Line No.", "Line No.");
     end;
 
     [IntegrationEvent(false, false)]

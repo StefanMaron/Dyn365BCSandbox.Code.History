@@ -176,10 +176,8 @@ codeunit 136311 "Job Reports II"
         Initialize();
         CurrencyField := CurrencyField::"Local Currency";  // Assign in Global variable.
         PrepareJobPlanningLinesReportWithCurrency('', JobPlanningLine, ContractPrice, ContractCost);
-        with JobPlanningLine do begin
-            Validate("Planning Date", CalcDate('<+1M>', WorkDate()));
-            Modify();
-        end;
+        JobPlanningLine.Validate("Planning Date", CalcDate('<+1M>', WorkDate()));
+        JobPlanningLine.Modify();
 
         // Exercise.
         RunJobPlanningLinesReportWorkdate(JobPlanningLine);
@@ -694,7 +692,7 @@ codeunit 136311 "Job Reports II"
         LibraryReportValidation.OpenFile();
 
         VerifyJobTransactionDetaisReportTotals(Job, JobTask, LineCost, LinePrice, LineAmount, LineDiscountAmount, CurrencyOption);
-    END;
+    end;
 
     [Test]
     [HandlerFunctions('ConfirmHandlerTrue,MessageHandler,DocumentEntriesReqPageHandler')]
@@ -1306,9 +1304,8 @@ codeunit 136311 "Job Reports II"
     local procedure VerifyJobPlanningLinesReportHeading(Job: Record Job)
     begin
         LibraryReportValidation.OpenFile();
-        with Job do
-            Assert.IsTrue(
-              LibraryReportValidation.CheckIfValueExists(StrSubstNo('%1 %2 %3 %4', TableCaption(), FieldCaption("No."), "No.", Description)),
+        Assert.IsTrue(
+              LibraryReportValidation.CheckIfValueExists(StrSubstNo('%1 %2 %3 %4', Job.TableCaption(), Job.FieldCaption("No."), Job."No.", Job.Description)),
               ValueNotFoundErr);
     end;
 
@@ -1347,7 +1344,7 @@ codeunit 136311 "Job Reports II"
     end;
 
     local procedure VerifyJobTransactionDetaisReportTotals(Job: array[2] of Record "Job"; JobTask: array[2, 2] of Record "Job Task"; LineCost: array[2, 2, 2] of Decimal; LinePrice: array[2, 2, 2] of Decimal; LineAmount: array[2, 2, 2] of Decimal; LineDiscountAmount: array[2, 2, 2] of Decimal; CurrencyOption: Option);
-    VAR
+    var
         JobToReport: Record "Job";
         JobCalculateBatches: Codeunit "Job Calculate Batches";
         TotalCostColumnNo: Integer;
@@ -1386,7 +1383,7 @@ codeunit 136311 "Job Reports II"
             JobTotalPrice := 0;
             JobTotalLineAmount := 0;
             JobTotalLineDiscountAmount := 0;
-            for JobTaskIndex := 1 TO ArrayLen(JobTask, 2) do begin
+            for JobTaskIndex := 1 to ArrayLen(JobTask, 2) do begin
                 JobTaskTotalCost := 0;
                 JobTaskTotalPrice := 0;
                 JobTaskTotalLineAmount := 0;

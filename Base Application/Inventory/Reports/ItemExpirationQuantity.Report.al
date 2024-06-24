@@ -191,8 +191,10 @@ report 5809 "Item Expiration - Quantity"
         i: Integer;
         TotalInvtQty: Decimal;
 
+#pragma warning disable AA0074
         Text002: Label 'Enter the ending date.';
         Text003: Label 'The minimum permitted value is 1D.';
+#pragma warning restore AA0074
 
     procedure InitializeRequest(NewPeriodStartDate: Date; NewPeriodLength: DateFormula)
     begin

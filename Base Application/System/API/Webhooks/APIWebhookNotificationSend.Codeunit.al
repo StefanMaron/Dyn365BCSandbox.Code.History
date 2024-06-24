@@ -25,8 +25,11 @@ codeunit 6154 "API Webhook Notification Send"
 
     trigger OnRun()
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
         APIWebhookSubscription: Record "API Webhook Subscription";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         APIWebhookNotification: Record "API Webhook Notification";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         APIWebhookNotificationAggr: Record "API Webhook Notification Aggr";
     begin
         if not IsApiSubscriptionEnabled() then begin
@@ -968,11 +971,13 @@ codeunit 6154 "API Webhook Notification Send"
     local procedure DeleteObsoleteNotifications(var DeletedSubscriptionList: List of [Text[150]])
     var
         APIWebhookNotification: Record "API Webhook Notification";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        APIWebhookNotification2: Record "API Webhook Notification";
         SubscriptionId: Text[150];
     begin
         Session.LogMessage('0000EFP', StrSubstNo(DeleteNotificationsForDeletedSubscriptionsMsg, DeletedSubscriptionList.Count()), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', APIWebhookCategoryLbl);
 
-        if not APIWebhookNotification.WritePermission() then begin
+        if not APIWebhookNotification2.WritePermission() then begin
             Session.LogMessage('0000EFQ', NoPermissionsTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', APIWebhookCategoryLbl);
             exit;
         end;
@@ -987,11 +992,13 @@ codeunit 6154 "API Webhook Notification Send"
     local procedure DeleteObsoleteAggregateNotifications(var DeletedSubscriptionList: List of [Text[150]])
     var
         APIWebhookNotificationAggr: Record "API Webhook Notification Aggr";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        APIWebhookNotificationAggr2: Record "API Webhook Notification Aggr";
         SubscriptionId: Text[150];
     begin
         Session.LogMessage('0000EFR', StrSubstNo(DeleteAggrNotificationsForDeletedSubscriptionsMsg, DeletedSubscriptionList.Count()), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', APIWebhookCategoryLbl);
 
-        if not APIWebhookNotificationAggr.WritePermission() then begin
+        if not APIWebhookNotificationAggr2.WritePermission() then begin
             Session.LogMessage('0000EFS', NoPermissionsTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', APIWebhookCategoryLbl);
             exit;
         end;
@@ -1212,11 +1219,11 @@ codeunit 6154 "API Webhook Notification Send"
     var
         CDSConnectionSetup: Record "CDS Connection Setup";
         CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
-        Token: Text;
+        Token: SecretText;
     begin
         if CDSConnectionSetup.Get() then
             CDSIntegrationImpl.GetBusinessEventAccessToken(CDSConnectionSetup."Server Address", false, Token);
-        HttpWebRequestMgt.AddHeader('Authorization', 'Bearer ' + Token);
+        HttpWebRequestMgt.AddHeader('Authorization', 'Bearer ' + Token.Unwrap());
     end;
 
     local procedure GetMaskedUrl(Url: Text): Text
