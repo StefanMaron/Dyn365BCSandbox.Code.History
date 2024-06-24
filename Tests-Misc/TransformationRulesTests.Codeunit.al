@@ -65,12 +65,11 @@ codeunit 134274 "Transformation Rules Tests"
         InputText := TitleCaseJohnRobertsTxt;
         ResultText := TransformationRule.TransformText(InputText);
 
-        for Index := 1 to StrLen(InputText) do begin
+        for Index := 1 to StrLen(InputText) do
             if true in [Index = 1, InputText[Index - 1] = ' '] then
                 Assert.IsFalse(ResultText[Index] in ['a' .. 'z'], Format(ResultText[Index]))
             else
                 Assert.IsFalse(ResultText[Index] in ['A' .. 'Z'], Format(ResultText[Index]))
-        end;
     end;
 
     [Test]
@@ -388,7 +387,7 @@ codeunit 134274 "Transformation Rules Tests"
         ResultText := TransformationRule.TransformText(InputText);
 
         j := 1;
-        for i := 1 to StrLen(ResultText) do begin
+        for i := 1 to StrLen(ResultText) do
             if ResultText[i] <> InputText[j] then begin
                 for k := 1 to StrLen(TransformationRule."Find Value") do begin
                     Assert.AreEqual(Format(TransformationRule."Find Value"[k]), Format(InputText[j]), '');
@@ -401,7 +400,6 @@ codeunit 134274 "Transformation Rules Tests"
                 end
             end else
                 j += 1;
-        end;
     end;
 
     [Test]

@@ -6,14 +6,14 @@ using Microsoft.Inventory.Item;
 using Microsoft.Service.Comment;
 using Microsoft.Service.Contract;
 using Microsoft.Service.Document;
-using Microsoft.Integration.FieldService;
 using Microsoft.Service.History;
 using Microsoft.Service.Ledger;
 using Microsoft.Service.Maintenance;
 using Microsoft.Service.Reports;
 using Microsoft.Service.Resources;
+#if not CLEAN25
 using Microsoft.Integration.Dataverse;
-using Microsoft.Integration.SyncEngine;
+#endif
 using System.Text;
 
 page 5981 "Service Item List"
@@ -64,6 +64,12 @@ page 5981 "Service Item List"
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the number of the customer who owns this item.';
+                }
+                field("Customer Name"; Rec.Name)
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the name of the customer who owns this item.';
+                    Visible = false;
                 }
                 field("Ship-to Code"; Rec."Ship-to Code")
                 {
@@ -143,20 +149,37 @@ page 5981 "Service Item List"
                     ToolTip = 'Specifies that the service item is blocked from being used in service contracts or used and posted in transactions via service documents, except credit memos.';
                     Visible = false;
                 }
+#if not CLEAN25
                 field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies that the service item is coupled to an entity in Dynamics 365 Field Service.';
-                    Visible = FSIntegrationEnabled;
+                    Visible = false;
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
                 }
+#endif
             }
         }
         area(factboxes)
         {
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Service Item"),
+                              "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = Service;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Service Item"),
                               "No." = field("No.");
             }
@@ -418,17 +441,24 @@ page 5981 "Service Item List"
                     ToolTip = 'View all the ledger entries for the service item or service order that result from posting transactions in service documents that contain warranty agreements.';
                 }
             }
+#if not CLEAN25
             group(ActionGroupFS)
             {
                 Caption = 'Dynamics 365 Field Service';
-                Visible = FSIntegrationEnabled;
-                Enabled = (BlockedFilterApplied and (Rec.Blocked = Rec.Blocked::" ")) or not BlockedFilterApplied;
+                Visible = false;
+                ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '25.0';
+
                 action(CRMGoToProduct)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Customer Asset';
                     Image = CoupledItem;
                     ToolTip = 'Open the coupled Dynamics 365 Field Service customer asset.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
 
                     trigger OnAction()
                     var
@@ -444,6 +474,9 @@ page 5981 "Service Item List"
                     Caption = 'Synchronize';
                     Image = Refresh;
                     ToolTip = 'Send updated data to Dynamics 365 Field Service.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
 
                     trigger OnAction()
                     var
@@ -457,6 +490,10 @@ page 5981 "Service Item List"
                     Caption = 'Coupling', Comment = 'Coupling is a noun';
                     Image = LinkAccount;
                     ToolTip = 'Create, change, or delete a coupling between the Business Central record and a Dynamics 365 Field Service record.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
+
                     action(ManageCRMCoupling)
                     {
                         AccessByPermission = TableData "CRM Integration Record" = IM;
@@ -464,6 +501,9 @@ page 5981 "Service Item List"
                         Caption = 'Set Up Coupling';
                         Image = LinkAccount;
                         ToolTip = 'Create or modify the coupling to a Dynamics 365 Field Service product.';
+                        ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '25.0';
 
                         trigger OnAction()
                         var
@@ -479,6 +519,9 @@ page 5981 "Service Item List"
                         Caption = 'Match-Based Coupling';
                         Image = CoupledItem;
                         ToolTip = 'Couple resources to products in Dynamics 365 Sales based on matching criteria.';
+                        ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '25.0';
 
                         trigger OnAction()
                         var
@@ -496,9 +539,12 @@ page 5981 "Service Item List"
                         AccessByPermission = TableData "CRM Integration Record" = D;
                         ApplicationArea = Suite;
                         Caption = 'Delete Coupling';
-                        Enabled = CRMIsCoupledToRecord;
+                        Enabled = false;
                         Image = UnLinkAccount;
                         ToolTip = 'Delete the coupling to a Dynamics 365 Field Service product.';
+                        ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '25.0';
 
                         trigger OnAction()
                         var
@@ -514,6 +560,9 @@ page 5981 "Service Item List"
                     Caption = 'Synchronization Log';
                     Image = Log;
                     ToolTip = 'View integration synchronization jobs for the resource table.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
 
                     trigger OnAction()
                     var
@@ -523,6 +572,7 @@ page 5981 "Service Item List"
                     end;
                 }
             }
+#endif
         }
         area(processing)
         {
@@ -582,16 +632,6 @@ page 5981 "Service Item List"
             group(Category_New)
             {
                 Caption = 'New';
-
-#if not CLEAN22
-                actionref("New Item_Promoted"; "New Item")
-                {
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action is being demoted based on overall low usage.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
             }
             group(Category_Process)
             {
@@ -658,31 +698,9 @@ page 5981 "Service Item List"
         }
     }
 
-    trigger OnOpenPage()
-    var
-        IntegrationTableMapping: Record "Integration Table Mapping";
-        FSConnectionSetup: Record "FS Connection Setup";
-    begin
-        if CRMIntegrationManagement.IsCRMIntegrationEnabled() then
-            FSIntegrationEnabled := FSConnectionSetup.IsEnabled();
-
-        if FSIntegrationEnabled then begin
-            IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
-            IntegrationTableMapping.SetRange("Delete After Synchronization", false);
-            IntegrationTableMapping.SetRange("Table ID", Database::"Service Item");
-            IntegrationTableMapping.SetRange("Integration Table ID", Database::"FS Customer Asset");
-            if IntegrationTableMapping.FindFirst() then
-                BlockedFilterApplied := IntegrationTableMapping.GetTableFilter().Contains('Field40=1(0)');
-        end;
-    end;
-
     var
         ResourceSkill: Record "Resource Skill";
-        CRMIntegrationManagement: Codeunit "CRM Integration Management";
         SkilledResourceList: Page "Skilled Resource List";
-        FSIntegrationEnabled: Boolean;
-        CRMIsCoupledToRecord: Boolean;
-        BlockedFilterApplied: Boolean;
 
     procedure SelectServiceItemsForServiceContract(ServiceContractHeader: Record "Service Contract Header"; ServiceContractLine: Record "Service Contract Line"): Text
     var
@@ -709,10 +727,10 @@ page 5981 "Service Item List"
     procedure GetSelectionFilter(): Text
     var
         ServiceItem: Record "Service Item";
-        SelectionFilterManagement: Codeunit SelectionFilterManagement;
+        ServSelectionFilterMgt: Codeunit "Serv. Selection Filter Mgt.";
     begin
         CurrPage.SetSelectionFilter(ServiceItem);
-        exit(SelectionFilterManagement.GetSelectionFilterForServiceItem(ServiceItem));
+        exit(ServSelectionFilterMgt.GetSelectionFilterForServiceItem(ServiceItem));
     end;
 
     [IntegrationEvent(false, false)]

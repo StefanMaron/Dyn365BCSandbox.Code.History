@@ -23,6 +23,7 @@ codeunit 136350 "UT T Job"
         RollingBackChangesErr: Label 'Rolling back changes...';
         LibraryERM: Codeunit "Library - ERM";
         LibrarySales: Codeunit "Library - Sales";
+        LibraryPurchase: Codeunit "Library - Purchase";
         LibraryJob: Codeunit "Library - Job";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryDimension: Codeunit "Library - Dimension";
@@ -172,18 +173,14 @@ codeunit 136350 "UT T Job"
         Job.Validate("WIP Method", JobWIPMethod.Code);
         JobTask.FindFirst();
         Assert.AreEqual(JobWIPMethod.Code, JobTask."WIP Method", 'The WIP Method set on the Job is not propagated to the Job Task Line.');
-
-        with Job do begin
-            // Validate that Job WIP Method without "WIP Sales" can't be set when WIP Posting Method is Per Job Ledger Entry.
-            CreateJobWIPMethod(JobWIPMethod, false, true);
-            Validate("WIP Posting Method", "WIP Posting Method"::"Per Job Ledger Entry");
-            asserterror Validate("WIP Method", JobWIPMethod.Code);
-
-            // Validate that Job WIP Method without "WIP Costs" can't be set when WIP Posting Method is Per Job Ledger Entry.
-            CreateJobWIPMethod(JobWIPMethod, true, false);
-            Validate("WIP Posting Method", "WIP Posting Method"::"Per Job Ledger Entry");
-            asserterror Validate("WIP Method", JobWIPMethod.Code);
-        end;
+        // Validate that Job WIP Method without "WIP Sales" can't be set when WIP Posting Method is Per Job Ledger Entry.
+        CreateJobWIPMethod(JobWIPMethod, false, true);
+        Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job Ledger Entry");
+        asserterror Job.Validate("WIP Method", JobWIPMethod.Code);
+        // Validate that Job WIP Method without "WIP Costs" can't be set when WIP Posting Method is Per Job Ledger Entry.
+        CreateJobWIPMethod(JobWIPMethod, true, false);
+        Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job Ledger Entry");
+        asserterror Job.Validate("WIP Method", JobWIPMethod.Code);
 
         TearDown();
     end;
@@ -198,43 +195,38 @@ codeunit 136350 "UT T Job"
     begin
         Initialize();
         SetUp(true);
+        // Validate that WIP Posting Method can't be changed back to Per Job, once entries have been posted with Per Job Ledger Entry.
+        Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job Ledger Entry");
+        JobLedgerEntry.Init();
+        JobLedgerEntry."Job No." := Job."No.";
+        JobLedgerEntry."Amt. Posted to G/L" := LibraryRandom.RandInt(1000);
+        JobLedgerEntry.Insert();
+        asserterror Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job");
+        // Validate that WIP Posting Method can't be changed, if Job WIP Entries exist.
+        Clear(JobWIPEntry);
+        JobWIPEntry.Init();
+        if JobWIPEntry.FindLast() then
+            JobWIPEntry."Entry No." += 1
+        else
+            JobWIPEntry."Entry No." := 1;
+        JobWIPEntry."Job No." := Job."No.";
+        JobWIPEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
+        JobWIPEntry.Insert();
+        asserterror Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job Ledger Entry");
+        // Validate that the Job WIP Method has WIP Sales and WIP Costs enabled, when WIP Posting Method is set to Per Job Ledger Entry.
+        Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job");
+        CreateJobWIPMethod(JobWIPMethod, false, true);
+        Job.Validate("WIP Method", JobWIPMethod.Code);
+        asserterror Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job Ledger Entry");
 
-        with Job do begin
-            // Validate that WIP Posting Method can't be changed back to Per Job, once entries have been posted with Per Job Ledger Entry.
-            Validate("WIP Posting Method", "WIP Posting Method"::"Per Job Ledger Entry");
-            JobLedgerEntry.Init();
-            JobLedgerEntry."Job No." := "No.";
-            JobLedgerEntry."Amt. Posted to G/L" := LibraryRandom.RandInt(1000);
-            JobLedgerEntry.Insert();
-            asserterror Validate("WIP Posting Method", "WIP Posting Method"::"Per Job");
+        CreateJobWIPMethod(JobWIPMethod, true, false);
+        Job.Validate("WIP Method", JobWIPMethod.Code);
+        asserterror Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job Ledger Entry");
 
-            // Validate that WIP Posting Method can't be changed, if Job WIP Entries exist.
-            Clear(JobWIPEntry);
-            JobWIPEntry.Init();
-            if JobWIPEntry.FindLast() then
-                JobWIPEntry."Entry No." += 1
-            else
-                JobWIPEntry."Entry No." := 1;
-            JobWIPEntry."Job No." := "No.";
-            JobWIPEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
-            JobWIPEntry.Insert();
-            asserterror Validate("WIP Posting Method", "WIP Posting Method"::"Per Job Ledger Entry");
-
-            // Validate that the Job WIP Method has WIP Sales and WIP Costs enabled, when WIP Posting Method is set to Per Job Ledger Entry.
-            Validate("WIP Posting Method", "WIP Posting Method"::"Per Job");
-            CreateJobWIPMethod(JobWIPMethod, false, true);
-            Validate("WIP Method", JobWIPMethod.Code);
-            asserterror Validate("WIP Posting Method", "WIP Posting Method"::"Per Job Ledger Entry");
-
-            CreateJobWIPMethod(JobWIPMethod, true, false);
-            Validate("WIP Method", JobWIPMethod.Code);
-            asserterror Validate("WIP Posting Method", "WIP Posting Method"::"Per Job Ledger Entry");
-
-            CreateJobWIPMethod(JobWIPMethod, true, true);
-            Validate("WIP Method", JobWIPMethod.Code);
-            Validate("WIP Posting Method", "WIP Posting Method"::"Per Job Ledger Entry");
-            Assert.AreEqual("WIP Posting Method"::"Per Job Ledger Entry", "WIP Posting Method", 'WIP Posting Method could not be set.');
-        end;
+        CreateJobWIPMethod(JobWIPMethod, true, true);
+        Job.Validate("WIP Method", JobWIPMethod.Code);
+        Job.Validate("WIP Posting Method", Job."WIP Posting Method"::"Per Job Ledger Entry");
+        Assert.AreEqual(Job."WIP Posting Method"::"Per Job Ledger Entry", Job."WIP Posting Method", 'WIP Posting Method could not be set.');
 
         TearDown();
     end;
@@ -248,87 +240,84 @@ codeunit 136350 "UT T Job"
     begin
         Initialize();
         SetUp(true);
-
         // Verify that CalcAccWIPCostsAmount(), CalcAccWIPSalesAmount, CalcRecognizedProfitAmount, CalcRecognizedProfitPercentage,
         // CalcRecognizedProfitGLAmount and CalcRecognProfitGLPercentage calculate the correct amount.
-        with Job do begin
-            Clear(JobWIPEntry);
-            JobWIPEntry.Init();
-            if JobWIPEntry.FindLast() then
-                JobWIPEntry."Entry No." += 1
-            else
-                JobWIPEntry."Entry No." := 1;
-            JobWIPEntry."Job No." := "No.";
-            JobWIPEntry.Type := JobWIPEntry.Type::"Recognized Costs";
-            JobWIPEntry.Reverse := false;
-            JobWIPEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
-            JobWIPEntry.Insert();
+        Clear(JobWIPEntry);
+        JobWIPEntry.Init();
+        if JobWIPEntry.FindLast() then
+            JobWIPEntry."Entry No." += 1
+        else
+            JobWIPEntry."Entry No." := 1;
+        JobWIPEntry."Job No." := Job."No.";
+        JobWIPEntry.Type := JobWIPEntry.Type::"Recognized Costs";
+        JobWIPEntry.Reverse := false;
+        JobWIPEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
+        JobWIPEntry.Insert();
 
-            Clear(JobWIPEntry);
-            JobWIPEntry.Init();
-            if JobWIPEntry.FindLast() then
-                JobWIPEntry."Entry No." += 1
-            else
-                JobWIPEntry."Entry No." := 1;
-            JobWIPEntry."Job No." := "No.";
-            JobWIPEntry.Type := JobWIPEntry.Type::"Recognized Sales";
-            JobWIPEntry.Reverse := false;
-            JobWIPEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
-            JobWIPEntry.Insert();
+        Clear(JobWIPEntry);
+        JobWIPEntry.Init();
+        if JobWIPEntry.FindLast() then
+            JobWIPEntry."Entry No." += 1
+        else
+            JobWIPEntry."Entry No." := 1;
+        JobWIPEntry."Job No." := Job."No.";
+        JobWIPEntry.Type := JobWIPEntry.Type::"Recognized Sales";
+        JobWIPEntry.Reverse := false;
+        JobWIPEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
+        JobWIPEntry.Insert();
 
-            Clear(JobWIPGLEntry);
-            if JobWIPGLEntry.FindLast() then
-                JobWIPGLEntry."Entry No." += 1
-            else
-                JobWIPGLEntry."Entry No." := 1;
-            JobWIPGLEntry.Init();
-            JobWIPGLEntry."Job No." := "No.";
-            JobWIPGLEntry.Type := JobWIPGLEntry.Type::"Recognized Costs";
-            JobWIPGLEntry.Reverse := false;
-            JobWIPGLEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
-            JobWIPGLEntry.Insert();
+        Clear(JobWIPGLEntry);
+        if JobWIPGLEntry.FindLast() then
+            JobWIPGLEntry."Entry No." += 1
+        else
+            JobWIPGLEntry."Entry No." := 1;
+        JobWIPGLEntry.Init();
+        JobWIPGLEntry."Job No." := Job."No.";
+        JobWIPGLEntry.Type := JobWIPGLEntry.Type::"Recognized Costs";
+        JobWIPGLEntry.Reverse := false;
+        JobWIPGLEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
+        JobWIPGLEntry.Insert();
 
-            Clear(JobWIPGLEntry);
-            JobWIPGLEntry.Init();
-            if JobWIPGLEntry.FindLast() then
-                JobWIPGLEntry."Entry No." += 1
-            else
-                JobWIPGLEntry."Entry No." := 1;
-            JobWIPGLEntry."Job No." := "No.";
-            JobWIPGLEntry.Type := JobWIPGLEntry.Type::"Recognized Sales";
-            JobWIPGLEntry.Reverse := false;
-            JobWIPGLEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
-            JobWIPGLEntry.Insert();
+        Clear(JobWIPGLEntry);
+        JobWIPGLEntry.Init();
+        if JobWIPGLEntry.FindLast() then
+            JobWIPGLEntry."Entry No." += 1
+        else
+            JobWIPGLEntry."Entry No." := 1;
+        JobWIPGLEntry."Job No." := Job."No.";
+        JobWIPGLEntry.Type := JobWIPGLEntry.Type::"Recognized Sales";
+        JobWIPGLEntry.Reverse := false;
+        JobWIPGLEntry."WIP Entry Amount" := LibraryRandom.RandInt(1000);
+        JobWIPGLEntry.Insert();
 
-            JobTask."Recognized Sales Amount" := LibraryRandom.RandInt(1000);
-            JobTask."Recognized Costs Amount" := LibraryRandom.RandInt(1000);
-            JobTask."Recognized Sales G/L Amount" := LibraryRandom.RandInt(1000);
-            JobTask."Recognized Costs G/L Amount" := LibraryRandom.RandInt(1000);
-            JobTask.Modify();
+        JobTask."Recognized Sales Amount" := LibraryRandom.RandInt(1000);
+        JobTask."Recognized Costs Amount" := LibraryRandom.RandInt(1000);
+        JobTask."Recognized Sales G/L Amount" := LibraryRandom.RandInt(1000);
+        JobTask."Recognized Costs G/L Amount" := LibraryRandom.RandInt(1000);
+        JobTask.Modify();
 
-            CalcFields("Calc. Recog. Sales Amount", "Calc. Recog. Costs Amount",
-              "Calc. Recog. Sales G/L Amount", "Calc. Recog. Costs G/L Amount",
-              "Total WIP Cost Amount", "Total WIP Sales Amount",
-              "Applied Costs G/L Amount", "Applied Sales G/L Amount");
+        Job.CalcFields("Calc. Recog. Sales Amount", "Calc. Recog. Costs Amount",
+          "Calc. Recog. Sales G/L Amount", "Calc. Recog. Costs G/L Amount",
+          "Total WIP Cost Amount", "Total WIP Sales Amount",
+          "Applied Costs G/L Amount", "Applied Sales G/L Amount");
 
-            Assert.AreEqual("Total WIP Cost Amount" + "Applied Costs G/L Amount", CalcAccWIPCostsAmount(),
-              'CalcAccWIPCostsAmount calculates the wrong amount.');
+        Assert.AreEqual(Job."Total WIP Cost Amount" + Job."Applied Costs G/L Amount", Job.CalcAccWIPCostsAmount(),
+          'CalcAccWIPCostsAmount calculates the wrong amount.');
 
-            Assert.AreEqual("Total WIP Sales Amount" - "Applied Sales G/L Amount", CalcAccWIPSalesAmount(),
-              'CalcAccWIPSalesAmount calculates the wrong amount.');
+        Assert.AreEqual(Job."Total WIP Sales Amount" - Job."Applied Sales G/L Amount", Job.CalcAccWIPSalesAmount(),
+          'CalcAccWIPSalesAmount calculates the wrong amount.');
 
-            Assert.AreEqual("Calc. Recog. Sales Amount" - "Calc. Recog. Costs Amount", CalcRecognizedProfitAmount(),
-              'CalcRecognizedProfitAmount calculates the wrong amount.');
+        Assert.AreEqual(Job."Calc. Recog. Sales Amount" - Job."Calc. Recog. Costs Amount", Job.CalcRecognizedProfitAmount(),
+          'CalcRecognizedProfitAmount calculates the wrong amount.');
 
-            Assert.AreEqual((("Calc. Recog. Sales Amount" - "Calc. Recog. Costs Amount") / "Calc. Recog. Sales Amount") * 100,
-              CalcRecognizedProfitPercentage(), 'CalcRecognizedProfitPercentage calculates the wrong amount.');
+        Assert.AreEqual(((Job."Calc. Recog. Sales Amount" - Job."Calc. Recog. Costs Amount") / Job."Calc. Recog. Sales Amount") * 100,
+          Job.CalcRecognizedProfitPercentage(), 'CalcRecognizedProfitPercentage calculates the wrong amount.');
 
-            Assert.AreEqual("Calc. Recog. Sales G/L Amount" - "Calc. Recog. Costs G/L Amount", CalcRecognizedProfitGLAmount(),
-              'CalcRecognizedProfitGLAmount calculates the wrong amount.');
+        Assert.AreEqual(Job."Calc. Recog. Sales G/L Amount" - Job."Calc. Recog. Costs G/L Amount", Job.CalcRecognizedProfitGLAmount(),
+          'CalcRecognizedProfitGLAmount calculates the wrong amount.');
 
-            Assert.AreEqual((("Calc. Recog. Sales G/L Amount" - "Calc. Recog. Costs G/L Amount") / "Calc. Recog. Sales G/L Amount") * 100,
-              CalcRecognProfitGLPercentage(), 'CalcRecognProfitGLPercentage calculates the wrong amount.');
-        end;
+        Assert.AreEqual(((Job."Calc. Recog. Sales G/L Amount" - Job."Calc. Recog. Costs G/L Amount") / Job."Calc. Recog. Sales G/L Amount") * 100,
+          Job.CalcRecognProfitGLPercentage(), 'CalcRecognProfitGLPercentage calculates the wrong amount.');
 
         TearDown();
     end;
@@ -1673,6 +1662,148 @@ codeunit 136350 "UT T Job"
         Assert.AreEqual(JobPlanningLine."Bin Code", Bins[2].Code, StrSubstNo(BinCodeNotMatchedErr, JobPlanningLine."Bin Code", Bins[2].Code));
     end;
 
+    [Test]
+    [HandlerFunctions('PurchOrderFromJobModalPageHandler')]
+    procedure CreatePurchaseOrderFromJob()
+    var
+        Vendor: Record Vendor;
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchaseOrder: TestPage "Purchase Order";
+        JobCard: TestPage "Job Card";
+    begin
+        // [SCENARIO 332770] Verify Purchase document is created from Job Card
+        Initialize();
+
+        // [GIVEN] Create Vendor
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Item
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Job with Job Task
+        CreateJobAndJobTask();
+
+        // [GIVEN] Create Job Planning Line
+        CreateJobPlanningLineWithItem(JobPlanningLine."Line Type"::"Both Budget and Billable", Item."No.", 1);
+
+        // [WHEN] Create Purchase Order from Job
+        LibraryVariableStorage.Enqueue(Vendor."No.");
+        PurchaseOrder.Trap();
+        JobCard.OpenEdit();
+        JobCard.GotoRecord(Job);
+        JobCard.CreatePurchaseOrder.Invoke();
+
+        // [GIVEN] Find Purchase document
+        FindPurchaseDocumentByItemNo(PurchaseHeader, PurchaseLine, Item."No.");
+
+        // [THEN] Verify results
+        PurchaseLine.TestField("Job No.", JobPlanningLine."Job No.");
+        PurchaseLine.TestField("Job Task No.", JobPlanningLine."Job Task No.");
+        PurchaseLine.TestField("Job Planning Line No.", JobPlanningLine."Line No.");
+    end;
+
+    [Test]
+    [HandlerFunctions('PurchOrderFromJobModalPageHandler')]
+    procedure PostJobUsageWithPurchaseOrderCreatedFromJob()
+    var
+        Vendor: Record Vendor;
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        JobLedgerEntry: Record "Job Ledger Entry";
+        PurchaseOrder: TestPage "Purchase Order";
+        JobCard: TestPage "Job Card";
+        DocumentNo: Code[20];
+    begin
+        // [SCENARIO 332770] Verify Job usage is posted with Purchase Order created from Job Card
+        Initialize();
+
+        // [GIVEN] Create Vendor
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Item
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Job with Job Task
+        CreateJobAndJobTask();
+
+        // [GIVEN] Create Job Planning Line
+        CreateJobPlanningLineWithItem(JobPlanningLine."Line Type"::"Both Budget and Billable", Item."No.", 1);
+
+        // [GIVEN] Create Purchase Order from Job
+        LibraryVariableStorage.Enqueue(Vendor."No.");
+        PurchaseOrder.Trap();
+        JobCard.OpenEdit();
+        JobCard.GotoRecord(Job);
+        JobCard.CreatePurchaseOrder.Invoke();
+
+        // [GIVEN] Find Purchase document
+        FindPurchaseDocumentByItemNo(PurchaseHeader, PurchaseLine, Item."No.");
+
+        // [GIVEN] Set Vendor Invoice No.
+        PurchaseHeader.Validate("Vendor Invoice No.", LibraryUtility.GenerateGUID());
+        PurchaseHeader.Modify(true);
+
+        // [WHEN] Post Purchase Order
+        DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [GIVEN] Find posted usage
+        FindJobLedgerEntry(JobLedgerEntry, DocumentNo);
+
+        // [THEN] Verify results
+        Assert.RecordIsNotEmpty(JobLedgerEntry);
+    end;
+
+    [Test]
+    [HandlerFunctions('PurchOrderFromJobModalPageHandler')]
+    procedure TestCreatePurchaseOrderFromJobForMultipleJobTasks()
+    var
+        Vendor: Record Vendor;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLines: array[2] of Record "Purchase Line";
+        Items: array[2] of Record Item;
+        JobTasks: array[2] of Record "Job Task";
+        PurchaseOrder: TestPage "Purchase Order";
+        JobCard: TestPage "Job Card";
+    begin
+        // [SCENARIO 332770] Verify Purchase document is created from Job Card for multiple Job Tasks
+        Initialize();
+
+        // [GIVEN] Create Vendor
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Item
+        LibraryInventory.CreateItem(Items[1]);
+        LibraryInventory.CreateItem(Items[2]);
+
+        // [GIVEN] Create Job with Job Tasks
+        LibraryJob.CreateJob(Job);
+        LibraryJob.CreateJobTask(Job, JobTasks[1]);
+        LibraryJob.CreateJobTask(Job, JobTasks[2]);
+
+        // [GIVEN] Create Job Planning Lines
+        CreateJobPlanningLineWithItem(JobTasks[1], JobPlanningLine."Line Type"::"Both Budget and Billable", Items[1]."No.", 5);
+        CreateJobPlanningLineWithItem(JobTasks[2], JobPlanningLine."Line Type"::"Both Budget and Billable", Items[2]."No.", 3);
+
+        // [WHEN] Create Purchase Order from Job
+        LibraryVariableStorage.Enqueue(Vendor."No.");
+        LibraryVariableStorage.Enqueue(Vendor."No.");
+        PurchaseOrder.Trap();
+        JobCard.OpenEdit();
+        JobCard.GotoRecord(Job);
+        JobCard.CreatePurchaseOrder.Invoke();
+
+        // [GIVEN] Find Purchase document lines
+        FindPurchaseDocumentByItemNo(PurchaseHeader, PurchaseLines[1], Items[1]."No.");
+        FindPurchaseDocumentByItemNo(PurchaseHeader, PurchaseLines[2], Items[2]."No.");
+
+        // [THEN] Verify results
+        PurchaseLines[1].TestField(Quantity, 5);
+        PurchaseLines[2].TestField(Quantity, 3);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -1690,6 +1821,47 @@ codeunit 136350 "UT T Job"
         IsInitialized := true;
         Commit();
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"UT T Job");
+    end;
+
+    local procedure CreateJobAndJobTask()
+    begin
+        LibraryJob.CreateJob(Job);
+        LibraryJob.CreateJobTask(Job, JobTask);
+    end;
+
+    local procedure CreateJobPlanningLineWithItem(LineType: Enum "Job Planning Line Line Type"; ItemNo: Code[20]; Quantity: Decimal)
+    begin
+        LibraryJob.CreateJobPlanningLine(LineType, JobPlanningLine.Type::Item, JobTask, JobPlanningLine);
+        JobPlanningLine.Validate("No.", ItemNo);
+        JobPlanningLine.Validate(Quantity, Quantity);
+        JobPlanningLine.Modify(true);
+    end;
+
+    local procedure CreateJobPlanningLineWithItem(JobTask: Record "Job Task"; LineType: Enum "Job Planning Line Line Type"; ItemNo: Code[20]; Quantity: Decimal)
+    begin
+        LibraryJob.CreateJobPlanningLine(LineType, JobPlanningLine.Type::Item, JobTask, JobPlanningLine);
+        JobPlanningLine.Validate("No.", ItemNo);
+        JobPlanningLine.Validate(Quantity, Quantity);
+        JobPlanningLine.Modify(true);
+    end;
+
+    local procedure FindPurchaseDocumentByItemNo(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; ItemNo: Code[20])
+    begin
+        PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+        PurchaseLine.SetRange("No.", ItemNo);
+        PurchaseLine.FindFirst();
+        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
+    end;
+
+    local procedure FindJobLedgerEntry(var JobLedgerEntry: Record "Job Ledger Entry"; DocumentNo: Code[20])
+    begin
+        JobLedgerEntry.SetRange("Entry Type", JobLedgerEntry."Entry Type"::Usage);
+        JobLedgerEntry.SetRange("Document No.", DocumentNo);
+        JobLedgerEntry.SetRange("Job No.", Job."No.");
+        JobLedgerEntry.SetRange("Job Task No.", JobTask."Job Task No.");
+        JobLedgerEntry.SetRange(Type, JobLedgerEntry.Type::Item);
+        JobLedgerEntry.SetRange("No.", JobPlanningLine."No.");
+        JobLedgerEntry.FindFirst();
     end;
 
     local procedure SetUp(ApplyUsageLink: Boolean)
@@ -1782,16 +1954,14 @@ codeunit 136350 "UT T Job"
     var
         RecRef: RecordRef;
     begin
-        with ReservEntry do begin
-            Init();
-            RecRef.GetTable(ReservEntry);
-            "Entry No." := LibraryUtility.GetNewLineNo(RecRef, FieldNo("Entry No."));
-            "Source Type" := TableID;
-            "Source Subtype" := LibraryRandom.RandInt(5);
-            "Source ID" := SourceID;
-            "Source Ref. No." := LibraryRandom.RandInt(100);
-            Insert();
-        end;
+        ReservEntry.Init();
+        RecRef.GetTable(ReservEntry);
+        ReservEntry."Entry No." := LibraryUtility.GetNewLineNo(RecRef, ReservEntry.FieldNo("Entry No."));
+        ReservEntry."Source Type" := TableID;
+        ReservEntry."Source Subtype" := LibraryRandom.RandInt(5);
+        ReservEntry."Source ID" := SourceID;
+        ReservEntry."Source Ref. No." := LibraryRandom.RandInt(100);
+        ReservEntry.Insert();
     end;
 
     local procedure CreateJob(var Job: Record Job)
@@ -1805,36 +1975,30 @@ codeunit 136350 "UT T Job"
     var
         TimeSheetHeader: Record "Time Sheet Header";
     begin
-        with TimeSheetHeader do begin
-            Init();
-            "No." := LibraryUtility.GenerateGUID();
-            "Owner User ID" := UserId;
-            "Starting Date" := WorkDate();
-            "Ending Date" := WorkDate() + 7;
-            Insert();
-        end;
+        TimeSheetHeader.Init();
+        TimeSheetHeader."No." := LibraryUtility.GenerateGUID();
+        TimeSheetHeader."Owner User ID" := UserId;
+        TimeSheetHeader."Starting Date" := WorkDate();
+        TimeSheetHeader."Ending Date" := WorkDate() + 7;
+        TimeSheetHeader.Insert();
 
-        with TimeSheetLine do begin
-            Init();
-            "Time Sheet No." := TimeSheetHeader."No.";
-            "Line No." := 10000;
-            Type := Type::Job;
-            "Job No." := Job."No.";
-            Status := Status::Open;
-            Insert();
-        end;
+        TimeSheetLine.Init();
+        TimeSheetLine."Time Sheet No." := TimeSheetHeader."No.";
+        TimeSheetLine."Line No." := 10000;
+        TimeSheetLine.Type := TimeSheetLine.Type::Job;
+        TimeSheetLine."Job No." := Job."No.";
+        TimeSheetLine.Status := TimeSheetLine.Status::Open;
+        TimeSheetLine.Insert();
     end;
 
     local procedure MockUser(): Code[50]
     var
         UserSetup: Record "User Setup";
     begin
-        with UserSetup do begin
-            Init();
-            Validate("User ID", LibraryUtility.GenerateGUID());
-            Insert(true);
-            exit("User ID");
-        end;
+        UserSetup.Init();
+        UserSetup.Validate("User ID", LibraryUtility.GenerateGUID());
+        UserSetup.Insert(true);
+        exit(UserSetup."User ID");
     end;
 
     local procedure ValidateJobProjectManagerWithPage(Job: Record Job; ProjectManager: Code[50])
@@ -1869,14 +2033,12 @@ codeunit 136350 "UT T Job"
     var
         JobLedgEntry: Record "Job Ledger Entry";
     begin
-        with JobLedgEntry do begin
-            Init();
-            "Entry No." :=
-              LibraryUtility.GetNewRecNo(JobLedgEntry, FieldNo("Entry No."));
-            Validate("Job No.", JobNo);
-            "Total Cost (LCY)" := UsageCost;
-            Insert();
-        end;
+        JobLedgEntry.Init();
+        JobLedgEntry."Entry No." :=
+          LibraryUtility.GetNewRecNo(JobLedgEntry, JobLedgEntry.FieldNo("Entry No."));
+        JobLedgEntry.Validate("Job No.", JobNo);
+        JobLedgEntry."Total Cost (LCY)" := UsageCost;
+        JobLedgEntry.Insert();
     end;
 
     local procedure GetRandomSetOfDecimalsWithDelta(var FirstDecimal: Decimal; var SecondDecimal: Decimal; var ThirdDecimal: Decimal; Delta: Decimal)
@@ -1994,6 +2156,16 @@ codeunit 136350 "UT T Job"
     begin
         CustomerLookup.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
         CustomerLookup.OK().Invoke();
+    end;
+
+
+    [ModalPageHandler]
+    procedure PurchOrderFromJobModalPageHandler(var PurchOrderFromSalesOrder: TestPage "Purch. Order From Sales Order")
+    begin
+        PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
+        if PurchOrderFromSalesOrder.Next() then
+            PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
+        PurchOrderFromSalesOrder.OK().Invoke();
     end;
 
     [MessageHandler]

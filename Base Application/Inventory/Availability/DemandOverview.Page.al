@@ -4,21 +4,14 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Availability;
 
-using Microsoft.Assembly.Document;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
-using Microsoft.Inventory.Transfer;
-using Microsoft.Manufacturing.Document;
-using Microsoft.Projects.Project.Job;
-using Microsoft.Projects.Project.Planning;
-using Microsoft.Purchases.Document;
-using Microsoft.Sales.Document;
-using Microsoft.Service.Document;
+using Microsoft.Inventory.Requisition;
 
 page 5830 "Demand Overview"
 {
-    AccessByPermission = TableData "Service Header" = R;
+    AccessByPermission = TableData Item = R;
     AdditionalSearchTerms = 'supply planning,availability overview';
     ApplicationArea = Planning;
     Caption = 'Demand Overview';
@@ -65,13 +58,12 @@ page 5830 "Demand Overview"
                 {
                     ApplicationArea = Planning;
                     Caption = 'Demand Type';
-                    OptionCaption = ' All Demand,Sale,Production,Project,Service,Assembly';
                     ToolTip = 'Specifies a list of the types of orders for which you can calculate demand. Select one order type from the list:';
 
                     trigger OnValidate()
                     begin
                         IsCalculated := false;
-                        DemandNoCtrlEnable := DemandType <> DemandType::" ";
+                        DemandNoCtrlEnable := DemandType <> DemandType::"All Demands";
                     end;
                 }
                 field(DemandNoCtrl; DemandNo)
@@ -83,85 +75,14 @@ page 5830 "Demand Overview"
 
                     trigger OnLookup(var Text: Text) Result: Boolean
                     var
-                        SalesHeader: Record "Sales Header";
-                        ProdOrder: Record "Production Order";
-                        Job: Record Job;
-                        ServHeader: Record "Service Header";
-                        AsmHeader: Record "Assembly Header";
-                        SalesList: Page "Sales List";
-                        ProdOrderList: Page "Production Order List";
-                        JobList: Page "Job List";
-                        ServiceOrders: Page "Service Orders";
-                        AsmOrders: Page "Assembly Orders";
                         IsHandled: Boolean;
                     begin
                         IsHandled := false;
-                        OnBeforeLookupDemandNo(Rec, DemandType, Result, IsHandled, Text);
+                        OnBeforeLookupDemandNo(Rec, DemandType.AsInteger(), Result, IsHandled, Text);
                         if IsHandled then
                             exit(Result);
 
-                        case DemandType of
-                            DemandType::Sales:
-                                begin
-                                    SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
-                                    SalesList.SetTableView(SalesHeader);
-                                    SalesList.LookupMode := true;
-                                    if SalesList.RunModal() = ACTION::LookupOK then begin
-                                        SalesList.GetRecord(SalesHeader);
-                                        Text := SalesHeader."No.";
-                                        exit(true);
-                                    end;
-                                    exit(false);
-                                end;
-                            DemandType::Production:
-                                begin
-                                    ProdOrder.SetRange(Status, ProdOrder.Status::Planned, ProdOrder.Status::Released);
-                                    ProdOrderList.SetTableView(ProdOrder);
-                                    ProdOrderList.LookupMode := true;
-                                    if ProdOrderList.RunModal() = ACTION::LookupOK then begin
-                                        ProdOrderList.GetRecord(ProdOrder);
-                                        Text := ProdOrder."No.";
-                                        exit(true);
-                                    end;
-                                    exit(false);
-                                end;
-                            DemandType::Services:
-                                begin
-                                    ServHeader.SetRange("Document Type", ServHeader."Document Type"::Order);
-                                    ServiceOrders.SetTableView(ServHeader);
-                                    ServiceOrders.LookupMode := true;
-                                    if ServiceOrders.RunModal() = ACTION::LookupOK then begin
-                                        ServiceOrders.GetRecord(ServHeader);
-                                        Text := ServHeader."No.";
-                                        exit(true);
-                                    end;
-                                    exit(false);
-                                end;
-                            DemandType::Jobs:
-                                begin
-                                    Job.SetRange(Status, Job.Status::Open);
-                                    JobList.SetTableView(Job);
-                                    JobList.LookupMode := true;
-                                    if JobList.RunModal() = ACTION::LookupOK then begin
-                                        JobList.GetRecord(Job);
-                                        Text := Job."No.";
-                                        exit(true);
-                                    end;
-                                    exit(false);
-                                end;
-                            DemandType::Assembly:
-                                begin
-                                    AsmHeader.SetRange("Document Type", AsmHeader."Document Type"::Order);
-                                    AsmOrders.SetTableView(AsmHeader);
-                                    AsmOrders.LookupMode := true;
-                                    if AsmOrders.RunModal() = ACTION::LookupOK then begin
-                                        AsmOrders.GetRecord(AsmHeader);
-                                        Text := AsmHeader."No.";
-                                        exit(true);
-                                    end;
-                                    exit(false);
-                                end;
-                        end;
+                        OnLookupDemandNo(Rec, DemandType, Result, Text);
                     end;
 
                     trigger OnValidate()
@@ -489,7 +410,7 @@ page 5830 "Demand Overview"
         Rec.SetRange("Matches Criteria");
         if MatchCriteria then
             Rec.SetRange("Matches Criteria", true);
-        DemandNoCtrlEnable := DemandType <> DemandType::" ";
+        DemandNoCtrlEnable := DemandType <> DemandType::"All Demands";
         CurrPage.Update(false);
     end;
 
@@ -501,25 +422,21 @@ page 5830 "Demand Overview"
         VariantFilter: Code[250];
         StartDate: Date;
         EndDate: Date;
-        DemandType: Option " ",Sales,Production,Jobs,Services,Assembly;
+        DemandType: Enum "Demand Order Source Type";
         DemandNo: Code[20];
         IsCalculated: Boolean;
         MatchCriteria: Boolean;
-        Text001: Label 'Sales';
-        Text002: Label 'Production';
-        Text003: Label 'Purchase';
+#pragma warning disable AA0074
         Text004: Label 'Inventory';
-        Text005: Label 'Service';
-        Text006: Label 'Project';
-        Text007: Label 'Prod. Comp.';
-        Text008: Label 'Transfer';
-        Text009: Label 'Assembly';
         Text020: Label 'Expanding...\';
+#pragma warning disable AA0470
         Text021: Label 'Status    #1###################\';
+#pragma warning restore AA0470
         Text022: Label 'Setting Filters';
         Text023: Label 'Fetching Items';
         Text025: Label 'Fetching Specific Entries in Dates';
         Text026: Label 'Displaying results';
+#pragma warning restore AA0074
 
     protected var
         DemandNoCtrlEnable: Boolean;
@@ -528,7 +445,7 @@ page 5830 "Demand Overview"
         TypeEmphasize: Boolean;
         TypeIndent: Integer;
         SourceTypeHideValue: Boolean;
-        SourceTypeText: Text[1024];
+        SourceTypeText: Text;
         SourceOrderStatusHideValue: Boolean;
         DescriptionEmphasize: Boolean;
         QuantityText: Text[1024];
@@ -548,12 +465,11 @@ page 5830 "Demand Overview"
     begin
         AvailCalcOverview.Reset();
         AvailCalcOverview.SetFilter("Item No.", ItemFilter);
-        if (StartDate <> 0D) or (EndDate <> 0D) then begin
+        if (StartDate <> 0D) or (EndDate <> 0D) then
             if EndDate <> 0D then
                 AvailCalcOverview.SetRange(Date, StartDate, EndDate)
             else
                 AvailCalcOverview.SetRange(Date, StartDate, DMY2Date(31, 12, 9999));
-        end;
         if LocationFilter <> '' then
             AvailCalcOverview.SetFilter("Location Code", LocationFilter);
         if VariantFilter <> '' then
@@ -568,7 +484,7 @@ page 5830 "Demand Overview"
             exit;
         AvailCalcOverviewFilters.Copy(Rec);
         ApplyUserFilters(TempAvailCalcOverview);
-        CalcAvailOverview.SetParam(DemandType, DemandNo);
+        CalcAvailOverview.SetParameters(DemandType, DemandNo);
         CalcAvailOverview.Run(TempAvailCalcOverview);
         TempAvailCalcOverview.Reset();
         Rec.Reset();
@@ -600,7 +516,7 @@ page 5830 "Demand Overview"
         AvailCalcOverview.Reset();
         AvailCalcOverview.DeleteAll();
         ApplyUserFilters(AvailCalcOverview);
-        CalcAvailOverview.SetParam(DemandType, DemandNo);
+        CalcAvailOverview.SetParameters(DemandType, DemandNo);
 
         // Fetching Items
         Window.Update(1, Text023);
@@ -647,7 +563,15 @@ page 5830 "Demand Overview"
         CurrPage.Update(false);
     end;
 
+#if not CLEAN25
+    [Obsolete('Replaced by SetParameters() with enum', '25.0')]
     procedure Initialize(NewStartDate: Date; NewDemandType: Integer; NewDemandNo: Code[20]; NewItemNo: Code[20]; NewLocationFilter: Code[250])
+    begin
+        SetParameters(NewStartDate, "Demand Order Source Type".FromInteger(NewDemandType), NewDemandNo, NewItemNo, NewLocationFilter);
+    end;
+#endif
+
+    procedure SetParameters(NewStartDate: Date; NewDemandType: Enum "Demand Order Source Type"; NewDemandNo: Code[20]; NewItemNo: Code[20]; NewLocationFilter: Code[250])
     begin
         StartDate := NewStartDate;
         DemandType := NewDemandType;
@@ -657,32 +581,18 @@ page 5830 "Demand Overview"
         MatchCriteria := true;
     end;
 
-    local procedure SourceTypeTextOnFormat(var Text: Text[1024])
+    local procedure SourceTypeTextOnFormat(var Text: Text)
     begin
         SourceTypeHideValue := false;
         case Rec."Source Type" of
-            DATABASE::"Sales Line":
-                Text := Text001;
-            DATABASE::"Service Line":
-                Text := Text005;
-            DATABASE::"Job Planning Line":
-                Text := Text006;
-            DATABASE::"Prod. Order Line":
-                Text := Text002;
-            DATABASE::"Prod. Order Component":
-                Text := Text007;
-            DATABASE::"Purchase Line":
-                Text := Text003;
             DATABASE::"Item Ledger Entry":
                 Text := Text004;
-            DATABASE::"Transfer Line":
-                Text := Text008;
-            DATABASE::"Assembly Header",
-          DATABASE::"Assembly Line":
-                Text := Text009;
-            else
-                SourceTypeHideValue := true;
-        end
+            else begin
+                OnSourceTypeTextOnFormat(Rec, Text);
+                if Text = '' then
+                    SourceTypeHideValue := true;
+            end;
+        end;
     end;
 
     procedure SetCalculationParameter(CalculateDemandParam: Boolean)
@@ -692,6 +602,16 @@ page 5830 "Demand Overview"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeLookupDemandNo(var AvailabilityCalcOverview: Record "Availability Calc. Overview"; DemandType: Option; var Result: Boolean; var IsHandled: Boolean; var Text: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupDemandNo(var AvailabilityCalcOverview: Record "Availability Calc. Overview"; DemandType: Enum "Demand Order Source Type"; var Result: Boolean; var Text: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSourceTypeTextOnFormat(var AvailabilityCalcOverview: Record "Availability Calc. Overview"; var Text: Text)
     begin
     end;
 }

@@ -100,7 +100,11 @@ page 343 "Check Credit Limit"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 Do you still want to record the amount?';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     protected var
         CurrExchRate: Record "Currency Exchange Rate";

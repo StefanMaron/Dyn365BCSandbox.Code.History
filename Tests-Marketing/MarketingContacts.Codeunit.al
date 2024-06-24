@@ -30,7 +30,6 @@ codeunit 136201 "Marketing Contacts"
         LibraryHumanResource: Codeunit "Library - Human Resource";
         LibraryDocumentApprovals: Codeunit "Library - Document Approvals";
         IsInitialized: Boolean;
-        RelationErrorServiceTier: Label '%1 must have a value in %2: Primary Key=. It cannot be zero or empty.';
         ValidationError: Label '%1: %2 must exist.';
         ErrorMessage: Label '%1: %2 must not exist.';
         ExpectedMessage: Label 'The field IBAN is mandatory. You will not be able to use the account in a payment file until the IBAN is correctly filled in.\\Are you sure you want to continue?';
@@ -383,7 +382,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on linking Contact with an existing Customer if Bus. Rel.
         // Code for Customers field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Customers"), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Customers"));
     end;
 
     [Test]
@@ -407,7 +406,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on linking Contact with an existing Vendor if Bus. Rel.
         // Code for Vendors field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Vendors"), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Vendors"));
     end;
 
     [Test]
@@ -432,7 +431,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on linking Contact with an existing Bank Account if Bus. Rel.
         // Code for Bank Accs. field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Bank Accs."), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Bank Accs."));
 
         // 4. Cleanup: Input the original value of the field Bus. Rel. Code for Bank Accs. in Marketing Setup.
         ChangeBusinessRelationCodeForBankAccount(BusRelCodeForBankAccs);
@@ -545,7 +544,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on creation of a Customer from Contact if Bus. Rel. Code for Customers
         // field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Customers"), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Customers"));
     end;
 
     [Test]
@@ -669,7 +668,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on creation of a Vendor from Contact if Bus. Rel. Code for Vendors
         // field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Vendors"), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Vendors"));
     end;
 
     [Test]
@@ -747,7 +746,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on creation of a Bank Account from Contact if Bus. Rel. Code for
         // Bank Accs. field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Bank Accs."), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Bank Accs."));
 
         // 4. Cleanup: Input the original value of the field Bus. Rel. Code for Bank Accs. in Marketing Setup.
         ChangeBusinessRelationCodeForBankAccount(BusRelCodeForBankAccs);
@@ -774,7 +773,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on creation of a Contact from Customer if Bus. Rel. Code for Customers
         // field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Customers"), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Customers"));
     end;
 
     [Test]
@@ -798,7 +797,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on creation of a Contact from Vendor if Bus. Rel. Code for Vendors
         // field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Vendors"), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Vendors"));
     end;
 
     [Test]
@@ -824,7 +823,7 @@ codeunit 136201 "Marketing Contacts"
 
         // 3. Verify: Check that the application generates an error on creation of a Contact from Bank Account if Bus. Rel. Code
         // for Bank Accs. field in Marketing Setup is blank.
-        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Bank Accs."), MarketingSetup.TableCaption());
+        VerifyContactErrorMessage(MarketingSetup.FieldCaption("Bus. Rel. Code for Bank Accs."));
 
         // 4. Cleanup: Input the original value of the field Bus. Rel. Code for Bank Accs. in Marketing Setup.
         ChangeBusinessRelationCodeForBankAccount(BusRelCodeForBankAccs);
@@ -6017,12 +6016,10 @@ codeunit 136201 "Marketing Contacts"
     var
         Contact: Record Contact;
     begin
-        with Contact do begin
-            Init();
-            "No." := CompanyNo;
-            Type := Type::Company;
-            Insert();
-        end;
+        Contact.Init();
+        Contact."No." := CompanyNo;
+        Contact.Type := Contact.Type::Company;
+        Contact.Insert();
         exit(Contact."No.");
     end;
 
@@ -6055,12 +6052,10 @@ codeunit 136201 "Marketing Contacts"
 
     local procedure CreateCustomer(var Customer: Record Customer)
     begin
-        with Customer do begin
-            Init();
-            "No." := LibraryUtility.GenerateRandomCode(FieldNo("No."), DATABASE::Customer);
-            Name := CopyStr(CreateGuid(), 1, 50);
-            Insert();
-        end;
+        Customer.Init();
+        Customer."No." := LibraryUtility.GenerateRandomCode(Customer.FieldNo("No."), DATABASE::Customer);
+        Customer.Name := CopyStr(CreateGuid(), 1, 50);
+        Customer.Insert();
     end;
 
     local procedure CreateCustomerTemplate(var CustomerTemplate: Record "Customer Templ."; CustomerPriceGroupCode: Code[10])
@@ -6148,12 +6143,10 @@ codeunit 136201 "Marketing Contacts"
 
     local procedure CreateVendor(var Vendor: Record Vendor)
     begin
-        with Vendor do begin
-            Init();
-            "No." := LibraryUtility.GenerateRandomCode(FieldNo("No."), DATABASE::Vendor);
-            Name := CopyStr(CreateGuid(), 1, 50);
-            Insert();
-        end;
+        Vendor.Init();
+        Vendor."No." := LibraryUtility.GenerateRandomCode(Vendor.FieldNo("No."), DATABASE::Vendor);
+        Vendor.Name := CopyStr(CreateGuid(), 1, 50);
+        Vendor.Insert();
     end;
 
     local procedure CreateVendorWithCurrency(var Vendor: Record Vendor; CurrencyCode: Code[10])
@@ -6199,24 +6192,20 @@ codeunit 136201 "Marketing Contacts"
 
     local procedure CreateSegmentLine(var SegmentLine: Record "Segment Line"; AttachmentNo: Integer)
     begin
-        with SegmentLine do begin
-            Init();
-            "Segment No." := LibraryUtility.GenerateRandomCode(FieldNo("Segment No."), DATABASE::"Segment Line");
-            "Line No." := 10000;
-            "Attachment No." := AttachmentNo;
-            Insert();
-        end;
+        SegmentLine.Init();
+        SegmentLine."Segment No." := LibraryUtility.GenerateRandomCode(SegmentLine.FieldNo("Segment No."), DATABASE::"Segment Line");
+        SegmentLine."Line No." := 10000;
+        SegmentLine."Attachment No." := AttachmentNo;
+        SegmentLine.Insert();
     end;
 
     local procedure CreateInteractLogEntry(SegmentLineNo: Integer)
     var
         InteractLogEntry: Record "Interaction Log Entry";
     begin
-        with InteractLogEntry do begin
-            Init();
-            "Entry No." := SegmentLineNo;
-            Insert();
-        end;
+        InteractLogEntry.Init();
+        InteractLogEntry."Entry No." := SegmentLineNo;
+        InteractLogEntry.Insert();
     end;
 
     local procedure CreateVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup")
@@ -6247,16 +6236,15 @@ codeunit 136201 "Marketing Contacts"
         TempFile: File;
     begin
         FileName := FileMgt.ServerTempFileName(ExtensionTxt);
-        with TempFile do begin
-            TextMode(true);
-            WriteMode(true);
-            if not Exists(FileName) then
-                Create(FileName)
-            else
-                Open(FileName);
-            Write(Name); // write FileName into file
-            Close();
-        end;
+        TempFile.TextMode(true);
+        TempFile.WriteMode(true);
+        if not Exists(FileName) then
+            TempFile.Create(FileName)
+        else
+            TempFile.Open(FileName);
+        TempFile.Write(TempFile.Name);
+        // write FileName into file
+        TempFile.Close();
     end;
 
     local procedure CreateContactWithData(var Contact: Record Contact)
@@ -6564,9 +6552,9 @@ codeunit 136201 "Marketing Contacts"
         Customer.TestField("Territory Code", Contact."Territory Code");
     end;
 
-    local procedure VerifyContactErrorMessage(FieldCaptionOfMarketingField: Text[30]; TableCaptionOfTable: Text[30])
+    local procedure VerifyContactErrorMessage(FieldCaptionOfMarketingField: Text[30])
     begin
-        Assert.ExpectedError(StrSubstNo(RelationErrorServiceTier, FieldCaptionOfMarketingField, TableCaptionOfTable));
+        Assert.ExpectedTestFieldError(FieldCaptionOfMarketingField, '');
     end;
 
     local procedure VerifyContactBusinessRelationForLinkTableAndContact(ContactNo: Code[20]; LinkNo: Code[20]; LinkToTable: Enum "Contact Business Relation Link To Table")
@@ -6763,14 +6751,12 @@ codeunit 136201 "Marketing Contacts"
     var
         OpportunityEntry: Record "Opportunity Entry";
     begin
-        with OpportunityEntry do begin
-            SetRange("Opportunity No.", OppNo);
-            SetRange(Active, true);
-            FindFirst();
-            Assert.AreEqual(
-              ExpectedValue, "Calcd. Current Value (LCY)",
-              StrSubstNo(WrongCalcdCurValueErr, FieldCaption("Calcd. Current Value (LCY)")));
-        end;
+        OpportunityEntry.SetRange("Opportunity No.", OppNo);
+        OpportunityEntry.SetRange(Active, true);
+        OpportunityEntry.FindFirst();
+        Assert.AreEqual(
+          ExpectedValue, OpportunityEntry."Calcd. Current Value (LCY)",
+          StrSubstNo(WrongCalcdCurValueErr, OpportunityEntry.FieldCaption("Calcd. Current Value (LCY)")));
     end;
 
     [ModalPageHandler]

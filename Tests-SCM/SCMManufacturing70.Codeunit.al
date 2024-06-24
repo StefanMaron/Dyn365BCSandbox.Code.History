@@ -28,7 +28,6 @@ codeunit 137063 "SCM Manufacturing 7.0"
         LibraryPlanning: Codeunit "Library - Planning";
         LibraryUtility: Codeunit "Library - Utility";
         ErrorDoNotMatchErr: Label 'Expected error: ''%1''\Actual error: ''%2''', Locked = true;
-        BlockedItemErr: Label 'Blocked must be equal to ''No''  in Item: No.=%1. Current value is ''Yes''.', Comment = '%1 is the Item No.';
         LibraryPurchase: Codeunit "Library - Purchase";
         LibrarySales: Codeunit "Library - Sales";
         LibraryWarehouse: Codeunit "Library - Warehouse";
@@ -53,7 +52,6 @@ codeunit 137063 "SCM Manufacturing 7.0"
         NoDimensionExpectedErr: Label 'No of dimensions expected.';
         DimensionValueErr: Label 'Dimension Value Code must be same.';
         ReleasedProdOrderTxt: Label 'Released Prod. Order';
-        ItemUnitOfMeasureNotExistErr: Label 'The Item Unit of Measure does not exist.';
         ItemJournalLineErr: Label 'Wrong number of Item Journal Lines.';
         EffectiveCapacityErr: Label 'Effective Capacity must be match with Needed Time.';
         ErrorMsg: Label 'No. of records are not equal in %1 and %2.', Locked = true;
@@ -322,7 +320,7 @@ codeunit 137063 "SCM Manufacturing 7.0"
           ProductionOrder."Source Type"::Item, false);
 
         // [THEN] Error expected because of blocked item
-        Assert.ExpectedError(StrSubstNo(BlockedItemErr, ChildItem."No."));
+        Assert.ExpectedTestFieldError(ChildItem.FieldCaption(Blocked), Format(false));
     end;
 
     [Test]
@@ -1122,7 +1120,7 @@ codeunit 137063 "SCM Manufacturing 7.0"
         asserterror Item.Validate("Production BOM No.", ProductionBOMHeader."No.");
 
         // Verify: Verify Error message.
-        Assert.IsTrue(StrPos(GetLastErrorText, ItemUnitOfMeasureNotExistErr) > 0, GetLastErrorText);
+        Assert.ExpectedErrorCannotFind(Database::"Item Unit of Measure");
     end;
 
     [Test]
@@ -1155,7 +1153,7 @@ codeunit 137063 "SCM Manufacturing 7.0"
         asserterror ProductionBOMHeader.Validate("Unit of Measure Code", UnitOfMeasure.Code);
 
         // Verify: Verify Error message.
-        Assert.IsTrue(StrPos(GetLastErrorText, ItemUnitOfMeasureNotExistErr) > 0, GetLastErrorText);
+        Assert.ExpectedErrorCannotFind(Database::"Item Unit of Measure");
     end;
 
     [Test]
@@ -1419,7 +1417,7 @@ codeunit 137063 "SCM Manufacturing 7.0"
         CreateSalesLineWithShipmentDate(SalesHeader, Item."No.", '', Quantity, WorkDate(), false);
 
         // Exercise: Calculate Available to Promise.
-        AvailabilityManagement.SetSalesHeader(TempOrderPromisingLine, SalesHeader);
+        AvailabilityManagement.SetSourceRecord(TempOrderPromisingLine, SalesHeader);
         AvailabilityManagement.CalcAvailableToPromise(TempOrderPromisingLine);
 
         // Verify: Verify Earliest Shipment Dates on Order Promising Lines.
@@ -2344,23 +2342,16 @@ codeunit 137063 "SCM Manufacturing 7.0"
 
         // [GIVEN] "No. Series" with "Starting No." of length > 10
         Initialize();
-
         // [GIVEN] Createt Routing with "No. Series"
-        with RoutingHeader do begin
-            Init();
-            Validate("Version Nos.", CreateLongNoSeries(ExpectedVersionNo));
-            Insert(true);
-        end;
-
+        RoutingHeader.Init();
+        RoutingHeader.Validate("Version Nos.", CreateLongNoSeries(ExpectedVersionNo));
+        RoutingHeader.Insert(true);
         // [WHEN] Create new Version for Routing
-        with RoutingVersion do begin
-            Init();
-            Validate("Routing No.", RoutingHeader."No.");
-            Insert(true);
-
-            // [THEN] "Version Code" equals to "Starting No." of "No. Series"
-            Assert.AreEqual("Version Code", ExpectedVersionNo, WrongVersionCodeErr);
-        end;
+        RoutingVersion.Init();
+        RoutingVersion.Validate("Routing No.", RoutingHeader."No.");
+        RoutingVersion.Insert(true);
+        // [THEN] "Version Code" equals to "Starting No." of "No. Series"
+        Assert.AreEqual(RoutingVersion."Version Code", ExpectedVersionNo, WrongVersionCodeErr);
     end;
 
     [Test]
@@ -2376,23 +2367,16 @@ codeunit 137063 "SCM Manufacturing 7.0"
 
         // [GIVEN] "No. Series" with "Starting No." of length > 10
         Initialize();
-
         // [GIVEN] Create Production BOM with "No. Series"
-        with ProductionBOMHeader do begin
-            Init();
-            Validate("Version Nos.", CreateLongNoSeries(ExpectedVersionNo));
-            Insert(true);
-        end;
-
+        ProductionBOMHeader.Init();
+        ProductionBOMHeader.Validate("Version Nos.", CreateLongNoSeries(ExpectedVersionNo));
+        ProductionBOMHeader.Insert(true);
         // [WHEN] Create new Version for Production BOM
-        with ProductionBOMVersion do begin
-            Init();
-            Validate("Production BOM No.", ProductionBOMHeader."No.");
-            Insert(true);
-
-            // [THEN] "Version Code" equals to "Starting No." of "No. Series"
-            Assert.AreEqual("Version Code", ExpectedVersionNo, WrongVersionCodeErr);
-        end;
+        ProductionBOMVersion.Init();
+        ProductionBOMVersion.Validate("Production BOM No.", ProductionBOMHeader."No.");
+        ProductionBOMVersion.Insert(true);
+        // [THEN] "Version Code" equals to "Starting No." of "No. Series"
+        Assert.AreEqual(ProductionBOMVersion."Version Code", ExpectedVersionNo, WrongVersionCodeErr);
     end;
 
     [Test]
@@ -3063,13 +3047,11 @@ codeunit 137063 "SCM Manufacturing 7.0"
         CreateItem(
           Item, Item."Replenishment System"::"Prod. Order",
           Item."Reordering Policy"::"Lot-for-Lot", false, 0, 0, 0, RoutingHeader."No.");
-        with Item do begin
-            Evaluate(LotAccumulationPeriod, '<1D>');
-            Evaluate(ReschedulingPeriod, '<1D>');
-            Validate("Lot Accumulation Period", LotAccumulationPeriod);
-            Validate("Rescheduling Period", ReschedulingPeriod);
-            Modify(true);
-        end;
+        Evaluate(LotAccumulationPeriod, '<1D>');
+        Evaluate(ReschedulingPeriod, '<1D>');
+        Item.Validate("Lot Accumulation Period", LotAccumulationPeriod);
+        Item.Validate("Rescheduling Period", ReschedulingPeriod);
+        Item.Modify(true);
     end;
 
     local procedure MakeSupplyOrders(var RequisitionLine: Record "Requisition Line"; MakeOrders: Option; CreatePurchaseOrder: Enum "Planning Create Purchase Order")
@@ -3150,14 +3132,12 @@ codeunit 137063 "SCM Manufacturing 7.0"
         CreateRouting(RoutingHeader, RoutingLine, WorkCenter."No.", RoutingHeader.Type::Serial, RoutingLine.Type::"Work Center");
         UpdateRoutingLine(RoutingLine, 0, RunTime, 0); // Run Time
         UpdateRoutingStatus(RoutingHeader, RoutingHeader.Status::Certified);
-        with Item do begin
-            CreateItem(Item, "Replenishment System"::"Prod. Order", "Reordering Policy"::Order, false, 0, 0, 0, RoutingHeader."No.");
-            Validate("Manufacturing Policy", "Manufacturing Policy"::"Make-to-Order");
-            Validate("Order Tracking Policy", "Order Tracking Policy"::"Tracking & Action Msg.");
-            Validate("Production BOM No.", ProductionBOMNo);
-            Evaluate("Dampener Period", '<' + Format(DampenerDays) + 'D>');
-            Modify(true);
-        end;
+        CreateItem(Item, Item."Replenishment System"::"Prod. Order", Item."Reordering Policy"::Order, false, 0, 0, 0, RoutingHeader."No.");
+        Item.Validate("Manufacturing Policy", Item."Manufacturing Policy"::"Make-to-Order");
+        Item.Validate("Order Tracking Policy", Item."Order Tracking Policy"::"Tracking & Action Msg.");
+        Item.Validate("Production BOM No.", ProductionBOMNo);
+        Evaluate(Item."Dampener Period", '<' + Format(DampenerDays) + 'D>');
+        Item.Modify(true);
     end;
 
     local procedure CreateMultipleItems(var Item: Record Item; var Item2: Record Item; var Item3: Record Item; ReplenishmentSystem: Enum "Replenishment System"; ReplenishmentSystem2: Enum "Replenishment System"; ReorderingPolicy: Enum "Reordering Policy"; IncludeInventory: Boolean)
@@ -3176,14 +3156,14 @@ codeunit 137063 "SCM Manufacturing 7.0"
         // Just refresh production order in order to create lines
         LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
         if not ViaReport then // Calculate it again
-            with ProdOrderLine do begin
-                SetRange(Status, ProductionOrder.Status);
-                SetRange("Prod. Order No.", ProductionOrder."No.");
-                if Find('-') then
-                    repeat
-                        CalculateProdOrder.Calculate(ProdOrderLine, Direction::Backward, true, true, false, LetDueDateDecrease)
-                    until Next() = 0;
-            end;
+            begin
+            ProdOrderLine.SetRange(Status, ProductionOrder.Status);
+            ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+            if ProdOrderLine.Find('-') then
+                repeat
+                    CalculateProdOrder.Calculate(ProdOrderLine, Direction::Backward, true, true, false, LetDueDateDecrease)
+                until ProdOrderLine.Next() = 0;
+        end;
     end;
 
     local procedure CreateAndUpdateItems(var ParentItem: Record Item; var ChildItem: Record Item)
@@ -3194,11 +3174,9 @@ codeunit 137063 "SCM Manufacturing 7.0"
     begin
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         CreateItemWithUOM(ParentItem, UnitOfMeasure.Code, ParentItem."Replenishment System"::"Prod. Order");
-        with ParentItem do begin
-            RoutingHeader.FindFirst();
-            Validate("Routing No.", RoutingHeader."No.");
-            Modify(true);
-        end;
+        RoutingHeader.FindFirst();
+        ParentItem.Validate("Routing No.", RoutingHeader."No.");
+        ParentItem.Modify(true);
 
         CreateItemWithUOM(ChildItem, ParentItem."Base Unit of Measure", ChildItem."Replenishment System"::Purchase);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
@@ -3214,10 +3192,8 @@ codeunit 137063 "SCM Manufacturing 7.0"
     begin
         LibraryInventory.CreateItem(Item);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasureCode, 1);
-        with Item do begin
-            Validate("Base Unit of Measure", ItemUnitOfMeasure.Code);
-            Validate("Replenishment System", ReplenishmentSystem);
-        end;
+        Item.Validate("Base Unit of Measure", ItemUnitOfMeasure.Code);
+        Item.Validate("Replenishment System", ReplenishmentSystem);
     end;
 
     local procedure UpdateItem(var Item: Record Item; FieldNo: Integer; Value: Variant)
@@ -3346,7 +3322,7 @@ codeunit 137063 "SCM Manufacturing 7.0"
     var
         AvailabilityManagement: Codeunit AvailabilityManagement;
     begin
-        AvailabilityManagement.SetSalesHeader(TempOrderPromisingLine, SalesHeader);
+        AvailabilityManagement.SetSourceRecord(TempOrderPromisingLine, SalesHeader);
         AvailabilityManagement.CalcCapableToPromise(TempOrderPromisingLine, SalesHeader."No.");
     end;
 
@@ -3436,16 +3412,14 @@ codeunit 137063 "SCM Manufacturing 7.0"
         ProductionOrder.Validate("Source No.", Item1."No.");
 
         ProdOrderLine.Status := ProdOrderLine.Status::"Firm Planned";
-        with ProdOrderLine do begin
-            Init();
-            "Prod. Order No." := ProductionOrder."No.";
-            "Line No." := 10000;
-            "Item No." := Item1."No.";
-            "Unit of Measure Code" := Item1."Base Unit of Measure";
-            Validate(Quantity, LibraryRandom.RandInt(5));
-            "Due Date" := WorkDate();
-            Insert();
-        end;
+        ProdOrderLine.Init();
+        ProdOrderLine."Prod. Order No." := ProductionOrder."No.";
+        ProdOrderLine."Line No." := 10000;
+        ProdOrderLine."Item No." := Item1."No.";
+        ProdOrderLine."Unit of Measure Code" := Item1."Base Unit of Measure";
+        ProdOrderLine.Validate(Quantity, LibraryRandom.RandInt(5));
+        ProdOrderLine."Due Date" := WorkDate();
+        ProdOrderLine.Insert();
         ProductionOrder.Modify(true);
 
         LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
@@ -3499,13 +3473,11 @@ codeunit 137063 "SCM Manufacturing 7.0"
         LibraryManufacturing.CreateCapacityUnitOfMeasure(CapacityUnitOfMeasure, CapacityUnitOfMeasure.Type::Minutes);
         LibraryManufacturing.CreateMachineCenter(MachineCenter, WorkCenter."No.", LibraryRandom.RandDec(10, 1));
 
-        with MachineCenter do begin
-            Validate("Queue Time", QueueTime);
-            Validate("Queue Time Unit of Meas. Code", CapacityUnitOfMeasure.Code);
-            Modify(true);
-            LibraryManufacturing.CalculateMachCenterCalendar(MachineCenter, CalcDate('<-1W>', WorkDate()), CalcDate('<1W>', WorkDate()));
-            exit("No.");
-        end;
+        MachineCenter.Validate("Queue Time", QueueTime);
+        MachineCenter.Validate("Queue Time Unit of Meas. Code", CapacityUnitOfMeasure.Code);
+        MachineCenter.Modify(true);
+        LibraryManufacturing.CalculateMachCenterCalendar(MachineCenter, CalcDate('<-1W>', WorkDate()), CalcDate('<1W>', WorkDate()));
+        exit(MachineCenter."No.");
     end;
 
     local procedure CreateMultipleWorkCenterSetup(var WorkCenter: Record "Work Center"; var WorkCenter2: Record "Work Center"; var RoutingHeader: Record "Routing Header")
@@ -3569,11 +3541,9 @@ codeunit 137063 "SCM Manufacturing 7.0"
     begin
         LibraryManufacturing.CreateCapacityUnitOfMeasure(CapacityUnitOfMeasure, UOMType);
         LibraryManufacturing.CreateWorkCenter(WorkCenter);
-        with WorkCenter do begin
-            Validate("Unit of Measure Code", CapacityUnitOfMeasure.Code);
-            Validate("Shop Calendar Code", LibraryManufacturing.UpdateShopCalendarFullWorkingWeekCustomTime(FromTime, ToTime));
-            Modify(true);
-        end;
+        WorkCenter.Validate("Unit of Measure Code", CapacityUnitOfMeasure.Code);
+        WorkCenter.Validate("Shop Calendar Code", LibraryManufacturing.UpdateShopCalendarFullWorkingWeekCustomTime(FromTime, ToTime));
+        WorkCenter.Modify(true);
     end;
 
     local procedure CreateRoutingLine(var RoutingLine: Record "Routing Line"; RoutingHeader: Record "Routing Header"; CenterNo: Code[20])
@@ -3727,12 +3697,10 @@ codeunit 137063 "SCM Manufacturing 7.0"
     var
         CalendarEntry: Record "Calendar Entry";
     begin
-        with CalendarEntry do begin
-            SetRange("Capacity Type", "Capacity Type"::"Work Center");
-            SetRange("No.", WorkCenter."No.");
-            SetRange(Date, FromDate, ToDate);
-            DeleteAll();
-        end;
+        CalendarEntry.SetRange("Capacity Type", CalendarEntry."Capacity Type"::"Work Center");
+        CalendarEntry.SetRange("No.", WorkCenter."No.");
+        CalendarEntry.SetRange(Date, FromDate, ToDate);
+        CalendarEntry.DeleteAll();
     end;
 
     local procedure CalculatePlanForReqWksh(var Item: Record Item; StartDate: Date; EndDate: Date)
@@ -3961,15 +3929,13 @@ codeunit 137063 "SCM Manufacturing 7.0"
         ProdOrderLine: Record "Prod. Order Line";
         NewDimSetID: Integer;
     begin
-        with ProdOrderLine do begin
-            SetRange("Prod. Order No.", ProdOrderNo);
-            FindFirst();
-            NewDimSetID := LibraryDimension.CreateDimSet("Dimension Set ID", DimCode, DimValue);
-            Validate("Dimension Set ID", NewDimSetID);
-            Modify(true);
+        ProdOrderLine.SetRange("Prod. Order No.", ProdOrderNo);
+        ProdOrderLine.FindFirst();
+        NewDimSetID := LibraryDimension.CreateDimSet(ProdOrderLine."Dimension Set ID", DimCode, DimValue);
+        ProdOrderLine.Validate("Dimension Set ID", NewDimSetID);
+        ProdOrderLine.Modify(true);
 
-            exit("Dimension Set ID");
-        end;
+        exit(ProdOrderLine."Dimension Set ID");
     end;
 
     local procedure SelectJournalLineNos(ProductionOrder: Record "Production Order"; WorkCenterCode: Code[20]): Integer
@@ -4042,12 +4008,10 @@ codeunit 137063 "SCM Manufacturing 7.0"
 
     local procedure MockProdBOMLineWithUoM(var ProductionBOMLine: Record "Production BOM Line"; UnitOfMeasureCode: Code[10])
     begin
-        with ProductionBOMLine do begin
-            Init();
-            "No." := LibraryUtility.GenerateGUID();
-            Type := Type::"Production BOM";
-            "Unit of Measure Code" := UnitOfMeasureCode;
-        end;
+        ProductionBOMLine.Init();
+        ProductionBOMLine."No." := LibraryUtility.GenerateGUID();
+        ProductionBOMLine.Type := ProductionBOMLine.Type::"Production BOM";
+        ProductionBOMLine."Unit of Measure Code" := UnitOfMeasureCode;
     end;
 
     local procedure CreateSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; ItemNo: Code[20]; LocationCode: Code[10]; VariantCode: Code[10]; Quantity: Decimal)
@@ -4501,26 +4465,22 @@ codeunit 137063 "SCM Manufacturing 7.0"
         ItemJournalTemplate: Record "Item Journal Template";
         ItemJournalBatch: Record "Item Journal Batch";
     begin
-        with LibraryInventory do begin
-            SelectItemJournalTemplateName(ItemJournalTemplate, ItemJournalTemplate.Type::Item);
-            SelectItemJournalBatchName(ItemJournalBatch, ItemJournalTemplate.Type, ItemJournalTemplate.Name);
-            CreateItemJournalLine(ItemJournalLine, ItemJournalTemplate.Name, ItemJournalBatch.Name, EntryType,
-              Item."No.", Quantity);
-            ItemJournalLine.Validate("Location Code", LocationCode);
-            ItemJournalLine.Modify(true);
-            PostItemJournalLine(ItemJournalTemplate.Name, ItemJournalBatch.Name);
-        end;
+        LibraryInventory.SelectItemJournalTemplateName(ItemJournalTemplate, ItemJournalTemplate.Type::Item);
+        LibraryInventory.SelectItemJournalBatchName(ItemJournalBatch, ItemJournalTemplate.Type, ItemJournalTemplate.Name);
+        LibraryInventory.CreateItemJournalLine(ItemJournalLine, ItemJournalTemplate.Name, ItemJournalBatch.Name, EntryType,
+          Item."No.", Quantity);
+        ItemJournalLine.Validate("Location Code", LocationCode);
+        ItemJournalLine.Modify(true);
+        LibraryInventory.PostItemJournalLine(ItemJournalTemplate.Name, ItemJournalBatch.Name);
     end;
 
     local procedure VerifyDueDate(ProductionOrder: Record "Production Order"; DueDate: Date; ShouldBeEqual: Boolean)
     begin
-        with ProductionOrder do begin
-            Get(Status, "No.");
-            if ShouldBeEqual then
-                Assert.AreEqual(DueDate, "Due Date", WrongDueDateErr)
-            else
-                Assert.AreNotEqual(DueDate, "Due Date", WrongDueDateErr)
-        end;
+        ProductionOrder.Get(ProductionOrder.Status, ProductionOrder."No.");
+        if ShouldBeEqual then
+            Assert.AreEqual(DueDate, ProductionOrder."Due Date", WrongDueDateErr)
+        else
+            Assert.AreNotEqual(DueDate, ProductionOrder."Due Date", WrongDueDateErr)
     end;
 
     local procedure VerifyUntrackedPlanningElement(ItemNo: Code[20]; Source: Text[200]; ParameterValue: Decimal; UntrackedQuantity: Decimal)
@@ -4910,16 +4870,14 @@ codeunit 137063 "SCM Manufacturing 7.0"
     var
         RequisitionLine: Record "Requisition Line";
     begin
-        with RequisitionLine do begin
-            SetRange("Prod. Order No.", ProdOrderLine."Prod. Order No.");
-            SetRange("Prod. Order Line No.", ProdOrderLine."Line No.");
-            FindFirst();
+        RequisitionLine.SetRange("Prod. Order No.", ProdOrderLine."Prod. Order No.");
+        RequisitionLine.SetRange("Prod. Order Line No.", ProdOrderLine."Line No.");
+        RequisitionLine.FindFirst();
 
-            TestField(Type, Type::Item);
-            TestField("No.", ProdOrderLine."Item No.");
-            TestField(Quantity, ProdOrderLine.Quantity);
-            TestField("Replenishment System", "Replenishment System"::"Prod. Order");
-        end;
+        RequisitionLine.TestField(Type, RequisitionLine.Type::Item);
+        RequisitionLine.TestField("No.", ProdOrderLine."Item No.");
+        RequisitionLine.TestField(Quantity, ProdOrderLine.Quantity);
+        RequisitionLine.TestField("Replenishment System", RequisitionLine."Replenishment System"::"Prod. Order");
     end;
 
     local procedure VerifyItemLedgerEntryForOutput(ItemNo: Code[20]; Quantity: Decimal; EntryType: Enum "Item Ledger Document Type")
@@ -4949,22 +4907,20 @@ codeunit 137063 "SCM Manufacturing 7.0"
         StartingDate: Date;
         StartingTime: Time;
     begin
-        with RequisitionLine do begin
-            SetRange(Type, Type::Item);
-            SetFilter("No.", ParentItemFilter);
-            FindSet();
-            StartingDate := "Starting Date";
-            StartingTime := "Starting Time";
-            repeat
-                TotalQty += Quantity * QtyPer;
-            until Next() = 0;
+        RequisitionLine.SetRange(Type, RequisitionLine.Type::Item);
+        RequisitionLine.SetFilter("No.", ParentItemFilter);
+        RequisitionLine.FindSet();
+        StartingDate := RequisitionLine."Starting Date";
+        StartingTime := RequisitionLine."Starting Time";
+        repeat
+            TotalQty += RequisitionLine.Quantity * QtyPer;
+        until RequisitionLine.Next() = 0;
 
-            SetRange("No.", ComponentItemNo);
-            SetRange("Ending Date", StartingDate);
-            SetRange("Ending Time", StartingTime);
-            FindFirst();
-            Assert.AreEqual(TotalQty, Quantity, IncorrectQtyOnEndingDateErr);
-        end;
+        RequisitionLine.SetRange("No.", ComponentItemNo);
+        RequisitionLine.SetRange("Ending Date", StartingDate);
+        RequisitionLine.SetRange("Ending Time", StartingTime);
+        RequisitionLine.FindFirst();
+        Assert.AreEqual(TotalQty, RequisitionLine.Quantity, IncorrectQtyOnEndingDateErr);
     end;
 
     local procedure VerifyCommentForProdOrderComponent(ProductionOrderNo: Code[20]; CommentText: Text[80])

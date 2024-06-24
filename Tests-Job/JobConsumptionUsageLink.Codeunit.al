@@ -50,25 +50,20 @@ codeunit 136303 "Job Consumption - Usage Link"
 
         // Exercise
         CreateJobPlanningLinePerType(JobTask, JobPlanningLine);
-
         // Verify
-        with JobPlanningLine do begin
-            SetRange("Schedule Line", true);
-            FindSet();
-            repeat
-                Assert.IsTrue("Usage Link", FieldCaption("Usage Link"));
-                Validate("Usage Link", false);
-                // should still be true
-                Assert.IsTrue("Usage Link", FieldCaption("Usage Link"));
-            until Next() = 0;
-        end;
+        JobPlanningLine.SetRange("Schedule Line", true);
+        JobPlanningLine.FindSet();
+        repeat
+            Assert.IsTrue(JobPlanningLine."Usage Link", JobPlanningLine.FieldCaption("Usage Link"));
+            JobPlanningLine.Validate("Usage Link", false);
+            // should still be true
+            Assert.IsTrue(JobPlanningLine."Usage Link", JobPlanningLine.FieldCaption("Usage Link"));
+        until JobPlanningLine.Next() = 0;
 
-        with JobPlanningLine do begin
-            SetRange("Schedule Line", false);
-            FindFirst();
-            Assert.IsFalse("Usage Link", FieldCaption("Usage Link"));
-            asserterror Validate("Usage Link", true);
-        end;
+        JobPlanningLine.SetRange("Schedule Line", false);
+        JobPlanningLine.FindFirst();
+        Assert.IsFalse(JobPlanningLine."Usage Link", JobPlanningLine.FieldCaption("Usage Link"));
+        asserterror JobPlanningLine.Validate("Usage Link", true);
     end;
 
     [Test]
@@ -92,24 +87,19 @@ codeunit 136303 "Job Consumption - Usage Link"
 
         // Exercise
         CreateJobPlanningLinePerType(JobTask, JobPlanningLine);
-
         // Verify
-        with JobPlanningLine do begin
-            SetRange("Schedule Line", true);
-            FindSet();
-            repeat
-                Assert.IsFalse("Usage Link", 'Usage link for line type that includes budget');
-                Validate("Usage Link", true);
-                Assert.IsTrue("Usage Link", 'Enabling usage link.');
-            until Next() = 0;
-        end;
+        JobPlanningLine.SetRange("Schedule Line", true);
+        JobPlanningLine.FindSet();
+        repeat
+            Assert.IsFalse(JobPlanningLine."Usage Link", 'Usage link for line type that includes budget');
+            JobPlanningLine.Validate("Usage Link", true);
+            Assert.IsTrue(JobPlanningLine."Usage Link", 'Enabling usage link.');
+        until JobPlanningLine.Next() = 0;
 
-        with JobPlanningLine do begin
-            SetRange("Schedule Line", false);
-            FindFirst();
-            Assert.IsFalse("Usage Link", 'Usage link for line type that excludes budget');
-            asserterror Validate("Usage Link", true);
-        end;
+        JobPlanningLine.SetRange("Schedule Line", false);
+        JobPlanningLine.FindFirst();
+        Assert.IsFalse(JobPlanningLine."Usage Link", 'Usage link for line type that excludes budget');
+        asserterror JobPlanningLine.Validate("Usage Link", true);
     end;
 
     [Test]
@@ -1465,7 +1455,7 @@ codeunit 136303 "Job Consumption - Usage Link"
 
         // Verfiy
         asserterror LibraryJob.PostJobJournal(JobJournalLine);
-        Assert.IsTrue(StrPos(GetLastErrorText, 'The Project Planning Line does not exist.') = 1, 'Unexpected error');
+        Assert.ExpectedErrorCannotFind(Database::"Job Planning Line");
     end;
 
     [Test]
@@ -1669,7 +1659,7 @@ codeunit 136303 "Job Consumption - Usage Link"
             // Different sign: no match => verify new line
             Assert.AreEqual(LineCount + 1, JobPlanningLine.Count, 'One planning line should have been created.');
             LibraryJob.VerifyPlanningLines(JobJournalLine, true)
-        end else begin
+        end else
             // Same sign: match => verify updated planning line
             if Abs(QtyToPost) > Abs(QtyToMatch) then begin
                 // Excess posted: new line => verify
@@ -1682,8 +1672,7 @@ codeunit 136303 "Job Consumption - Usage Link"
                 // Partially posted
                 Assert.AreEqual(LineCount, JobPlanningLine.Count, 'No planning lines should have been created.');
                 VerifyJobPlanningLine(BeforeJobPlanningLine, JobPlanningLine, JobJournalLine)
-            end
-        end
+            end;
     end;
 
     [Test]
@@ -2327,12 +2316,10 @@ codeunit 136303 "Job Consumption - Usage Link"
         JobPlanningLine: Record "Job Planning Line";
     begin
         LibraryJob.CreateJobPlanningLine(LibraryJob.PlanningLineTypeContract(), LibraryJob.ResourceType(), JobTask, JobPlanningLine);
-        with JobPlanningLine do begin
-            Validate("No.", ResourceNo);
-            Validate("Work Type Code", WorkTypeCode);
-            Modify(true);
-            exit("Unit Price");
-        end
+        JobPlanningLine.Validate("No.", ResourceNo);
+        JobPlanningLine.Validate("Work Type Code", WorkTypeCode);
+        JobPlanningLine.Modify(true);
+        exit(JobPlanningLine."Unit Price");
     end;
 
     local procedure CreateJobJournalLineWithWorkTypeCode(JobTask: Record "Job Task"; ResourceNo: Code[20]; WorkTypeCode: Code[10]): Decimal
@@ -2340,12 +2327,10 @@ codeunit 136303 "Job Consumption - Usage Link"
         JobJournalLine: Record "Job Journal Line";
     begin
         LibraryJob.CreateJobJournalLineForType(LibraryJob.UsageLineTypeContract(), LibraryJob.ResourceType(), JobTask, JobJournalLine);
-        with JobJournalLine do begin
-            Validate("No.", ResourceNo);
-            Validate("Work Type Code", WorkTypeCode);
-            Modify(true);
-            exit("Unit Price");
-        end
+        JobJournalLine.Validate("No.", ResourceNo);
+        JobJournalLine.Validate("Work Type Code", WorkTypeCode);
+        JobJournalLine.Modify(true);
+        exit(JobJournalLine."Unit Price");
     end;
 
     local procedure CreateJob(ApplyUsageLink: Boolean; BothAllowed: Boolean; var Job: Record Job)
@@ -2428,12 +2413,9 @@ codeunit 136303 "Job Consumption - Usage Link"
     local procedure CreateJobPlanningLinePerType(JobTask: Record "Job Task"; var JobPlanningLine: Record "Job Planning Line")
     begin
         // Create planning line for all line types
-
-        with JobPlanningLine do begin
-            LibraryJob.CreateJobPlanningLine("Line Type"::Budget, Type::Resource, JobTask, JobPlanningLine);
-            LibraryJob.CreateJobPlanningLine("Line Type"::"Both Budget and Billable", Type::Resource, JobTask, JobPlanningLine);
-            LibraryJob.CreateJobPlanningLine("Line Type"::Billable, Type::Resource, JobTask, JobPlanningLine)
-        end;
+        LibraryJob.CreateJobPlanningLine(JobPlanningLine."Line Type"::Budget, JobPlanningLine.Type::Resource, JobTask, JobPlanningLine);
+        LibraryJob.CreateJobPlanningLine(JobPlanningLine."Line Type"::"Both Budget and Billable", JobPlanningLine.Type::Resource, JobTask, JobPlanningLine);
+        LibraryJob.CreateJobPlanningLine(JobPlanningLine."Line Type"::Billable, JobPlanningLine.Type::Resource, JobTask, JobPlanningLine);
 
         JobPlanningLine.SetRange("Job No.", JobTask."Job No.");
         JobPlanningLine.SetRange("Job Task No.", JobTask."Job Task No.");
@@ -2535,37 +2517,33 @@ codeunit 136303 "Job Consumption - Usage Link"
         // Get the sign of the planned quantity
         Sign := BeforeJobPlanningLine.Quantity / Abs(BeforeJobPlanningLine.Quantity);
 
-        with AfterJobPlanningLine do begin
-            TestField(
-              Quantity,
-              Sign * Max(Sign * BeforeJobPlanningLine.Quantity, Sign * (JobJournalLine.Quantity + BeforeJobPlanningLine."Qty. Posted")));
-            TestField("Qty. Posted", BeforeJobPlanningLine."Qty. Posted" + JobJournalLine.Quantity);
-            TestField("Qty. to Transfer to Journal", Quantity - (JobJournalLine.Quantity + BeforeJobPlanningLine."Qty. Posted"));
-            TestField("Remaining Qty.", Quantity - "Qty. Posted");
+        AfterJobPlanningLine.TestField(
+          Quantity,
+          Sign * Max(Sign * BeforeJobPlanningLine.Quantity, Sign * (JobJournalLine.Quantity + BeforeJobPlanningLine."Qty. Posted")));
+        AfterJobPlanningLine.TestField("Qty. Posted", BeforeJobPlanningLine."Qty. Posted" + JobJournalLine.Quantity);
+        AfterJobPlanningLine.TestField("Qty. to Transfer to Journal", AfterJobPlanningLine.Quantity - (JobJournalLine.Quantity + BeforeJobPlanningLine."Qty. Posted"));
+        AfterJobPlanningLine.TestField("Remaining Qty.", AfterJobPlanningLine.Quantity - AfterJobPlanningLine."Qty. Posted");
 
-            TestField("Posted Total Cost", BeforeJobPlanningLine."Posted Total Cost" + Round(JobJournalLine."Total Cost"));
-            TestField(
-              "Posted Total Cost (LCY)", BeforeJobPlanningLine."Posted Total Cost (LCY)" + Round(JobJournalLine."Total Cost (LCY)"));
-            Assert.AreNearlyEqual(
-              BeforeJobPlanningLine."Posted Line Amount" + JobJournalLine."Line Amount", "Posted Line Amount", 0.01,
-              'Posted line Amoung on After Line Matches');
+        AfterJobPlanningLine.TestField("Posted Total Cost", BeforeJobPlanningLine."Posted Total Cost" + Round(JobJournalLine."Total Cost"));
+        AfterJobPlanningLine.TestField(
+          "Posted Total Cost (LCY)", BeforeJobPlanningLine."Posted Total Cost (LCY)" + Round(JobJournalLine."Total Cost (LCY)"));
+        Assert.AreNearlyEqual(
+          BeforeJobPlanningLine."Posted Line Amount" + JobJournalLine."Line Amount", AfterJobPlanningLine."Posted Line Amount", 0.01,
+          'Posted line Amoung on After Line Matches');
 
-            Precision := LibraryJob.GetAmountRoundingPrecision("Currency Code");
-            TestField("Remaining Total Cost", Round("Remaining Qty." * "Unit Cost", Precision));
-            TestField("Remaining Total Cost (LCY)", Round("Remaining Qty." * "Unit Cost", Precision));
-            TestField("Remaining Line Amount", Round("Remaining Qty." * "Unit Price"));
-            TestField("Remaining Line Amount (LCY)", Round("Remaining Qty." * "Unit Price (LCY)"))
-        end
+        Precision := LibraryJob.GetAmountRoundingPrecision(AfterJobPlanningLine."Currency Code");
+        AfterJobPlanningLine.TestField("Remaining Total Cost", Round(AfterJobPlanningLine."Remaining Qty." * AfterJobPlanningLine."Unit Cost", Precision));
+        AfterJobPlanningLine.TestField("Remaining Total Cost (LCY)", Round(AfterJobPlanningLine."Remaining Qty." * AfterJobPlanningLine."Unit Cost", Precision));
+        AfterJobPlanningLine.TestField("Remaining Line Amount", Round(AfterJobPlanningLine."Remaining Qty." * AfterJobPlanningLine."Unit Price"));
+        AfterJobPlanningLine.TestField("Remaining Line Amount (LCY)", Round(AfterJobPlanningLine."Remaining Qty." * AfterJobPlanningLine."Unit Price (LCY)"))
     end;
 
     local procedure VerifyJobPlanningLineDone(JobPlanningLine: Record "Job Planning Line")
     begin
-        with JobPlanningLine do begin
-            TestField("Remaining Qty.", 0);
-            TestField("Remaining Total Cost", 0);
-            TestField("Remaining Line Amount", 0);
-            TestField("Qty. Posted", Quantity)
-        end
+        JobPlanningLine.TestField("Remaining Qty.", 0);
+        JobPlanningLine.TestField("Remaining Total Cost", 0);
+        JobPlanningLine.TestField("Remaining Line Amount", 0);
+        JobPlanningLine.TestField("Qty. Posted", JobPlanningLine.Quantity)
     end;
 
     local procedure AssertNoDiscounts(JobPlanningLine: Record "Job Planning Line")
@@ -2573,16 +2551,14 @@ codeunit 136303 "Job Consumption - Usage Link"
         Precision: Decimal;
     begin
         Precision := LibraryJob.GetAmountRoundingPrecision(JobPlanningLine."Currency Code");
-        with JobPlanningLine do begin
-            TestField("Total Cost", Round(Quantity * "Unit Cost", Precision));
-            TestField("Total Price", Round(Quantity * "Unit Price", Precision));
-            TestField("Line Discount %", 0);
-            TestField("Line Discount Amount", 0);
-            TestField("Line Amount", "Total Price");
-            TestField("Remaining Qty.", Quantity);
-            TestField("Remaining Total Cost", "Total Cost");
-            TestField("Remaining Line Amount", "Line Amount")
-        end
+        JobPlanningLine.TestField("Total Cost", Round(JobPlanningLine.Quantity * JobPlanningLine."Unit Cost", Precision));
+        JobPlanningLine.TestField("Total Price", Round(JobPlanningLine.Quantity * JobPlanningLine."Unit Price", Precision));
+        JobPlanningLine.TestField("Line Discount %", 0);
+        JobPlanningLine.TestField("Line Discount Amount", 0);
+        JobPlanningLine.TestField("Line Amount", JobPlanningLine."Total Price");
+        JobPlanningLine.TestField("Remaining Qty.", JobPlanningLine.Quantity);
+        JobPlanningLine.TestField("Remaining Total Cost", JobPlanningLine."Total Cost");
+        JobPlanningLine.TestField("Remaining Line Amount", JobPlanningLine."Line Amount")
     end;
 
     local procedure UseFromPlan(var JobJournalLine: Record "Job Journal Line"; var JobPlanningLine: Record "Job Planning Line")

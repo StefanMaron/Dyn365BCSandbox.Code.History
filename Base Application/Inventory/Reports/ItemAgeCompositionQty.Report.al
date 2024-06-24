@@ -202,7 +202,9 @@ report 5807 "Item Age Composition - Qty."
         TotalInvtQty: Decimal;
         PrintLine: Boolean;
 
+#pragma warning disable AA0074
         Text002: Label 'Enter the ending date';
+#pragma warning restore AA0074
         ItemAgeCompositionQtyCaptionLbl: Label 'Item Age Composition - Quantity';
         PageNoCaptionLbl: Label 'Page';
         AfterCaptionLbl: Label 'After...';

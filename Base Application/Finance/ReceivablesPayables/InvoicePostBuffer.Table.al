@@ -398,8 +398,8 @@ table 49 "Invoice Post. Buffer"
             Caption = 'Posting Description';
             DataClassification = SystemMetadata;
             ObsoleteReason = 'Merged to W1';
-            ObsoleteState = Pending;
-            ObsoleteTag = '15.0';
+            ObsoleteState = Removed;
+            ObsoleteTag = '25.0';
         }
     }
 

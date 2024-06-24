@@ -38,8 +38,12 @@ codeunit 5922 "Serv-Quote to Order (Yes/No)"
     var
         ServQuoteToOrder: Codeunit "Service-Quote to Order";
 
+#pragma warning disable AA0074
         Text000: Label 'Do you want to convert the quote to an order?';
+#pragma warning disable AA0470
         Text001: Label 'Service quote %1 has been converted to service order no. %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowMessage(var Rec: Record "Service Header"; OrderNo: Code[20]; var HideMessage: Boolean)

@@ -2,7 +2,9 @@ namespace System.Security.AccessControl;
 
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+#if not CLEAN25
 using Microsoft.Integration.FieldService;
+#endif
 using Microsoft.Sales.Customer;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.CRM.Interaction;
@@ -19,15 +21,9 @@ permissionset 618 "D365 DYN CRM READ"
                   tabledata "CDS Connection Setup" = R,
                   tabledata "CDS Coupled Business Unit" = R,
                   tabledata "CDS Environment" = R,
-#if not CLEAN22
-                  tabledata "CDS Failed Option Mapping" = R,
-#endif
                   tabledata "CDS Solution" = R,
                   tabledata "CDS Teammembership" = R,
                   tabledata "CDS Teamroles" = R,
-#if not CLEAN22
-                  tabledata "Coupling Field Buffer" = R,
-#endif
                   tabledata "Coupling Record Buffer" = R,
                   tabledata "Dataverse Entity Change" = R,
                   tabledata "CRM Account" = R,
@@ -81,6 +77,7 @@ permissionset 618 "D365 DYN CRM READ"
                   tabledata "CRM Transactioncurrency" = R,
                   tabledata "CRM Uom" = R,
                   tabledata "CRM Uomschedule" = R,
+#if not CLEAN25
                   tabledata "FS Connection Setup" = R,
                   tabledata "FS Bookable Resource" = R,
                   tabledata "FS Bookable Resource Booking" = R,
@@ -95,6 +92,7 @@ permissionset 618 "D365 DYN CRM READ"
                   tabledata "FS Work Order Service" = R,
                   tabledata "FS Work Order Substatus" = R,
                   tabledata "FS Work Order Type" = R,
+#endif
                   tabledata "Customer Templ." = R,
                   tabledata "Vendor Templ." = R,
                   tabledata "Integration Field Mapping" = R,

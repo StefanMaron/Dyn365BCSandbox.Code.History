@@ -446,9 +446,14 @@ table 28074 "Sales Tax Cr.Memo Line"
         field(5712; "Product Group Code"; Code[10])
         {
             Caption = 'Product Group Code';
+            ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+#if CLEAN25
+            ObsoleteState = Removed;
+            ObsoleteTag = '28.0';
+#else
             ObsoleteState = Pending;
             ObsoleteTag = '17.0';
-            ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+#endif
         }
         field(5811; "Appl.-from Item Entry"; Integer)
         {

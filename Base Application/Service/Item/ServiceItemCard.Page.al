@@ -9,15 +9,15 @@ using Microsoft.Sales.Customer;
 using Microsoft.Service.Comment;
 using Microsoft.Service.Contract;
 using Microsoft.Service.Document;
-using Microsoft.Integration.FieldService;
 using Microsoft.Service.History;
 using Microsoft.Service.Ledger;
 using Microsoft.Service.Maintenance;
 using Microsoft.Service.Reports;
 using Microsoft.Service.Resources;
 using Microsoft.Utilities;
+#if not CLEAN25
 using Microsoft.Integration.Dataverse;
-using Microsoft.Integration.SyncEngine;
+#endif
 
 page 5980 "Service Item Card"
 {
@@ -461,10 +461,22 @@ page 5980 "Service Item Card"
         }
         area(factboxes)
         {
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Service Item"),
+                              "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = Service;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Service Item"),
                               "No." = field("No.");
             }
@@ -727,17 +739,24 @@ page 5980 "Service Item Card"
                     ToolTip = 'View all the ledger entries for the service item or service order that result from posting transactions in service documents that contain warranty agreements.';
                 }
             }
+#if not CLEAN25
             group(ActionGroupFS)
             {
                 Caption = 'Dynamics 365 Field Service';
-                Visible = FSIntegrationEnabled;
-                Enabled = (BlockedFilterApplied and (Rec.Blocked = Rec.Blocked::" ")) or not BlockedFilterApplied;
+                Visible = false;
+                ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '25.0';
+
                 action(CRMGoToProduct)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Customer Asset';
                     Image = CoupledItem;
                     ToolTip = 'Open the coupled Dynamics 365 Field Service customer asset.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
 
                     trigger OnAction()
                     var
@@ -753,6 +772,9 @@ page 5980 "Service Item Card"
                     Caption = 'Synchronize';
                     Image = Refresh;
                     ToolTip = 'Send updated data to Dynamics 365 Field Service.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
 
                     trigger OnAction()
                     var
@@ -766,6 +788,10 @@ page 5980 "Service Item Card"
                     Caption = 'Coupling', Comment = 'Coupling is a noun';
                     Image = LinkAccount;
                     ToolTip = 'Create, change, or delete a coupling between the Business Central record and a Dynamics 365 Field Service record.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
+
                     action(ManageCRMCoupling)
                     {
                         AccessByPermission = TableData "CRM Integration Record" = IM;
@@ -773,6 +799,9 @@ page 5980 "Service Item Card"
                         Caption = 'Set Up Coupling';
                         Image = LinkAccount;
                         ToolTip = 'Create or modify the coupling to a Dynamics 365 Field Service product.';
+                        ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '25.0';
 
                         trigger OnAction()
                         var
@@ -788,6 +817,9 @@ page 5980 "Service Item Card"
                         Caption = 'Match-Based Coupling';
                         Image = CoupledItem;
                         ToolTip = 'Couple resources to products in Dynamics 365 Sales based on matching criteria.';
+                        ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '25.0';
 
                         trigger OnAction()
                         var
@@ -805,9 +837,12 @@ page 5980 "Service Item Card"
                         AccessByPermission = TableData "CRM Integration Record" = D;
                         ApplicationArea = Suite;
                         Caption = 'Delete Coupling';
-                        Enabled = CRMIsCoupledToRecord;
+                        Enabled = false;
                         Image = UnLinkAccount;
                         ToolTip = 'Delete the coupling to a Dynamics 365 Field Service product.';
+                        ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '25.0';
 
                         trigger OnAction()
                         var
@@ -823,6 +858,9 @@ page 5980 "Service Item Card"
                     Caption = 'Synchronization Log';
                     Image = Log;
                     ToolTip = 'View integration synchronization jobs for the resource table.';
+                    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
 
                     trigger OnAction()
                     var
@@ -832,6 +870,7 @@ page 5980 "Service Item Card"
                     end;
                 }
             }
+#endif
         }
         area(processing)
         {
@@ -949,21 +988,7 @@ page 5980 "Service Item Card"
     end;
 
     trigger OnOpenPage()
-    var
-        IntegrationTableMapping: Record "Integration Table Mapping";
-        FSConnectionSetup: Record "FS Connection Setup";
     begin
-        if CRMIntegrationManagement.IsCRMIntegrationEnabled() then
-            FSIntegrationEnabled := FSConnectionSetup.IsEnabled();
-
-        if FSIntegrationEnabled then begin
-            IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
-            IntegrationTableMapping.SetRange("Delete After Synchronization", false);
-            IntegrationTableMapping.SetRange("Table ID", Database::"Service Item");
-            IntegrationTableMapping.SetRange("Integration Table ID", Database::"FS Customer Asset");
-            if IntegrationTableMapping.FindFirst() then
-                BlockedFilterApplied := IntegrationTableMapping.GetTableFilter().Contains('Field40=1(0)');
-        end;
         IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
         IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
         SetNoFieldVisible();
@@ -972,12 +997,8 @@ page 5980 "Service Item Card"
     var
         ResourceSkill: Record "Resource Skill";
         FormatAddress: Codeunit "Format Address";
-        CRMIntegrationManagement: Codeunit "CRM Integration Management";
         SkilledResourceList: Page "Skilled Resource List";
-        FSIntegrationEnabled: Boolean;
         NoFieldVisible: Boolean;
-        CRMIsCoupledToRecord: Boolean;
-        BlockedFilterApplied: Boolean;
         IsSellToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
         VariantCodeMandatory: Boolean;
@@ -1007,9 +1028,9 @@ page 5980 "Service Item Card"
 
     local procedure SetNoFieldVisible()
     var
-        DocumentNoVisibility: Codeunit DocumentNoVisibility;
+        ServDocumentNoVisibility: Codeunit "Serv. Document No. Visibility";
     begin
-        NoFieldVisible := DocumentNoVisibility.ServiceItemNoIsVisible();
+        NoFieldVisible := ServDocumentNoVisibility.ServiceItemNoIsVisible();
     end;
 }
 
