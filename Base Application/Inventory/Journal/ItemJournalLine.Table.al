@@ -3788,6 +3788,7 @@ table 83 "Item Journal Line"
         else
             ReservEntry.SetSourceFilter(Database::"Item Journal Line", "Entry Type".AsInteger(), "Journal Template Name", "Line No.", SourceKey);
         ReservEntry.SetSourceFilter("Journal Batch Name", 0);
+        OnAfterSetReservEntrySourceFilters(ReservEntry, SourceKey);
     end;
 
     internal procedure IsSourceSales(): Boolean
@@ -5881,6 +5882,11 @@ table 83 "Item Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckSerialNoQty(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetReservEntrySourceFilters(var ReservationEntry: Record "Reservation Entry"; SourceKey: Boolean);
     begin
     end;
 }

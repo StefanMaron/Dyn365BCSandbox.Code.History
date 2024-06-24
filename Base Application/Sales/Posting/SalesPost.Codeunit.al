@@ -1255,7 +1255,7 @@ codeunit 80 "Sales-Post"
 #if not CLEAN23
         end;
 #endif
-        UpdateSalesHeader(CustLedgEntry);
+        UpdateSalesHeader(CustLedgEntry, SalesHeader);
 
         // Balancing account
         if SalesHeader."Bal. Account No." <> '' then begin
@@ -6286,13 +6286,13 @@ codeunit 80 "Sales-Post"
     end;
 #endif
 
-    local procedure UpdateSalesHeader(var CustLedgerEntry: Record "Cust. Ledger Entry")
+    local procedure UpdateSalesHeader(var CustLedgerEntry: Record "Cust. Ledger Entry"; var SalesHeader: Record "Sales Header")
     var
         GenJnlLine: Record "Gen. Journal Line";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateSalesHeader(CustLedgerEntry, SalesInvHeader, SalesCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled);
+        OnBeforeUpdateSalesHeader(CustLedgerEntry, SalesInvHeader, SalesCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled, GenJnlLineDocNo, PreviewMode, SalesHeader);
         if IsHandled then
             exit;
 
@@ -6311,7 +6311,7 @@ codeunit 80 "Sales-Post"
                 end;
         end;
 
-        OnAfterUpdateSalesHeader(CustLedgerEntry, SalesInvHeader, SalesCrMemoHeader, GenJnlLineDocType.AsInteger());
+        OnAfterUpdateSalesHeader(CustLedgerEntry, SalesInvHeader, SalesCrMemoHeader, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, PreviewMode, SalesHeader);
     end;
 
     local procedure MakeSalesLineToShip(var SalesLineToShip: Record "Sales Line"; SalesLineInvoiced: Record "Sales Line")
@@ -8431,8 +8431,10 @@ codeunit 80 "Sales-Post"
                 ReturnRcptLine."Return Qty. Rcd. Not Invd." :=
                   ReturnRcptLine.Quantity - ReturnRcptLine."Quantity Invoiced";
 
-                OnPostItemTrackingForReceiptOnBeforeReturnRcptLineModify(SalesHeader, ReturnRcptLine, SalesLine);
-                ReturnRcptLine.Modify();
+                IsHandled := false;
+                OnPostItemTrackingForReceiptOnBeforeReturnRcptLineModify(SalesHeader, ReturnRcptLine, SalesLine, IsHandled);
+                if not IsHandled then
+                    ReturnRcptLine.Modify();
 
                 OnBeforePostItemTrackingReturnRcpt(
                   SalesInvHeader, SalesShptLine, TempTrackingSpecification, TrackingSpecificationExists,
@@ -9722,7 +9724,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateSalesHeader(var CustLedgerEntry: Record "Cust. Ledger Entry"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; GenJnlLineDocType: Integer)
+    local procedure OnAfterUpdateSalesHeader(var CustLedgerEntry: Record "Cust. Ledger Entry"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; GenJnlLineDocType: Integer; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean; var SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -10496,7 +10498,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateSalesHeader(var CustLedgerEntry: Record "Cust. Ledger Entry"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; GenJnlLineDocType: Option; var IsHandled: Boolean)
+    local procedure OnBeforeUpdateSalesHeader(var CustLedgerEntry: Record "Cust. Ledger Entry"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; GenJnlLineDocType: Option; var IsHandled: Boolean; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean; var SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -11893,7 +11895,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostItemTrackingForReceiptOnBeforeReturnRcptLineModify(SalesHeader: Record "Sales Header"; var ReturnRcptLine: Record "Return Receipt Line"; SalesLine: Record "Sales Line")
+    local procedure OnPostItemTrackingForReceiptOnBeforeReturnRcptLineModify(SalesHeader: Record "Sales Header"; var ReturnRcptLine: Record "Return Receipt Line"; SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
