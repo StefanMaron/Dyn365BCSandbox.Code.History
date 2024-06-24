@@ -16,7 +16,9 @@ codeunit 500 "Enum Assignment Management"
     end;
 
     var
+#pragma warning disable AA0470
         DocumentTypeEnumErr: Label '%1 Document Type %2 enum cannot be converted to %3 Document Type enum.';
+#pragma warning restore AA0470
 
     procedure GetSalesApprovalDocumentType(SalesDocumentType: Enum "Sales Document Type") ApprovalDocumentType: Enum "Approval Document Type"
     var

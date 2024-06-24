@@ -1006,7 +1006,9 @@ page 8901 "Finance Manager Role Center"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Reconciliation';
-                        RunObject = Report "Create Check Installments";
+                        Image = BankAccountRec;
+                        RunObject = Report "Bank Account Reconciliation";
+                        ToolTip = 'Prepare to print a report of bank ledger entries that are not recorded so that it helps in bank reconciliation. This report reconciles the balance of a defined bank account as at a defined date. The report displays open bank ledger entries as either unpresented checks or deposits not recorded.';
                     }
                     action("Deposit Slip")
                     {
@@ -2634,15 +2636,6 @@ page 8901 "Finance Manager Role Center"
                         Tooltip = 'Open the VAT Reports Configuration page.';
                     }
                 }
-#if not CLEAN22
-                group("Group59")
-                {
-                    Caption = 'Intrastat';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '22.0';
-                    ObsoleteReason = 'Intrastat related functionalities are moved to Intrastat extensions.';
-                }
-#endif
                 group("Group60")
                 {
                     Caption = 'Intercompany';

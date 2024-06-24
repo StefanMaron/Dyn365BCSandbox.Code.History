@@ -390,6 +390,12 @@ page 5972 "Posted Service Credit Memo"
                         Editable = false;
                         ToolTip = 'Specifies the country/region in the customer''s address.';
                     }
+                    field("Ship-to Phone"; Rec."Ship-to Phone")
+                    {
+                        ApplicationArea = Service;
+                        Caption = 'Phone No.';
+                        ToolTip = 'Specifies the telephone number of the company''s shipping address.';
+                    }
                     field("Ship-to Contact"; Rec."Ship-to Contact")
                     {
                         ApplicationArea = Service;
@@ -470,10 +476,22 @@ page 5972 "Posted Service Credit Memo"
         }
         area(factboxes)
         {
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Service Cr.Memo Header"),
+                              "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = Service;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Service Cr.Memo Header"),
                               "No." = field("No.");
             }

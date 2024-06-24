@@ -450,6 +450,11 @@ table 6650 "Return Shipment Header"
             MaxValue = 100;
             MinValue = 0;
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -568,13 +573,22 @@ table 6650 "Return Shipment Header"
         DimMgt: Codeunit DimensionManagement;
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         UserSetupMgt: Codeunit "User Setup Management";
+#pragma warning disable AA0074
         Text001: Label 'Posted Document Dimensions';
+#pragma warning restore AA0074
 
     procedure PrintRecords(ShowRequestForm: Boolean)
     var
         ReportSelection: Record "Report Selections";
+        IsHandled: Boolean;
     begin
         ReturnShptHeader.Copy(Rec);
+
+        IsHandled := false;
+        OnBeforePrintRecords(ReturnShptHeader, ShowRequestForm, IsHandled);
+        if IsHandled then
+            exit;
+
         ReportSelection.PrintWithDialogForVend(
           ReportSelection.Usage::"P.Ret.Shpt.", ReturnShptHeader, ShowRequestForm, ReturnShptHeader.FieldNo("Buy-from Vendor No."));
     end;
@@ -616,6 +630,11 @@ table 6650 "Return Shipment Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupAppliesToDocNoOnAfterSetFilters(var VendLedgEntry: Record "Vendor Ledger Entry"; ReturnShipmentHeader: Record "Return Shipment Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePrintRecords(var ReturnShipmentHeader: Record "Return Shipment Header"; ShowRequestForm: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

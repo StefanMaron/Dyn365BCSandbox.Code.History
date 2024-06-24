@@ -8,7 +8,6 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
-using Microsoft.Service.Document;
 
 page 576 "VAT Specification Subform"
 {
@@ -91,20 +90,17 @@ page 576 "VAT Specification Subform"
                     trigger OnValidate()
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
-                            if ParentControl = PAGE::"Service Order Statistics" then
-                                Error(Text000, Rec.FieldCaption("VAT Amount"), Text002)
-                            else
-                                Error(Text000, Rec.FieldCaption("VAT Amount"), Text003);
+                            CheckAmountChange(Rec.FieldCaption("VAT Amount"));
 
                         GLSetup.Get();
                         if GLSetup."Additional Reporting Currency" <> '' then
                             AddCurrency.Get(GLSetup."Additional Reporting Currency");
                         if PurchHeader1."Posting Date" <> 0D then begin
-                            if (PurchHeader1."Vendor Exchange Rate (ACY)" <> 0) and (PurchHeader1."Currency Code" = '') then begin
+                            if (PurchHeader1."Vendor Exchange Rate (ACY)" <> 0) and (PurchHeader1."Currency Code" = '') then
                                 CurrencyFactor :=
                                   CurrExchRate.ExchangeRateFactorFRS21(
                                     PurchHeader1."Posting Date", GLSetup."Additional Reporting Currency", PurchHeader1."Vendor Exchange Rate (ACY)")
-                            end else
+                            else
                                 CurrencyFactor :=
                                   CurrExchRate.ExchangeRate(
                                     PurchHeader1."Posting Date", GLSetup."Additional Reporting Currency");
@@ -183,10 +179,7 @@ page 576 "VAT Specification Subform"
                     trigger OnValidate()
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
-                            if ParentControl = PAGE::"Service Order Statistics" then
-                                Error(Text000, Rec.FieldCaption("Non-Deductible VAT Amount"), Text002)
-                            else
-                                Error(Text000, Rec.FieldCaption("Non-Deductible VAT Amount"), Text003);
+                            CheckAmountChange(Rec.FieldCaption("Non-Deductible VAT Amount"));
                         NonDeductibleVAT.CheckNonDeductibleVATAmountDiff(Rec, xRec, AllowVATDifference, Currency);
                         ModifyRec();
                     end;
@@ -277,8 +270,8 @@ page 576 "VAT Specification Subform"
 
     var
         Currency: Record Currency;
-        ServHeader: Record "Service Header";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
+        SourceHeader: Variant;
         CurrencyCode: Code[10];
         AllowVATDifference: Boolean;
         AllowVATDifferenceOnThisTab: Boolean;
@@ -300,10 +293,13 @@ page 576 "VAT Specification Subform"
         "Amount (ACY)Visible": Boolean;
         "VAT Difference (ACY)Visible": Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 can only be modified on the %2 tab.';
         Text001: Label 'The total %1 for a document must not exceed the value %2 in the %3 field.';
-        Text002: Label 'Details';
+#pragma warning restore AA0470
         Text003: Label 'Invoicing';
+#pragma warning restore AA0074
 
     protected var
         AllowInvDisc, InvoiceDiscountAmountEditable : Boolean;
@@ -385,20 +381,19 @@ page 576 "VAT Specification Subform"
               Currency.FieldCaption("Max. VAT Difference Allowed"));
     end;
 
+    local procedure CheckAmountChange(AmountFieldCaption: Text)
+    begin
+        OnBeforeCheckAmountChange(ParentControl, AmountFieldCaption);
+        Error(Text000, AmountFieldCaption, Text003);
+    end;
+
     local procedure ModifyRec()
-    var
-        ServLine: Record "Service Line";
     begin
         Rec.Modified := true;
         Rec.Modify();
 
-        if ((ParentControl = PAGE::"Service Order Statistics") and
-            (CurrentTabNo <> 1))
-        then
-            if Rec.GetAnyLineModified() then begin
-                ServLine.UpdateVATOnLines(0, ServHeader, ServLine, Rec);
-                ServLine.UpdateVATOnLines(1, ServHeader, ServLine, Rec);
-            end;
+        if SourceHeader.IsRecord() then
+            OnAfterModifyRec(SourceHeader, Rec, ParentControl, CurrentTabNo);
     end;
 
     procedure SetParentControl(ID: Integer)
@@ -407,9 +402,17 @@ page 576 "VAT Specification Subform"
         OnAfterSetParentControl(ParentControl);
     end;
 
-    procedure SetServHeader(ServiceHeader: Record "Service Header")
+#if not CLEAN25
+    [Obsolete('Replaced by procedure SetSourceHeader', '25.0')]
+    procedure SetServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header")
     begin
-        ServHeader := ServiceHeader;
+        SourceHeader := ServiceHeader;
+    end;
+#endif
+
+    procedure SetSourceHeader(NewSourceHeader: Variant)
+    begin
+        SourceHeader := NewSourceHeader;
     end;
 
     procedure SetCurrentTabNo(TabNo: Integer)
@@ -424,6 +427,16 @@ page 576 "VAT Specification Subform"
 
     [IntegrationEvent(true, false)]
     procedure OnBeforeInitGlobals(NewCurrencyCode: Code[10]; NewAllowVATDifference: Boolean; NewAllowVATDifferenceOnThisTab: Boolean; NewPricesIncludingVAT: Boolean; NewAllowInvDisc: Boolean; NewVATBaseDiscPct: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckAmountChange(ParentControl: Integer; AmountFieldCaption: Text);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterModifyRec(var SourceHeader: Variant; var VATAmountLine: Record "VAT Amount Line"; ParentControl: Integer; CurrentTabNo: Integer)
     begin
     end;
 

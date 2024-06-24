@@ -565,14 +565,20 @@ page 6520 "Item Tracing"
         TempTrackEntry: Record "Item Tracing Buffer" temporary;
         ItemTracingMgt: Codeunit "Item Tracing Mgt.";
         ActualExpansionStatus: Option "Has Children",Expanded,"No Children";
+#pragma warning disable AA0074
         Text001: Label 'Item No. Filter is required.';
+#pragma warning restore AA0074
         TraceText: Text;
+#pragma warning disable AA0470
         TraceTextTxt: Label 'Serial No.: %1, Lot No.: %2, Package No. %3, Item: %4, Variant: %5, Trace Method: %6, Show Components: %7', Comment = '%1 - Serial No.';
+#pragma warning restore AA0470
         PreviousExists: Boolean;
         NextExists: Boolean;
+#pragma warning disable AA0074
         Text003: Label 'Filters are too large to show.';
         Text004: Label 'Origin->Usage,Usage->Origin';
         Text005: Label 'No,Item-tracked Only,All';
+#pragma warning restore AA0074
         DescriptionIndent: Integer;
         FunctionsEnable: Boolean;
         PrintEnable: Boolean;

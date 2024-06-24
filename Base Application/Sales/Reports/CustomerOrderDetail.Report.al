@@ -336,8 +336,12 @@ report 108 "Customer - Order Detail"
         CurrencyCode2: Code[10];
         PageGroupNo: Integer;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Shipment Date: %1';
         Text001: Label 'Sales Order Line: %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CustOrderDetailCaptionLbl: Label 'Customer - Order Detail';
         PageCaptionLbl: Label 'Page';
         AllAmtAreInLCYCaptionLbl: Label 'All amounts are in LCY';

@@ -1875,12 +1875,10 @@ codeunit 137062 "SCM Sales & Receivables"
 
     local procedure VerifySalesLineDetails(SalesLine: Record "Sales Line"; ExpectedType: Enum "Sales Line Type"; ExpectedNo: Code[20]; ExpectedBOMItemNo: Code[20]; ExpectedDescription: Text[100])
     begin
-        with SalesLine do begin
-            Assert.AreEqual(ExpectedType, Type, FieldCaption(Type));
-            Assert.AreEqual(ExpectedNo, "No.", FieldCaption("No."));
-            Assert.AreEqual(ExpectedBOMItemNo, "BOM Item No.", FieldCaption("BOM Item No."));
-            Assert.AreEqual(ExpectedDescription, Description, FieldCaption(Description));
-        end;
+        Assert.AreEqual(ExpectedType, SalesLine.Type, SalesLine.FieldCaption(Type));
+        Assert.AreEqual(ExpectedNo, SalesLine."No.", SalesLine.FieldCaption("No."));
+        Assert.AreEqual(ExpectedBOMItemNo, SalesLine."BOM Item No.", SalesLine.FieldCaption("BOM Item No."));
+        Assert.AreEqual(ExpectedDescription, SalesLine.Description, SalesLine.FieldCaption(Description));
     end;
 
     local procedure VerifySalesLinesAfterExplodeBOMWithAutoExtTexts(SalesLine: Record "Sales Line"; ParentItem: Record Item; ChildItem: Record Item; ParentItemExtText: Text[100]; ChildItemExtText: Text[100])

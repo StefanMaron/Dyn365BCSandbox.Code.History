@@ -33,6 +33,7 @@ codeunit 141008 "ERM - Miscellaneous APAC"
         IsInitialized: Boolean;
         CurrentSaveValuesId: Integer;
         LinesNotUpdatedMsg: Label 'You have changed %1 on the purchase header, but it has not been changed on the existing purchase lines.', Comment = 'You have changed Posting Date on the purchase header, but it has not been changed on the existing purchase lines.';
+        ValueMustBeEqualErr: Label '%1 must be equal to %2 in the %3.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Table Caption';
 
     [Test]
     [Scope('OnPrem')]
@@ -1073,6 +1074,123 @@ codeunit 141008 "ERM - Miscellaneous APAC"
           Round(PurchaseLine."Amount (ACY)" + PurchaseLine."VAT Base (ACY)" * PurchaseLine."VAT %" / 100));
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure VerifyAmountACYInVATAmountLine()
+    var
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
+        VATPostingSetup: Record "VAT Posting Setup";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Currency: Record Currency;
+        ExpectedAmountACY: Decimal;
+        NewExchRate: Decimal;
+    begin
+        // [SCENARIO 533482] The "Amount (ACY)" value is incorrect when the currency code is the same in the Purchase Header and Reporting Currency fields in General Ledger Setup.
+        Initialize();
+
+        // [GIVEN] Update Reporting Currency in the General Ledger Setup.
+        LibraryERM.CreateCurrency(Currency);
+        LibraryERM.SetAddReportingCurrency(Currency.Code);
+
+        // [GIVEN] Create an Exchange Rate.
+        NewExchRate := LibraryRandom.RandDecInRange(10, 20, 2);
+        LibraryERM.CreateExchangeRate(
+            Currency.Code,
+            WorkDate(),
+            NewExchRate,
+            NewExchRate);
+
+        // [GIVEN] Create a VAT Posting Setup with Accounts.
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 0);
+
+        // [GIVEN] Create a Purchase Invoice.
+        LibraryPurchase.CreatePurchHeader(
+            PurchaseHeader,
+            PurchaseHeader."Document Type"::Invoice,
+            LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+
+        // [GIVEN] Create a Purchase Line with a VAT Product Posting Group.
+        LibraryPurchase.CreatePurchaseLine(
+            PurchaseLine,
+            PurchaseHeader,
+            PurchaseLine.Type::Item,
+            LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group"),
+            LibraryRandom.RandInt(100));
+
+        // [GIVEN] Update Direct Unit Cost in Purchase Line.
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
+        PurchaseLine.Modify(true);
+
+        // [WHEN] Calculate VAT Amount Line.
+        ExpectedAmountACY := Round(PurchaseLine."VAT Base Amount" * NewExchRate);
+        PurchaseLine.CalcVATAmountLines(0, PurchaseHeader, PurchaseLine, TempVATAmountLine);
+
+        // [VERIFY] Verify "Amount (ACY)" in VAT Amount Line when the currency code is different in the Purchase Header and Reporting Currency fields in General Ledger Setup.
+        Assert.AreEqual(
+            ExpectedAmountACY,
+            TempVATAmountLine."Amount (ACY)",
+            StrSubstNo(
+                ValueMustBeEqualErr,
+                TempVATAmountLine.FieldCaption("Amount (ACY)"),
+                ExpectedAmountACY,
+                TempVATAmountLine.TableCaption()));
+
+        // [GIVEN] Create another Purchase Invoice.
+        LibraryPurchase.CreatePurchHeader(
+            PurchaseHeader,
+            PurchaseHeader."Document Type"::Invoice,
+            LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+
+        // [GIVEN] Update Currency Code in Purchase Header.
+        PurchaseHeader.Validate("Currency Code", Currency.Code);
+        PurchaseHeader.Modify();
+
+        // [GIVEN] Create a Purchase Line with a VAT Product Posting Group.
+        LibraryPurchase.CreatePurchaseLine(
+            PurchaseLine,
+            PurchaseHeader,
+            PurchaseLine.Type::Item,
+            LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group"),
+            LibraryRandom.RandInt(100));
+
+        // [GIVEN] Update Direct Unit Cost in Purchase Line.
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Save Expected "Amount ACY".
+        ExpectedAmountACY := Round(PurchaseLine."VAT Base Amount");
+
+        // [GIVEN] Create another Purchase Line with a VAT Product Posting Group.
+        LibraryPurchase.CreatePurchaseLine(
+            PurchaseLine,
+            PurchaseHeader,
+            PurchaseLine.Type::Item,
+            LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group"),
+            LibraryRandom.RandInt(100));
+
+        // [GIVEN] Update Direct Unit Cost in Purchase Line.
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Save Expected "Amount ACY".
+        ExpectedAmountACY += Round(PurchaseLine."VAT Base Amount");
+
+        // [WHEN] Calculate VAT Amount Line.
+        TempVATAmountLine.DeleteAll();
+        PurchaseLine.CalcVATAmountLines(0, PurchaseHeader, PurchaseLine, TempVATAmountLine);
+
+        // [VERIFY] Verify "Amount (ACY)" in VAT Amount Line when the currency code is same in the Purchase Header and Reporting Currency fields in General Ledger Setup.
+        Assert.AreEqual(
+            ExpectedAmountACY,
+            TempVATAmountLine."Amount (ACY)",
+            StrSubstNo(
+                ValueMustBeEqualErr,
+                TempVATAmountLine.FieldCaption("Amount (ACY)"),
+                ExpectedAmountACY,
+                TempVATAmountLine.TableCaption()));
+    end;
+
     local procedure Initialize()
     var
         LibraryApplicationArea: Codeunit "Library - Application Area";
@@ -1111,30 +1229,26 @@ codeunit 141008 "ERM - Miscellaneous APAC"
         LibraryERM.CreateBankAccReconciliation(
           BankAccReconciliation, BankAccount."No.", BankAccReconciliation."Statement Type"::"Payment Application");
         LibraryERM.CreateBankAccReconciliationLn(BankAccReconciliationLine, BankAccReconciliation);
-        with BankAccReconciliationLine do begin
-            Validate("Transaction Date", WorkDate());
-            Validate("Account Type", "Account Type"::"G/L Account");
-            Validate("Account No.", GLAccountNo);
-            Validate("Statement Amount", StmtAmount);
-            Modify();
-        end;
+        BankAccReconciliationLine.Validate("Transaction Date", WorkDate());
+        BankAccReconciliationLine.Validate("Account Type", BankAccReconciliationLine."Account Type"::"G/L Account");
+        BankAccReconciliationLine.Validate("Account No.", GLAccountNo);
+        BankAccReconciliationLine.Validate("Statement Amount", StmtAmount);
+        BankAccReconciliationLine.Modify();
     end;
 
     local procedure CreatePaymentApplication(var BankAccReconLine: Record "Bank Acc. Reconciliation Line"; AmountToApply: Decimal)
     var
         AppliedPaymentEntry: Record "Applied Payment Entry";
     begin
-        with AppliedPaymentEntry do begin
-            Init();
-            "Statement Type" := BankAccReconLine."Statement Type";
-            "Bank Account No." := BankAccReconLine."Bank Account No.";
-            "Statement No." := BankAccReconLine."Statement No.";
-            "Statement Line No." := BankAccReconLine."Statement Line No.";
-            "Account Type" := BankAccReconLine."Account Type";
-            "Account No." := BankAccReconLine."Account No.";
-            "Applied Amount" := AmountToApply;
-            Insert();
-        end;
+        AppliedPaymentEntry.Init();
+        AppliedPaymentEntry."Statement Type" := BankAccReconLine."Statement Type";
+        AppliedPaymentEntry."Bank Account No." := BankAccReconLine."Bank Account No.";
+        AppliedPaymentEntry."Statement No." := BankAccReconLine."Statement No.";
+        AppliedPaymentEntry."Statement Line No." := BankAccReconLine."Statement Line No.";
+        AppliedPaymentEntry."Account Type" := BankAccReconLine."Account Type";
+        AppliedPaymentEntry."Account No." := BankAccReconLine."Account No.";
+        AppliedPaymentEntry."Applied Amount" := AmountToApply;
+        AppliedPaymentEntry.Insert();
 
         BankAccReconLine.Validate("Applied Amount", AmountToApply);
         BankAccReconLine.Modify();
@@ -1597,56 +1711,48 @@ codeunit 141008 "ERM - Miscellaneous APAC"
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            SetRange("Document No.", PostedDocNo);
-            SetRange("Document Type", "Document Type"::Invoice);
-            SetRange("G/L Account No.", GetReceivablesAccountFromCustomerPostingGroup(CustomerNo));
-            FindFirst();
-            TestField(Description, ExpectedDescription);
-        end;
+        GLEntry.SetRange("Document No.", PostedDocNo);
+        GLEntry.SetRange("Document Type", GLEntry."Document Type"::Invoice);
+        GLEntry.SetRange("G/L Account No.", GetReceivablesAccountFromCustomerPostingGroup(CustomerNo));
+        GLEntry.FindFirst();
+        GLEntry.TestField(Description, ExpectedDescription);
     end;
 
     local procedure VerifyGLEntriesForNotReceivablesAccountsDescription(PostedDocNo: Code[20]; CustomerNo: Code[20]; ExpectedDescription: Text)
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            SetRange("Document No.", PostedDocNo);
-            SetRange("Document Type", "Document Type"::Invoice);
-            SetFilter("G/L Account No.", StrSubstNo('<>%1', GetReceivablesAccountFromCustomerPostingGroup(CustomerNo)));
-            FindSet();
-            repeat
-                TestField(Description, ExpectedDescription);
-            until Next() = 0;
-        end;
+        GLEntry.SetRange("Document No.", PostedDocNo);
+        GLEntry.SetRange("Document Type", GLEntry."Document Type"::Invoice);
+        GLEntry.SetFilter("G/L Account No.", StrSubstNo('<>%1', GetReceivablesAccountFromCustomerPostingGroup(CustomerNo)));
+        GLEntry.FindSet();
+        repeat
+            GLEntry.TestField(Description, ExpectedDescription);
+        until GLEntry.Next() = 0;
     end;
 
     local procedure VerifyGLEntryForPayablesAccountDescription(PostedDocNo: Code[20]; VendorNo: Code[20]; ExpectedDescription: Text)
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            SetRange("Document No.", PostedDocNo);
-            SetRange("Document Type", "Document Type"::Invoice);
-            SetRange("G/L Account No.", GetPayablesAccountFromVendorPostingGroup(VendorNo));
-            FindFirst();
-            TestField(Description, ExpectedDescription);
-        end;
+        GLEntry.SetRange("Document No.", PostedDocNo);
+        GLEntry.SetRange("Document Type", GLEntry."Document Type"::Invoice);
+        GLEntry.SetRange("G/L Account No.", GetPayablesAccountFromVendorPostingGroup(VendorNo));
+        GLEntry.FindFirst();
+        GLEntry.TestField(Description, ExpectedDescription);
     end;
 
     local procedure VerifyGLEntriesForNotPayablesAccountsDescription(PostedDocNo: Code[20]; VendorNo: Code[20]; ExpectedDescription: Text)
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            SetRange("Document No.", PostedDocNo);
-            SetRange("Document Type", "Document Type"::Invoice);
-            SetFilter("G/L Account No.", StrSubstNo('<>%1', GetPayablesAccountFromVendorPostingGroup(VendorNo)));
-            FindSet();
-            repeat
-                TestField(Description, ExpectedDescription);
-            until Next() = 0;
-        end;
+        GLEntry.SetRange("Document No.", PostedDocNo);
+        GLEntry.SetRange("Document Type", GLEntry."Document Type"::Invoice);
+        GLEntry.SetFilter("G/L Account No.", StrSubstNo('<>%1', GetPayablesAccountFromVendorPostingGroup(VendorNo)));
+        GLEntry.FindSet();
+        repeat
+            GLEntry.TestField(Description, ExpectedDescription);
+        until GLEntry.Next() = 0;
     end;
 
     local procedure InitGSTPurchaseEntry()

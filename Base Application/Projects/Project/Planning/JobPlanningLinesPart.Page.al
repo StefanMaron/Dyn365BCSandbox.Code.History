@@ -678,12 +678,11 @@ page 1015 "Job Planning Lines Part"
 
     trigger OnModifyRecord(): Boolean
     begin
-        if Rec."System-Created Entry" then begin
+        if Rec."System-Created Entry" then
             if Confirm(Text001, false) then
                 Rec."System-Created Entry" := false
             else
                 Error('');
-        end;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -704,7 +703,9 @@ page 1015 "Job Planning Lines Part"
 
     var
         JobCreateInvoice: Codeunit "Job Create-Invoice";
+#pragma warning disable AA0074
         Text001: Label 'This project planning line was automatically generated. Do you want to continue?';
+#pragma warning restore AA0074
         ExtendedPriceEnabled: Boolean;
         VariantCodeMandatory: Boolean;
 

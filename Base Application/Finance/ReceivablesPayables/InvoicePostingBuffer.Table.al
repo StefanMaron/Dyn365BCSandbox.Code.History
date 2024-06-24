@@ -286,7 +286,7 @@ table 55 "Invoice Posting Buffer"
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
-            Caption = 'Non-Deductible VAT %"';
+            Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
             DataClassification = SystemMetadata;
         }
@@ -834,7 +834,7 @@ table 55 "Invoice Posting Buffer"
             PurchSetup."Copy Line Descr. to G/L Entry",
             PurchaseLine."Line No.",
             PurchaseLine.Description,
-            PurchaseHeader."Posting Description", false);
+            PurchaseHeader."Posting Description", true);
     end;
 
     local procedure UpdateEntryDescriptionFromSalesLine(SalesLine: Record "Sales Line")
@@ -848,7 +848,7 @@ table 55 "Invoice Posting Buffer"
             SalesSetup."Copy Line Descr. to G/L Entry",
             SalesLine."Line No.",
             SalesLine.Description,
-            SalesHeader."Posting Description", false);
+            SalesHeader."Posting Description", SalesSetup."Copy Line Descr. to G/L Entry");
     end;
 
     local procedure UpdateEntryDescriptionFromServiceLine(ServiceLine: Record "Service Line")
@@ -862,16 +862,16 @@ table 55 "Invoice Posting Buffer"
             ServiceSetup."Copy Line Descr. to G/L Entry",
             ServiceLine."Line No.",
             ServiceLine.Description,
-            ServiceHeader."Posting Description", true);
+            ServiceHeader."Posting Description", false);
     end;
 
-    local procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100]; IsService: Boolean)
+    local procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100]; SetLineNo: Boolean)
     begin
         "Entry Description" := HeaderDescription;
         if Type in [Type::"G/L Account", Type::"Fixed Asset"] then begin
             if CopyLineDescrToGLEntry then
                 "Entry Description" := LineDescription;
-            if not IsService then
+            if SetLineNo then
                 "Fixed Asset Line No." := LineNo;
         end;
     end;

@@ -32,7 +32,6 @@ codeunit 137295 "SCM Inventory Misc. III"
 #endif
         TrackingOption: Option AssignSerialNo,AssignLotNo,SelectEntries,SetLotNo;
         isInitialized: Boolean;
-        ApplyItemEntryError: Label '%1 must have a value in %2: Document Type=%3, Document No.=%4';
         ChangeBaseUnitOfMeasureError: Label 'You cannot change Base Unit of Measure because there are one or more open ledger entries for this item.';
         CancelReservationMessage: Label 'Do you want to cancel all reservations in ';
         ClosedFiscalYear: Label 'Once the fiscal year is closed it cannot be opened again, and the periods in the fiscal year cannot be changed.';
@@ -42,7 +41,6 @@ codeunit 137295 "SCM Inventory Misc. III"
         FinishProductionOrder: Label 'Production Order %1 has not been finished. Some output is still missing.';
         PhysInvLedgerEntriesExists: Label 'Physical Inventory Ledger Entries Must Be Deleted.';
         ProdOrderCreated: Label 'Prod. Order';
-        ReservedQtyError: Label 'Reserved Qty. (Base) must be equal to ''0''  in Prod. Order Line: Status=%1, Prod. Order No.=%2';
         PostJournalLines: Label 'Do you want to post the journal lines';
         RegisterJournalLines: Label 'Do you want to register the journal lines?';
         SuccessfullyPostLines: Label 'The journal lines were successfully posted';
@@ -82,6 +80,7 @@ codeunit 137295 "SCM Inventory Misc. III"
     var
         SalesLine: Record "Sales Line";
         ProductionOrder: Record "Production Order";
+        ProdOrderLine: Record "Prod. Order Line";
     begin
         // Verify error while Refresh Planned Production Order created from Sales Order.
 
@@ -94,7 +93,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         asserterror LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
 
         // Verify: Verify error while Refresh Planned Production Order.
-        Assert.ExpectedError(StrSubstNo(ReservedQtyError, ProductionOrder.Status, ProductionOrder."No."));
+        Assert.ExpectedTestFieldError(ProdOrderLine.FieldCaption("Reserved Qty. (Base)"), Format(0));
     end;
 
     [Test]
@@ -126,6 +125,7 @@ codeunit 137295 "SCM Inventory Misc. III"
     var
         SalesLine: Record "Sales Line";
         ProductionOrder: Record "Production Order";
+        ProdOrderLine: Record "Prod. Order Line";
     begin
         // Verify error while Refresh Planned Production Order created from Sales Order and after changing the Production Order status from Planned to Firm Planned.
 
@@ -142,7 +142,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         asserterror LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
 
         // Verify: Verify error while Refresh Firm Planned Production Order.
-        Assert.ExpectedError(StrSubstNo(ReservedQtyError, ProductionOrder.Status, ProductionOrder."No."));
+        Assert.ExpectedTestFieldError(ProdOrderLine.FieldCaption("Reserved Qty. (Base)"), Format(0));
     end;
 
     [Test]
@@ -530,10 +530,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         asserterror PostPurchaseDocument(PurchaseHeader);
 
         // Verify: Verify error while posting Purchase Return Order when Apply to Item Entry is Zero.
-        Assert.ExpectedError(
-          StrSubstNo(
-            ApplyItemEntryError, PurchaseLine.FieldCaption("Appl.-to Item Entry"), PurchaseLine.TableCaption(),
-            PurchaseHeader."Document Type", PurchaseHeader."No."));
+        Assert.ExpectedTestFieldError(PurchaseLine.FieldCaption("Appl.-to Item Entry"), '');
 
         // Tear Down.
         UpdateInventorySetup(InventorySetup."Automatic Cost Adjustment");
@@ -679,10 +676,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         asserterror PostSalesDocument(SalesLine, true);
 
         // Verify: Verify error while posting sales Return Order when Apply from Item Entry is Zero.
-        Assert.ExpectedError(
-          StrSubstNo(
-            ApplyItemEntryError, SalesLine.FieldCaption("Appl.-from Item Entry"), SalesLine.TableCaption(), SalesHeader2."Document Type",
-            SalesHeader2."No."));
+        Assert.ExpectedTestFieldError(SalesLine.FieldCaption("Appl.-from Item Entry"), '');
 
         // Tear Down.
         UpdateInventorySetup(InventorySetup."Automatic Cost Adjustment");
@@ -1854,14 +1848,12 @@ codeunit 137295 "SCM Inventory Misc. III"
             CreateReturnOrderMethod::GetPostedDocumentLineToReserve:
                 CreateSalesReturnOrderByGetPstdDocLineToRev(SalesHeader, Item, SellToCustomerNo, DocumentNo);
             CreateReturnOrderMethod::CopyDocument:
-                begin
-                    if Invoice then
-                        CreateSalesReturnOrderByCopyDocument(
-                            SalesHeader, SellToCustomerNo, DocumentNo, "Sales Document Type From"::"Posted Invoice", false)
-                    else
-                        CreateSalesReturnOrderByCopyDocument(
-                            SalesHeader, SellToCustomerNo, DocumentNo, "Sales Document Type From"::"Posted Shipment", true);
-                end;
+                if Invoice then
+                    CreateSalesReturnOrderByCopyDocument(
+                        SalesHeader, SellToCustomerNo, DocumentNo, "Sales Document Type From"::"Posted Invoice", false)
+                else
+                    CreateSalesReturnOrderByCopyDocument(
+                        SalesHeader, SellToCustomerNo, DocumentNo, "Sales Document Type From"::"Posted Shipment", true);
             CreateReturnOrderMethod::ByManually:
                 CreateSalesReturnOrderWithApplFromItemEntryOnItemTrackingLine(
                   SalesHeader, SellToCustomerNo, Item."No.", ItemLedgerEntry."Lot No.", 1, ItemLedgerEntry."Entry No."); // Quantity is 1, as Quantity(Base) cannot be more than 1 with Serial No.
@@ -1982,14 +1974,12 @@ codeunit 137295 "SCM Inventory Misc. III"
     var
         ItemJournalLine: Record "Item Journal Line";
     begin
-        with ItemJournalLine do begin
-            CreateItemJournalLine(
-              ItemJournalLine, "Entry Type"::"Positive Adjmt.", ItemNo, LibraryRandom.RandDec(10, 2),
-              LibraryRandom.RandDec(10, 2));
-            Validate("Reason Code", ReasonCode);
-            Modify(true);
-            LibraryInventory.PostItemJournalLine("Journal Template Name", "Journal Batch Name");
-        end;
+        CreateItemJournalLine(
+          ItemJournalLine, ItemJournalLine."Entry Type"::"Positive Adjmt.", ItemNo, LibraryRandom.RandDec(10, 2),
+          LibraryRandom.RandDec(10, 2));
+        ItemJournalLine.Validate("Reason Code", ReasonCode);
+        ItemJournalLine.Modify(true);
+        LibraryInventory.PostItemJournalLine(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
     end;
 
     local procedure CreateAndPostPurchaseOrder(var PurchaseLine: Record "Purchase Line"; No: Code[20]): Code[20]

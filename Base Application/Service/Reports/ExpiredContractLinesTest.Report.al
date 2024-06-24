@@ -177,9 +177,11 @@ report 5987 "Expired Contract Lines - Test"
         ReasonCode: Code[10];
         ServItemFilters: Text;
 
+#pragma warning disable AA0074
         Text000: Label 'You must fill in the Remove to field.';
         Text001: Label 'You must fill in the Reason Code field.';
         Text002: Label 'Would be removed';
+#pragma warning restore AA0074
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         Expired_Contract_Lines___TestCaptionLbl: Label 'Expired Contract Lines - Test';
         Delete_Contract_Lines_toCaptionLbl: Label 'Delete Contract Lines to';

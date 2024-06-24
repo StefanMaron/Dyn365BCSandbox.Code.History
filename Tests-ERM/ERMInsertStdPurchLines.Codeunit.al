@@ -1055,7 +1055,7 @@ codeunit 134564 "ERM Insert Std. Purch. Lines"
         // [WHEN] Standard Purchase Code is deleted
         // [THEN] Confirmation message appears 
         // [WHEN] User agrees with confirmation
-        StdPurchCode.Delete(True);
+        StdPurchCode.Delete(true);
 
         // [THEN] Standard Purchase Code and Standard Vendor Purchase Code linked are deleted
         StdPurchCode.Reset();
@@ -1094,7 +1094,7 @@ codeunit 134564 "ERM Insert Std. Purch. Lines"
         // [WHEN] Standard Purchase Code is deleted
         // [THEN] Confirmation message appears 
         // [WHEN] User disagree with confirmation
-        AssertError StdPurchCode.Delete(true);
+        asserterror StdPurchCode.Delete(true);
         Assert.ExpectedError('');
 
         // [THEN] Standard Purchase Code and Standard Vendor Purchase Code linked are not deleted
@@ -1122,7 +1122,7 @@ codeunit 134564 "ERM Insert Std. Purch. Lines"
 
         // [WHEN] Standard Sales Purchase is deleted
         // [THEN] Confirmation message does not appear
-        StdPurchCode.Delete(True);
+        StdPurchCode.Delete(true);
 
         // [THEN] Standard Sales Purchase is deleted
         StdPurchCode.Reset();
@@ -1168,6 +1168,29 @@ codeunit 134564 "ERM Insert Std. Purch. Lines"
         // [THEN] No other lines were added
         PurchaseLineOrder.SetFilter("No.", '<>%1', PurchaseLineBlanketOrder."No.");
         Assert.RecordIsEmpty(PurchaseLineOrder);
+    end;
+
+    [Test]
+    [HandlerFunctions('AllocationAccountListPageHandler')]
+    procedure AllocationAccountTableRelationOnStandardPurchaseLine()
+    var
+        StandardPurchaseCodeSubform: TestPage "Standard Purchase Code Subform";
+        AllocationAccountNo: Code[20];
+    begin
+        // [SCENARIO 537442] Allocation Account type has table relation to Allocation Account on Standard Purchase Line
+        Initialize();
+
+        // [GIVEN] Create Allocation account "A", "Account Type" = fixed
+        AllocationAccountNo := CreateAllocationAccountWithFixedDistribution();
+        LibraryVariableStorage.Enqueue(AllocationAccountNo);
+
+        // [WHEN] Lookup "No." for "Allocation Account" type
+        StandardPurchaseCodeSubform.OpenEdit();
+        StandardPurchaseCodeSubform.Type.SetValue("Purchase Line Type"::"Allocation Account");
+        StandardPurchaseCodeSubform."No.".Lookup();
+
+        // [THEN] "Allocation Account List" page is run includes Allocation Account "A" (AllocationAccountListPageHandler)
+        LibraryVariableStorage.AssertEmpty();
     end;
 
     local procedure Initialize()
@@ -1483,6 +1506,18 @@ codeunit 134564 "ERM Insert Std. Purch. Lines"
         Assert.AreEqual(StandardPurchaseLine."Unit of Measure Code", Resource."Base Unit of Measure", ResourceErr);
     end;
 
+    local procedure CreateAllocationAccountWithFixedDistribution(): Code[20]
+    var
+        AllocationAccount: Record "Allocation Account";
+    begin
+        AllocationAccount."No." := Format(LibraryRandom.RandText(5));
+        AllocationAccount."Account Type" := AllocationAccount."Account Type"::Fixed;
+        AllocationAccount.Name := Format(LibraryRandom.RandText(10));
+        AllocationAccount.Insert();
+
+        exit(AllocationAccount."No.");
+    end;
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure StandardVendorPurchaseCodesModalPageHandler(var StandardVendorPurchaseCodes: TestPage "Standard Vendor Purchase Codes")
@@ -1547,5 +1582,12 @@ codeunit 134564 "ERM Insert Std. Purch. Lines"
         LibraryVariableStorage.Enqueue(Question);
     end;
 
+    [ModalPageHandler]
+    procedure AllocationAccountListPageHandler(var AllocationAccountList: TestPage "Allocation Account List")
+    begin
+        AllocationAccountList.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
+        AllocationAccountList.First();
+        AllocationAccountList.Cancel().Invoke();
+    end;
 }
 

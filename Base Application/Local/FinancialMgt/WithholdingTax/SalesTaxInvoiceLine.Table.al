@@ -450,9 +450,14 @@ table 28072 "Sales Tax Invoice Line"
         field(5712; "Product Group Code"; Code[10])
         {
             Caption = 'Product Group Code';
-            ObsoleteState = Pending;
             ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+#if CLEAN25
+            ObsoleteState = Removed;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Pending;
             ObsoleteTag = '17.0';
+#endif
         }
         field(5811; "Appl.-from Item Entry"; Integer)
         {

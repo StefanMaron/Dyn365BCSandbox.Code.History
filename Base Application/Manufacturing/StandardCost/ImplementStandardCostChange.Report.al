@@ -171,12 +171,16 @@ report 5855 "Implement Standard Cost Change"
         Window: Dialog;
         StdCostWkshName: Code[10];
         DocNo: Code[20];
+#pragma warning disable AA0074
         Text000: Label 'Implementing standard cost changes...\\';
         Text001: Label 'You must specify a document no.';
         Text002: Label 'You must specify a worksheet to implement from.';
+#pragma warning disable AA0470
         Text007: Label 'Type                       #1##########\';
         Text008: Label 'No.                        #2##########';
+#pragma warning restore AA0470
         Text009: Label '\Revaluation journal lines have also been created.';
+#pragma warning restore AA0074
         RevalJnlCreated: Boolean;
         ItemCostsUpdated: Boolean;
         MachCtrCostsUpdated: Boolean;
@@ -185,10 +189,14 @@ report 5855 "Implement Standard Cost Change"
         SKUCostsUpdated: Boolean;
         NoMessage: Boolean;
         HideDuplWarning: Boolean;
+#pragma warning disable AA0074
         Text010: Label 'Costs have been updated on the following: ';
         Text011: Label ', ';
         Text012: Label '.';
+#pragma warning disable AA0470
         Text013: Label 'Standard Cost Worksheet %1 is empty.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     protected var
         PostingDate: Date;

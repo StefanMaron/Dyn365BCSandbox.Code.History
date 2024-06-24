@@ -861,6 +861,12 @@ table 5050 Contact
             FieldClass = FlowFilter;
             TableRelation = "Job Responsibility";
         }
+        field(8010; "Temp Parent Id."; Guid)
+        {
+            Caption = 'Temp Parent Id';
+            Editable = false;
+            Tooltip = 'Specifies the current Parent Id when called from the API it may change and do not take depency on it as tThe data is calculated on the fly';
+        }
         field(8050; "Xrm Id"; Guid)
         {
             Caption = 'Xrm Id';
@@ -887,15 +893,11 @@ table 5050 Contact
                     repeat
                         case ContBusRel."Link to Table" of
                             ContBusRel."Link to Table"::Customer:
-                                begin
-                                    if ContBusRel."No." = '' then
-                                        ABNManagement.CheckABN(ABN, 0);
-                                end;
+                                if ContBusRel."No." = '' then
+                                    ABNManagement.CheckABN(ABN, 0);
                             ContBusRel."Link to Table"::Vendor:
-                                begin
-                                    if ContBusRel."No." = '' then
-                                        ABNManagement.CheckABN(ABN, 1);
-                                end;
+                                if ContBusRel."No." = '' then
+                                    ABNManagement.CheckABN(ABN, 1);
                         end;
                     until ContBusRel.Next() = 0;
                 ABNManagement.CheckABN(ABN, 3);
@@ -1012,9 +1014,6 @@ table 5050 Contact
         Opp: Record Opportunity;
         Cont: Record Contact;
         ContBusRel: Record "Contact Business Relation";
-#if not CLEAN22
-        IntrastatSetup: Record "Intrastat Setup";
-#endif
         Customer: Record Customer;
         Vendor: Record Vendor;
         CampaignTargetGrMgt: Codeunit "Campaign Target Group Mgt";
@@ -1148,9 +1147,6 @@ table 5050 Contact
             ContAltAddrDateRange.DeleteAll();
 
         VATRegistrationLogMgt.DeleteContactLog(Rec);
-#if not CLEAN22
-        IntrastatSetup.CheckDeleteIntrastatContact(IntrastatSetup."Intrastat Contact Type"::Contact, "No.");
-#endif
         Customer.SetRange("Primary Contact No.", "No.");
         Customer.ModifyAll(Contact, '');
         Customer.ModifyAll("Primary Contact No.", '');
@@ -1254,13 +1250,23 @@ table 5050 Contact
 
     var
         CannotDeleteWithOpenTasksErr: Label 'You cannot delete contact %1 because there are one or more tasks open.', Comment = '%1 = Contact No.';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'You cannot delete the %2 record of the %1 because the contact is assigned one or more unlogged segments.';
         Text002: Label 'You cannot delete the %2 record of the %1 because one or more opportunities are in not started or progress.';
         Text003: Label '%1 cannot be changed because one or more interaction log entries are linked to the contact.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CannotChangeWithOpenTasksErr: Label '%1 cannot be changed because one or more tasks are linked to the contact.', Comment = '%1 = Contact No.';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text006: Label '%1 cannot be changed because one or more opportunities are linked to the contact.';
         Text007: Label '%1 cannot be changed because there are one or more related people linked to the contact.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+#pragma warning disable AA0470
         RelatedRecordIsCreatedMsg: Label 'The %1 record has been created.', Comment = 'The Customer record has been created.';
+#pragma warning restore AA0470
         RMSetup: Record "Marketing Setup";
         Salesperson: Record "Salesperson/Purchaser";
         PostCode: Record "Post Code";
@@ -1271,11 +1277,17 @@ table 5050 Contact
         ABNManagement: Codeunit "ABN Management";
         SelectedBusRelationCodes: Text;
         ContChanged: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text012: Label 'You cannot change %1 because one or more unlogged segments are assigned to the contact.';
         Text019: Label 'The %2 record of the %1 already has the %3 with %4 %5.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CreateCustomerFromContactQst: Label 'Do you want to create a contact as a customer using a customer template?';
+#pragma warning disable AA0074
         Text021: Label 'You have to set up the salutation formula of the type %1 in %2 language for the %3 contact.', Comment = '%1 - salutation type, %2 - language code, %3 - contact number.';
         Text022: Label 'The creation of the customer has been aborted.';
+#pragma warning restore AA0074
         SelectContactErr: Label 'You must select an existing contact.';
         AlreadyExistErr: Label '%1 %2 already has a %3 with %4 %5.', Comment = '%1=Contact table caption;%2=Contact number;%3=Contact Business Relation table caption;%4=Contact Business Relation Link to Table value;%5=Contact Business Relation number';
         PrivacyBlockedPostErr: Label 'You cannot post this type of document because contact %1 is blocked due to privacy.', Comment = '%1=contact no.';
@@ -3015,7 +3027,11 @@ table 5050 Contact
     procedure TouchContact(ContactNo: Code[20])
     var
         Cont: Record Contact;
+        IsHandled: Boolean;
     begin
+        OnBeforeTouchContact(ContactNo, IsHandled);
+        if IsHandled then
+            exit;
         Cont.LockTable();
         if Cont.Get(ContactNo) then begin
             Cont.SetLastDateTimeModified();
@@ -3947,6 +3963,11 @@ table 5050 Contact
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateBankAccountLink(var Contact: Record Contact; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTouchContact(ContactNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }

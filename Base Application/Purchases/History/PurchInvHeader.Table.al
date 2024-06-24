@@ -524,6 +524,11 @@ table 122 "Purch. Inv. Header"
             Caption = 'VAT Date';
             Editable = false;
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';

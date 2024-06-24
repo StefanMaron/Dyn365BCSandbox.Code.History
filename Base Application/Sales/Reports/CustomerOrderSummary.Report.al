@@ -292,7 +292,9 @@ report 107 "Customer - Order Summary"
         AllamountsareinLCYCaptionLbl: Label 'All amounts are in LCY';
         OutstandingOrdersCaptionLbl: Label 'Outstanding Orders';
         CustomerNoCaptionLbl: Label 'Customer No.';
+#pragma warning disable AA0074
         CustomerNameCap: Label 'Name';
+#pragma warning restore AA0074
         BeforeCaptionLbl: Label '...before';
         AfterCaptionLbl: Label 'after...';
         TotalCaptionLbl: Label 'Total';

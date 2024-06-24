@@ -253,7 +253,9 @@ page 9082 "Customer Statistics FactBox"
     end;
 
     var
+#pragma warning disable AA0074
         Text000: Label 'Overdue Amounts (LCY)';
+#pragma warning restore AA0074
         TaskIdCalculateCue: Integer;
         CurrCustomerNo: Code[20];
         LinkedVendorNo: Code[20];

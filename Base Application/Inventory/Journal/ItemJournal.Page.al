@@ -584,7 +584,7 @@ page 40 "Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByEvent())
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, "Item Availability Type"::"Event")
                         end;
                     }
                     action(Period)
@@ -596,7 +596,7 @@ page 40 "Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByPeriod())
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, "Item Availability Type"::Period)
                         end;
                     }
                     action("Variant")
@@ -608,7 +608,7 @@ page 40 "Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByVariant())
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, "Item Availability Type"::Variant)
                         end;
                     }
                     action(Location)
@@ -621,7 +621,7 @@ page 40 "Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByLocation())
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, "Item Availability Type"::Location)
                         end;
                     }
                     action(Lot)
@@ -645,7 +645,7 @@ page 40 "Item Journal"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByBOM())
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItemJnlLine(Rec, "Item Availability Type"::BOM)
                         end;
                     }
                 }
@@ -1084,9 +1084,13 @@ page 40 "Item Journal"
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot use entry type %1 in this journal.';
         Text001: Label 'Item Journal lines have been successfully inserted from Standard Item Journal %1.';
         Text002: Label 'Standard Item Journal %1 has been successfully created.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     protected var
         EntryType: Enum "Item Journal Entry Type";
