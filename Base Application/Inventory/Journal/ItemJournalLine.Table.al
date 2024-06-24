@@ -3928,7 +3928,7 @@ table 83 "Item Journal Line"
             Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', "Journal Template Name", "Journal Batch Name", "Line No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
-        OnAfterShowDimensions(Rec);
+        OnAfterShowDimensions(Rec, xRec);
     end;
 
     procedure ShowReclasDimensions()
@@ -5411,7 +5411,7 @@ table 83 "Item Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterShowDimensions(var ItemJournalLine: Record "Item Journal Line")
+    local procedure OnAfterShowDimensions(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
