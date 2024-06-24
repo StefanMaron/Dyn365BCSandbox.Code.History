@@ -45,35 +45,37 @@ codeunit 5510 "Production Journal Mgt"
         LeaveForm: Boolean;
         IsHandled: Boolean;
     begin
-        OnBeforeHandling(ProdOrder);
-
-        MfgSetup.Get();
-
-        SetTemplateAndBatchName();
-
-        InitSetupValues();
-
-        ProgressBar.Open(GeneratingJnlLinesMsg);
-        DeleteJnlLines(ToTemplateName, ToBatchName, ProdOrder."No.", ActualLineNo);
-        CreateJnlLines(ProdOrder, ActualLineNo);
-        ProgressBar.Close();
-
         IsHandled := false;
-        OnBeforeRunProductionJnl(ToTemplateName, ToBatchName, ProdOrder, ActualLineNo, PostingDate, IsHandled);
+        OnBeforeHandling(ProdOrder, ActualLineNo, IsHandled);
         if not IsHandled then begin
-            repeat
-                // Commit before running Production Journal page
-                Commit();
+            MfgSetup.Get();
 
-                LeaveForm := true;
-                Clear(ProductionJnl);
-                ProductionJnl.Setup(ToTemplateName, ToBatchName, ProdOrder, ActualLineNo, PostingDate);
-                ProductionJnl.RunModal();
-                if DataHasChanged(ToTemplateName, ToBatchName, ProdOrder."No.", ActualLineNo) then
-                    LeaveForm := Confirm(Text001, true);
-            until LeaveForm;
+            SetTemplateAndBatchName();
 
+            InitSetupValues();
+
+            ProgressBar.Open(GeneratingJnlLinesMsg);
             DeleteJnlLines(ToTemplateName, ToBatchName, ProdOrder."No.", ActualLineNo);
+            CreateJnlLines(ProdOrder, ActualLineNo);
+            ProgressBar.Close();
+
+            IsHandled := false;
+            OnBeforeRunProductionJnl(ToTemplateName, ToBatchName, ProdOrder, ActualLineNo, PostingDate, IsHandled);
+            if not IsHandled then begin
+                repeat
+                    // Commit before running Production Journal page
+                    Commit();
+
+                    LeaveForm := true;
+                    Clear(ProductionJnl);
+                    ProductionJnl.Setup(ToTemplateName, ToBatchName, ProdOrder, ActualLineNo, PostingDate);
+                    ProductionJnl.RunModal();
+                    if DataHasChanged(ToTemplateName, ToBatchName, ProdOrder."No.", ActualLineNo) then
+                        LeaveForm := Confirm(Text001, true);
+                until LeaveForm;
+
+                DeleteJnlLines(ToTemplateName, ToBatchName, ProdOrder."No.", ActualLineNo);
+            end;
         end;
     end;
 
@@ -665,7 +667,7 @@ codeunit 5510 "Production Journal Mgt"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeHandling(ProdOrder: Record "Production Order")
+    local procedure OnBeforeHandling(ProdOrder: Record "Production Order"; ActualLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
