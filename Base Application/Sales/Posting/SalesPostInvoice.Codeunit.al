@@ -212,7 +212,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
 
         if SalesLine."Deferral Code" <> '' then begin
             SalesPostInvoiceEvents.RunOnPrepareLineOnBeforePrepareDeferralLine(
-                SalesLine, InvoicePostingBuffer, SalesHeader.GetUseDate(), InvDefLineNo, DeferralLineNo, SuppressCommit);
+                SalesLine, InvoicePostingBuffer, SalesHeader.GetUseDate(), InvDefLineNo, DeferralLineNo, SuppressCommit, DeferralAccount, SalesAccount);
             PrepareDeferralLine(
                 SalesHeader, SalesLine, InvoicePostingBuffer.Amount, InvoicePostingBuffer."Amount (ACY)",
                 AmtToDefer, AmtToDeferACY, DeferralAccount, SalesAccount);
@@ -338,7 +338,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         if TempInvoicePostingBuffer.Find('+') then
             repeat
                 LineCount := LineCount + 1;
-                if GuiAllowed and not HideProgressWindow then
+                if GuiAllowed() and not HideProgressWindow then
                     Window.Update(3, LineCount);
 
                 TempInvoicePostingBuffer.ApplyRoundingForFinalPosting();

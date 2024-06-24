@@ -24,13 +24,11 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         LibraryRandom: Codeunit "Library - Random";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         isInitialized: Boolean;
-        ExpectedError: Label 'You must not use Item No. Filter and Item Category Filter at the same time.';
-        Cost: Label 'Cost';
-        ValidationError: Label '%1 must be %2.', Comment = '%1:Field1,%2:Value1';
-        UndoShipment: Label 'Do you want to undo the selected shipment line(s)?';
-        UndoConsumption: Label 'Do you want to undo consumption of the selected shipment line(s)?';
-        InvValueZeroErr: Label '%1 must be equal to ''%2''';
-        BlockedSetupErr: Label 'Blocked must be equal to ''No''  in General Posting Setup';
+        FiltersMustNotBeUsedErr: Label 'You must not use Item No. Filter and Item Category Filter at the same time.';
+        CostLbl: Label 'Cost';
+        FieldValidationErr: Label '%1 must be %2.', Comment = '%1:Field1,%2:Value1';
+        UndoShipmentQst: Label 'Do you want to undo the selected shipment line(s)?';
+        UndoConsumptionQst: Label 'Do you want to undo consumption of the selected shipment line(s)?';
 
     [Test]
     [Scope('OnPrem')]
@@ -52,7 +50,7 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         asserterror ItemJnlLine.Validate("Item No.", ItemNo);
 
         // [THEN] Error message: "Inventory Value Zero must be equal to No"
-        Assert.ExpectedError(StrSubstNo(InvValueZeroErr, Item.FieldCaption("Inventory Value Zero"), false));
+        Assert.ExpectedTestFieldError(Item.FieldCaption("Inventory Value Zero"), Format(false));
     end;
 
     [Test]
@@ -270,7 +268,7 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         asserterror LibraryCosting.AdjustCostItemEntries(ServiceLine."No.", ItemCategory.Code);
 
         // Verify.
-        Assert.ExpectedError(ExpectedError);
+        Assert.ExpectedError(FiltersMustNotBeUsedErr);
     end;
 
     [Test]
@@ -498,13 +496,13 @@ codeunit 137285 "SCM Inventory Batch Jobs"
           '');
         Assert.AreNearlyEqual(
           CostAmountActual, ValueEntry."Cost Amount (Actual)", LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, ItemLedgerEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
+          StrSubstNo(FieldValidationErr, ItemLedgerEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
         FindValueEntry(
           ValueEntry, ValueEntry."Item Ledger Entry Type"::Sale, ValueEntry."Entry Type"::"Direct Cost", ItemJournalLine."Item No.", true,
           '');
         Assert.AreNearlyEqual(
           CostAmountActual2, ValueEntry."Cost Amount (Actual)", LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, ItemLedgerEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual2));
+          StrSubstNo(FieldValidationErr, ItemLedgerEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual2));
     end;
 
     [Test]
@@ -613,7 +611,7 @@ codeunit 137285 "SCM Inventory Batch Jobs"
           true, TransferHeader."In-Transit Code");
         Assert.AreNearlyEqual(
           -ItemJournalLine.Quantity * CostPerUnit, ValueEntry."Cost Amount (Actual)", LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, ValueEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
+          StrSubstNo(FieldValidationErr, ValueEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
     end;
 
     [Test]
@@ -732,8 +730,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          ServiceLine."Document No.", '', PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", '', GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -757,7 +755,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         ServiceHeader.Get(ServiceLine."Document Type", ServiceLine."Document No.");
         LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
         FindItemLedgerEntry(ItemLedgerEntry, ItemLedgerEntry."Entry Type"::Purchase, PurchaseLine."No.", true);
-        UnitCostRevalued := PurchaseLine."Unit Cost (LCY)" + LibraryRandom.RandDec(10, 2);  // Add random value to Unit Cost to make positive Revaluation.
+        UnitCostRevalued :=
+            GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) + LibraryRandom.RandDec(10, 2);  // Add random value to Unit Cost to make positive Revaluation.
         CreateAndPostRevaluationJournal(
           PurchaseLine."No.", ItemLedgerEntry."Entry No.", LibraryRandom.RandDec(100, 2), UnitCostRevalued);  // Use Random value for Inventory Value Revalued and 0 for Unit Cost Revalued.
 
@@ -766,7 +765,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          ServiceLine."Document No.", '', PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity, UnitCostRevalued * ServiceLine.Quantity);
+            ServiceLine."Document No.", '',
+            GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity, UnitCostRevalued * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -791,8 +791,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceCrMemoStatistics(
-          ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
 #if not CLEAN23
@@ -818,8 +818,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          ServiceLine."Document No.", '', PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", '', GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -845,8 +845,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          ServiceLine."Document No.", '', PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", '', GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -869,8 +869,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceCrMemoStatistics(
-          ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 #endif
 
@@ -895,8 +895,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on Services Order Statistics.
         VerifyServiceOrderStatistics(
-          ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", GetItemCost(PurchaseLine."No.") * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -956,8 +956,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          OrderNo, ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          OrderNo, ServiceLine."Document No.", GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -983,8 +983,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on Services Order Statistics.
         VerifyServiceOrderStatistics(
-          ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -1029,8 +1029,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on Services Order Statistics.
         VerifyServiceOrderStatistics(
-          ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+            ServiceLine."Document No.", GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+            GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -1052,8 +1052,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          ServiceLine."Document No.", '', PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+            ServiceLine."Document No.", '', GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+            GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -1074,8 +1074,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Credit Memo Statistics
         VerifyCostOnPostedServiceCrMemoStatistics(
-          ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+          ServiceLine."Document No.", GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+          GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -1103,8 +1103,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          OrderNo, ServiceLine."Document No.", PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+            OrderNo, ServiceLine."Document No.", GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+            GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -1136,8 +1136,8 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
         // Verify: Verify Original Cost and Adjusted Cost on posted Services Invoice Statistics.
         VerifyCostOnPostedServiceInvStatistics(
-          ServiceLine."Document No.", '', PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity,
-          PurchaseLine."Unit Cost (LCY)" * ServiceLine.Quantity);
+            ServiceLine."Document No.", '', GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity,
+            GetItemCostLCY(PurchaseLine."No.", PurchaseLine."Currency Code", PurchaseLine.GetDate()) * ServiceLine.Quantity);
     end;
 
     [Test]
@@ -1205,23 +1205,19 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         // [WHEN] Run Post Inventory to G/L Test report on the Value Entry.
         ValueEntry.SetRange("Entry No.", ValueEntry."Entry No.");
         GetPostInvtToGLTestBuffer(TempInvtPostToGLTestBuffer, ValueEntry);
-
         // [THEN] Invt. Post To G/L Test Buffer is filled with two records:
-        with TempInvtPostToGLTestBuffer do begin
-            // [THEN] The first one has "Gen. Prod. Posting Group" = "X", and blank Inventory Posting Group and Location Code.
-            Reset();
-            SetRange("Gen. Prod. Posting Group", GenProductPostingGroup.Code);
-            FindFirst();
-            TestField("Invt. Posting Group Code", '');
-            TestField("Location Code", '');
-
-            // [THEN] The second one has "Inventory Posting Group" = "Y" and Location Code = "Z", and blank "Gen. Prod. Posting Group".
-            Reset();
-            SetRange("Invt. Posting Group Code", InventoryPostingGroup.Code);
-            FindFirst();
-            TestField("Location Code", ValueEntry."Location Code");
-            TestField("Gen. Prod. Posting Group", '');
-        end;
+        // [THEN] The first one has "Gen. Prod. Posting Group" = "X", and blank Inventory Posting Group and Location Code.
+        TempInvtPostToGLTestBuffer.Reset();
+        TempInvtPostToGLTestBuffer.SetRange("Gen. Prod. Posting Group", GenProductPostingGroup.Code);
+        TempInvtPostToGLTestBuffer.FindFirst();
+        TempInvtPostToGLTestBuffer.TestField("Invt. Posting Group Code", '');
+        TempInvtPostToGLTestBuffer.TestField("Location Code", '');
+        // [THEN] The second one has "Inventory Posting Group" = "Y" and Location Code = "Z", and blank "Gen. Prod. Posting Group".
+        TempInvtPostToGLTestBuffer.Reset();
+        TempInvtPostToGLTestBuffer.SetRange("Invt. Posting Group Code", InventoryPostingGroup.Code);
+        TempInvtPostToGLTestBuffer.FindFirst();
+        TempInvtPostToGLTestBuffer.TestField("Location Code", ValueEntry."Location Code");
+        TempInvtPostToGLTestBuffer.TestField("Gen. Prod. Posting Group", '');
     end;
 
     [Test]
@@ -1267,7 +1263,7 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         asserterror InventoryPostingToGL.BufferInvtPosting(ValueEntry);
 
         // [THEN] Error: 'Blocked must be equal to No in General Posting Setup'
-        Assert.ExpectedError(BlockedSetupErr);
+        Assert.ExpectedTestFieldError(GeneralPostingSetup.FieldCaption(Blocked), Format(false));
     end;
 
     local procedure Initialize()
@@ -1619,23 +1615,21 @@ codeunit 137285 "SCM Inventory Batch Jobs"
 
     local procedure MockValueEntry(var ValueEntry: Record "Value Entry"; GenProdPostingGroupCode: Code[20]; InventoryPostingGroupCode: Code[20])
     begin
-        with ValueEntry do begin
-            Init();
-            "Entry No." := LibraryUtility.GetNewRecNo(ValueEntry, FieldNo("Entry No."));
-            "Item Ledger Entry No." := 0;
-            "Capacity Ledger Entry No." := LibraryRandom.RandInt(100);
-            "Posting Date" := WorkDate();
-            "Entry Type" := "Entry Type"::"Direct Cost";
-            "Gen. Prod. Posting Group" := GenProdPostingGroupCode;
-            "Inventory Posting Group" := InventoryPostingGroupCode;
-            "Location Code" := LibraryUtility.GenerateGUID();
-            Type := Type::"Work Center";
-            "No." := LibraryUtility.GenerateGUID();
-            "Valued Quantity" := LibraryRandom.RandInt(10);
-            "Cost per Unit" := LibraryRandom.RandDec(10, 2);
-            "Cost Amount (Actual)" := "Valued Quantity" * "Cost per Unit";
-            Insert();
-        end;
+        ValueEntry.Init();
+        ValueEntry."Entry No." := LibraryUtility.GetNewRecNo(ValueEntry, ValueEntry.FieldNo("Entry No."));
+        ValueEntry."Item Ledger Entry No." := 0;
+        ValueEntry."Capacity Ledger Entry No." := LibraryRandom.RandInt(100);
+        ValueEntry."Posting Date" := WorkDate();
+        ValueEntry."Entry Type" := ValueEntry."Entry Type"::"Direct Cost";
+        ValueEntry."Gen. Prod. Posting Group" := GenProdPostingGroupCode;
+        ValueEntry."Inventory Posting Group" := InventoryPostingGroupCode;
+        ValueEntry."Location Code" := LibraryUtility.GenerateGUID();
+        ValueEntry.Type := ValueEntry.Type::"Work Center";
+        ValueEntry."No." := LibraryUtility.GenerateGUID();
+        ValueEntry."Valued Quantity" := LibraryRandom.RandInt(10);
+        ValueEntry."Cost per Unit" := LibraryRandom.RandDec(10, 2);
+        ValueEntry."Cost Amount (Actual)" := ValueEntry."Valued Quantity" * ValueEntry."Cost per Unit";
+        ValueEntry.Insert();
     end;
 
     local procedure GetPostInvtToGLTestBuffer(var TempInvtPostToGLTestBuffer: Record "Invt. Post to G/L Test Buffer" temporary; var ValueEntry: Record "Value Entry")
@@ -1677,6 +1671,21 @@ codeunit 137285 "SCM Inventory Batch Jobs"
     begin
         ServiceShipmentLine.SetRange("Order No.", OrderNo);
         ServiceShipmentLine.FindFirst();
+    end;
+
+    local procedure GetItemCost(ItemNo: Code[20]): Decimal
+    var
+        Item: Record Item;
+    begin
+        Item.Get(ItemNo);
+        exit(Item."Unit Cost");
+    end;
+
+    local procedure GetItemCostLCY(ItemNo: Code[20]; CurrencyCode: Code[10]; Date: Date): Decimal
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        exit(CurrencyExchangeRate.ExchangeAmtFCYToLCY(Date, CurrencyCode, GetItemCost(ItemNo), CurrencyExchangeRate.ExchangeRate(Date, CurrencyCode)));
     end;
 
     local procedure PostChargeOnPurchaseDocument(var PurchaseLine: Record "Purchase Line")
@@ -1752,7 +1761,7 @@ codeunit 137285 "SCM Inventory Batch Jobs"
     var
         ServiceShipmentLine: Record "Service Shipment Line";
     begin
-        LibraryVariableStorage.Enqueue(UndoShipment);  // Enqueue value for Confirm handler.
+        LibraryVariableStorage.Enqueue(UndoShipmentQst);  // Enqueue value for Confirm handler.
         FindServiceShipmentLine(ServiceShipmentLine, OrderNo);
         CODEUNIT.Run(CODEUNIT::"Undo Service Shipment Line", ServiceShipmentLine);
     end;
@@ -1761,7 +1770,7 @@ codeunit 137285 "SCM Inventory Batch Jobs"
     var
         ServiceShipmentLine: Record "Service Shipment Line";
     begin
-        LibraryVariableStorage.Enqueue(UndoConsumption);  // Enqueue value for Confirm handler.
+        LibraryVariableStorage.Enqueue(UndoConsumptionQst);  // Enqueue value for Confirm handler.
         FindServiceShipmentLine(ServiceShipmentLine, OrderNo);
         CODEUNIT.Run(CODEUNIT::"Undo Service Consumption Line", ServiceShipmentLine);
     end;
@@ -1783,7 +1792,7 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         FindValueEntry(ValueEntry, ItemLedgerEntryType, EntryType, ItemNo, Adjustment, LocationCode);
         Assert.AreNearlyEqual(
           CostAmountActual, ValueEntry."Cost Amount (Actual)", LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, ValueEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
+          StrSubstNo(FieldValidationErr, ValueEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
     end;
 
     local procedure VerifyValueEntryForItemCharge(ItemNo: Code[20]; ItemChargeNo: Code[20]; CostAmountActual: Decimal)
@@ -1807,10 +1816,10 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         ItemLedgerEntry.TestField("Applied Entry to Adjust", AppliedEntryToAdjust);
         Assert.AreNearlyEqual(
           CostAmountActual, ItemLedgerEntry."Cost Amount (Actual)", LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, ItemLedgerEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
+          StrSubstNo(FieldValidationErr, ItemLedgerEntry.FieldCaption("Cost Amount (Actual)"), CostAmountActual));
         Assert.AreNearlyEqual(
           CostAmountExpected, ItemLedgerEntry."Cost Amount (Expected)", LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, ItemLedgerEntry.FieldCaption("Cost Amount (Expected)"), CostAmountExpected));
+          StrSubstNo(FieldValidationErr, ItemLedgerEntry.FieldCaption("Cost Amount (Expected)"), CostAmountExpected));
     end;
 
     local procedure VerifyValueEntryCost(ItemNo: Code[20])
@@ -1853,10 +1862,10 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         PostedServiceInvoice.GotoRecord(ServiceInvHeader);
         PostedServiceInvoice.Statistics.Invoke();
         Assert.AreNearlyEqual(
-          CostLCY, ServiceInvStatistics.CostLCY.AsDecimal(), LibraryERM.GetAmountRoundingPrecision(), StrSubstNo(ValidationError, Cost, CostLCY));
+          CostLCY, ServiceInvStatistics.CostLCY.AsDecimal(), LibraryERM.GetAmountRoundingPrecision(), StrSubstNo(FieldValidationErr, CostLbl, CostLCY));
         Assert.AreNearlyEqual(
           TotalAdjCostLCY, ServiceInvStatistics.TotalAdjCostLCY.AsDecimal(), LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, Cost, TotalAdjCostLCY));
+          StrSubstNo(FieldValidationErr, CostLbl, TotalAdjCostLCY));
     end;
 
     local procedure VerifyCostOnPostedServiceCrMemoStatistics(ServiceDocNo: Code[20]; CostLCY: Decimal; TotalAdjCostLCY: Decimal)
@@ -1927,10 +1936,10 @@ codeunit 137285 "SCM Inventory Batch Jobs"
         LibraryVariableStorage.Dequeue(TotalAdjCostLCY);
         Assert.AreNearlyEqual(
           CostLCY, ServiceOrderStatistics.OriginalCostLCY.AsDecimal(), LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, Cost, CostLCY));
+          StrSubstNo(FieldValidationErr, CostLbl, CostLCY));
         Assert.AreNearlyEqual(
           TotalAdjCostLCY, ServiceOrderStatistics.AdjustedCostLCY.AsDecimal(), LibraryERM.GetAmountRoundingPrecision(),
-          StrSubstNo(ValidationError, Cost, TotalAdjCostLCY));
+          StrSubstNo(FieldValidationErr, CostLbl, TotalAdjCostLCY));
     end;
 }
 

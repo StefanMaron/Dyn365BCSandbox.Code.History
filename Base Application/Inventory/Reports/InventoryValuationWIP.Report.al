@@ -346,7 +346,11 @@ report 5802 "Inventory Valuation - WIP"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text005: Label 'As of %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         StartDate: Date;
         EndDate: Date;
         ProdOrderFilter: Text;

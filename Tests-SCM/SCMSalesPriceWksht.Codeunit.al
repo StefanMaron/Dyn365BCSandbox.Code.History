@@ -600,11 +600,9 @@ codeunit 137201 "SCM Sales Price Wksht"
     var
         SalesPriceWorksheet: Record "Sales Price Worksheet";
     begin
-        with SalesPriceWorksheet do begin
-            SetRange("Item No.", ItemNo);
-            FindFirst();
-            TestField("Current Unit Price", CurrentUnitPrice);
-        end;
+        SalesPriceWorksheet.SetRange("Item No.", ItemNo);
+        SalesPriceWorksheet.FindFirst();
+        SalesPriceWorksheet.TestField("Current Unit Price", CurrentUnitPrice);
     end;
 #endif
 }

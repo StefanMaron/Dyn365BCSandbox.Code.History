@@ -135,7 +135,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         PurchPostInvoiceEvents.RunOnPrepareLineOnBeforePreparePurchase(PurchHeader, PurchLine, GenPostingSetup);
         InvoicePostingBuffer.PreparePurchase(PurchLine);
 
-        If NonDeductibleVAT.IsNonDeductibleVATEnabled() then
+        if NonDeductibleVAT.IsNonDeductibleVATEnabled() then
             InitTotalAmounts(
                 PurchLine, PurchLineACY, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY,
                 TotalVATBase, TotalVATBaseACY, TotalNonDedVATBase, TotalNonDedVATAmount, TotalNonDedVATBaseACY, TotalNonDedVATAmountACY, TotalNonDedVATDiff)
@@ -456,7 +456,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         if TempInvoicePostingBuffer.Find('+') then
             repeat
                 LineCount := LineCount + 1;
-                if GuiAllowed and not HideProgressWindow then
+                if GuiAllowed() and not HideProgressWindow then
                     Window.Update(3, LineCount);
 
                 TempInvoicePostingBuffer.ApplyRoundingForFinalPosting();

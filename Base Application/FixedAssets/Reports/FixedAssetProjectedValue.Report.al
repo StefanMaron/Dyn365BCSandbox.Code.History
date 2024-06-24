@@ -726,13 +726,17 @@ report 5607 "Fixed Asset - Projected Value"
         Year365Days: Boolean;
         NumberOfDaysCtrlEditable: Boolean;
 
+#pragma warning disable AA0470
         NumberOfDaysMustNotBeGreaterThanErr: Label 'Number of Days must not be greater than %1 or less than 5.', Comment = '1 - Number of days in fiscal year';
+#pragma warning restore AA0470
         ProjectedGainLossTxt: Label 'Projected Gain/Loss';
         GroupTotalTxt: Label 'Group Total';
         GroupTotalsTxt: Label 'Group Totals';
+#pragma warning disable AA0470
         HasBeenModifiedInFAErr: Label '%1 has been modified in fixed asset %2.', Comment = '1 - FA Posting Group caption; 2- FA No.';
         YouMustSpecifyErr: Label 'You must specify %1.', Comment = '1 - G/L Budget Name caption';
         YouMustCreateAccPeriodsErr: Label 'You must create accounting periods until %1 to use 365 days depreciation and ''Use Accounting Periods''.', Comment = '1 - Date';
+#pragma warning restore AA0470
         PageNoLbl: Label 'Page';
         FAProjectedValueLbl: Label 'Fixed Asset - Projected Value';
         FAPostingDateLbl: Label 'FA Posting Date';

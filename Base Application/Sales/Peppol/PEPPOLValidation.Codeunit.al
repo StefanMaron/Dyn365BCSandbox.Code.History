@@ -31,8 +31,10 @@ codeunit 1620 "PEPPOL Validation"
     end;
 
     var
+#pragma warning disable AA0470
         WrongLengthErr: Label 'should be %1 characters long';
         EmptyUnitOfMeasureErr: Label 'You must specify a valid International Standard Code for the Unit of Measure for %1.', Comment = 'Parameter 1 - document type (Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order), 2 - document number';
+#pragma warning restore AA0470
         MissingDescriptionErr: Label 'Description field is empty. \Field must be filled if you want to send the posted document as an electronic document.', Comment = 'Parameter 1 - document type (), 2 - document number';
         PEPPOLManagement: Codeunit "PEPPOL Management";
         ConfirmManagement: Codeunit "Confirm Management";

@@ -463,6 +463,9 @@ report 410 "Blanket Purchase Order"
                         column(ShiptoAddressCaption; ShiptoAddressCaptionLbl)
                         {
                         }
+                        column(ShipToPhoneNo; "Purchase Header"."Ship-to Phone No.")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -656,7 +659,9 @@ report 410 "Blanket Purchase Order"
         ArchiveDocument: Boolean;
         LogInteractionEnable: Boolean;
 
+#pragma warning disable AA0074
         Text002: Label 'Blanket Purchase Order %1', Comment = '%1 = Document No.';
+#pragma warning restore AA0074
         CompanyInfoPhNoCaptionLbl: Label 'Phone No.';
         CompanyInfoEnterpriseNoCaptionLbl: Label 'Enterprise No.';
         CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';

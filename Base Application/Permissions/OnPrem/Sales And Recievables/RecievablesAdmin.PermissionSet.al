@@ -47,6 +47,7 @@ permissionset 3723 "Recievables - Admin"
                   tabledata "Payment Terms" = RIMD,
                   tabledata "Reason Code" = R,
                   tabledata "Reminder Attachment Text" = RIMD,
+                  tabledata "Reminder Attachment Text Line" = RIMD,
                   tabledata "Reminder Email Text" = RIMD,
                   tabledata "Reminder Level" = RIMD,
                   tabledata "Reminder Terms" = RIMD,

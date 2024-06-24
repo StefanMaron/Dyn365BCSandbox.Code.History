@@ -180,7 +180,9 @@ report 5603 "Fixed Asset Register"
         CanceledLedgEntry: Text[30];
         FATotalAmount: Decimal;
 
+#pragma warning disable AA0074
         Text000: Label 'Canceled';
+#pragma warning restore AA0074
         Fixed_Asset_RegisterCaptionLbl: Label 'Fixed Asset Register';
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         FA_Ledger_Entry__FA_Posting_Date_CaptionLbl: Label 'FA Posting Date';

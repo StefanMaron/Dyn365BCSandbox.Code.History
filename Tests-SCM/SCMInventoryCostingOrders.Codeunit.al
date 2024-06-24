@@ -29,7 +29,6 @@ codeunit 137292 "SCM Inventory Costing Orders"
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         isInitialized: Boolean;
-        ApplFromItemEntryNoError: Label 'Positive must be equal to ''No''  in Item Ledger Entry: Entry No.=%1. Current value is ''Yes''.';
         AvailabilityWarning: Label 'You do not have enough inventory to meet the demand for items in one or more lines';
         BaseCalendarError: Label 'There is no Base Calendar Change within the filter.';
         CloseInventoryPeriodError: Label 'The Inventory Period cannot be closed because there is at least one item with unadjusted entries in the current period.';
@@ -44,9 +43,6 @@ codeunit 137292 "SCM Inventory Costing Orders"
         RecordFoundError: Label 'Record must not Found.';
         ReservationError: Label 'Applies-to Entry must not be filled out when reservations exist in Item Ledger Entry';
         ReturnOrderTrackingError: Label 'You must use form Item Tracking Lines to enter Appl.-to Item Entry, if item tracking is used.';
-#if not CLEAN23
-        SalesPriceWorksheetError: Label 'The Sales Price Worksheet does not exist.';
-#endif
         TrackingAndActionMessage: Label 'The change will not affect existing entries.';
         UndoShipmentLine: Label 'Do you want to undo the selected shipment line';
         ValueNotMatchedError: Label 'Value must be same.';
@@ -246,7 +242,7 @@ codeunit 137292 "SCM Inventory Costing Orders"
         asserterror ServiceLine.Validate("Appl.-from Item Entry", ItemLedgerEntry."Entry No.");
 
         // Verify: Verify Error while validating Appl.-from Item Entry on Service Order.
-        Assert.ExpectedError(StrSubstNo(ApplFromItemEntryNoError, ItemLedgerEntry."Entry No."));
+        Assert.ExpectedTestFieldError(ItemLedgerEntry.FieldCaption(Positive), Format(false));
     end;
 
     [Test]
@@ -986,7 +982,7 @@ codeunit 137292 "SCM Inventory Costing Orders"
             SalesPrice."Unit of Measure Code", 0);  // 0 for Minimum Amount.
 
         // Verify: Verify Sales Price Worksheet Error.
-        Assert.ExpectedError(SalesPriceWorksheetError);
+        Assert.ExpectedErrorCannotFind(Database::"Sales Price Worksheet");
     end;
 
     [Test]
@@ -1047,7 +1043,7 @@ codeunit 137292 "SCM Inventory Costing Orders"
         asserterror VerifySalesPriceWorksheet(SalesPrice, WorkDate(), ItemNo, CustomerPriceGroup, 0, UnitPrice);
 
         // Verify: Verify Sales Price Worksheet Error.
-        Assert.ExpectedError(SalesPriceWorksheetError);
+        Assert.ExpectedErrorCannotFind(Database::"Sales Price Worksheet");
     end;
 
     [Test]
@@ -2152,17 +2148,15 @@ codeunit 137292 "SCM Inventory Costing Orders"
         ItemLedgerEntry: Record "Item Ledger Entry";
         TotalCost: Decimal;
     begin
-        with ItemLedgerEntry do begin
-            FindItemLedgerEntry(ItemLedgerEntry, ItemNo, true);
-            CalcFields("Cost Amount (Actual)", "Cost Amount (Expected)");
-            TotalCost := "Cost Amount (Actual)" + "Cost Amount (Expected)";
+        FindItemLedgerEntry(ItemLedgerEntry, ItemNo, true);
+        ItemLedgerEntry.CalcFields("Cost Amount (Actual)", "Cost Amount (Expected)");
+        TotalCost := ItemLedgerEntry."Cost Amount (Actual)" + ItemLedgerEntry."Cost Amount (Expected)";
 
-            FindItemLedgerEntry(ItemLedgerEntry, ItemNo, false);
-            CalcFields("Cost Amount (Actual)", "Cost Amount (Expected)");
-            Assert.AreEqual(
-              -TotalCost, "Cost Amount (Actual)" + "Cost Amount (Expected)",
-              'Costs on inbound and applied outbound item entries do not match.');
-        end;
+        FindItemLedgerEntry(ItemLedgerEntry, ItemNo, false);
+        ItemLedgerEntry.CalcFields("Cost Amount (Actual)", "Cost Amount (Expected)");
+        Assert.AreEqual(
+          -TotalCost, ItemLedgerEntry."Cost Amount (Actual)" + ItemLedgerEntry."Cost Amount (Expected)",
+          'Costs on inbound and applied outbound item entries do not match.');
     end;
 
     local procedure VerifyValueEntryLines(var ValueEntry: Record "Value Entry"; ItemNo: Code[20]; EntryType: Enum "Item Ledger Document Type"; DocumentType: Enum "Item Ledger Document Type"; Adjustment: Boolean)

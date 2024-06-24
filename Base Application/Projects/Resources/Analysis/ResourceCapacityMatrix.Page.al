@@ -14,7 +14,6 @@ using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
-using Microsoft.Service.Resources;
 using System.Utilities;
 
 page 9237 "Resource Capacity Matrix"
@@ -364,14 +363,6 @@ page 9237 "Resource Capacity Matrix"
             {
                 Caption = 'Plan&ning';
                 Image = Planning;
-                action("&Set Capacity")
-                {
-                    ApplicationArea = Jobs;
-                    Caption = '&Set Capacity';
-                    RunObject = Page "Resource Capacity Settings";
-                    RunPageLink = "No." = field("No.");
-                    ToolTip = 'Change the capacity of the resource, such as a technician.';
-                }
                 action("Resource A&vailability")
                 {
                     ApplicationArea = Jobs;

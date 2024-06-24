@@ -337,7 +337,6 @@ table 55 "Invoice Posting Buffer"
         {
             Caption = 'Journal Template Name';
             DataClassification = SystemMetadata;
-            TableRelation = "Gen. Journal Template";
             ObsoleteReason = 'Replaced by W1 field Journal Templ. Name';
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';

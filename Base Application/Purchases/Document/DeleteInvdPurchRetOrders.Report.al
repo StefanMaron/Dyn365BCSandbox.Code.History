@@ -151,7 +151,11 @@ report 6661 "Delete Invd Purch. Ret. Orders"
         Window: Dialog;
         AllLinesDeleted: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Processing purch. orders #1##########';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetPurchLineFilters(var PurchaseLine: Record "Purchase Line")

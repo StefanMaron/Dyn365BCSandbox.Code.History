@@ -384,13 +384,17 @@ report 5610 "Fixed Asset - G/L Analysis"
         SalesReport: Boolean;
         TypeExist: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'Group Total';
         Text001: Label 'Group Totals';
+#pragma warning disable AA0470
         Text002: Label '%1 must be specified only together with the types %2, %3, %4 or %5.';
         Text003: Label 'The date type %1 is not a valid option.';
         Text004: Label 'The posting type %1 is not a valid option.';
         Text005: Label '%1 has been modified in fixed asset %2.';
+#pragma warning restore AA0470
         Text006: Label ' ,FA Class,FA Subclass,FA Location,Main Asset,Global Dimension 1,Global Dimension 2,FA Posting Group';
+#pragma warning restore AA0074
         CurrReportPageNoCaptionLbl: Label 'Page';
         FixedAssetGLAnalysisCptnLbl: Label 'Fixed Asset - G/L Analysis';
         TotalCaptionLbl: Label 'Total';
@@ -435,7 +439,9 @@ report 5610 "Fixed Asset - G/L Analysis"
 
     local procedure MakeAmountHeadLine(i: Integer; PostingType: Text[50]; PostingTypeNo: Integer; var Period: Option " ",Disposal,"Bal. Disposal")
     var
+#pragma warning disable AA0074
         LocalText000: Label ' ,Disposal,Bal. Disposal';
+#pragma warning restore AA0074
     begin
         if PostingTypeNo = 0 then
             exit;
