@@ -159,6 +159,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupAllowVATDateTag());
+        PerCompanyUpgradeTags.Add(GetBankExportImportSetupSEPACT09UpgradeTag());
         PerCompanyUpgradeTags.Add(GetSalesShipmentCustomerIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetCustomReportLayoutUpgradeTag());
         PerCompanyUpgradeTags.Add(GetFixedAssetLocationIdUpgradeTag());
@@ -760,6 +761,11 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetClearTemporaryTablesUpgradeTag(): Code[250]
     begin
         exit('MS-396184-CleanTemporaryTables-20210427');
+    end;
+
+    internal procedure GetBankExportImportSetupSEPACT09UpgradeTag(): Code[250]
+    begin
+        exit('MS-533446-BankExportImportSetupSEPACT09-20240528');
     end;
 
     internal procedure GetDimSetEntryGlobalDimNoUpgradeTag(): Code[250]
