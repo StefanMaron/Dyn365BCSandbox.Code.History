@@ -30,10 +30,14 @@ codeunit 232 "Gen. Jnl.-Post+Print"
         TempJnlBatchName: Code[10];
 
         JournalsScheduledMsg: Label 'Journal lines have been scheduled for posting.';
+#pragma warning disable AA0074
         Text000: Label 'cannot be filtered when posting recurring journals';
         Text001: Label 'Do you want to post the journal lines and print the report(s)?';
         Text003: Label 'The journal lines were successfully posted.';
+#pragma warning disable AA0470
         Text004: Label 'The journal lines were successfully posted. You are now in the %1 journal.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     local procedure "Code"()
     var
@@ -85,8 +89,7 @@ codeunit 232 "Gen. Jnl.-Post+Print"
             CODEUNIT.Run(CODEUNIT::"Gen. Jnl.-Post Batch", GenJnlLine);
             OnAfterPostJournalBatch(GenJnlLine);
 
-            RecRefToPrint.GetTable(GenJnlLine);
-            BatchPostingPrintMgt.PrintJournal(RecRefToPrint);
+            PrintJournal();
 
             if not HideDialog then
                 if GenJnlLine."Line No." = 0 then
@@ -111,6 +114,19 @@ codeunit 232 "Gen. Jnl.-Post+Print"
             GenJnlLine.FilterGroup(0);
             GenJnlLine."Line No." := 1;
         end;
+    end;
+
+    local procedure PrintJournal()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforePrintJournalBatch(GenJnlLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        RecRefToPrint.GetTable(GenJnlLine);
+        BatchPostingPrintMgt.PrintJournal(RecRefToPrint);
     end;
 
     [IntegrationEvent(false, false)]
@@ -140,6 +156,11 @@ codeunit 232 "Gen. Jnl.-Post+Print"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterOnRun(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePrintJournalBatch(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 }

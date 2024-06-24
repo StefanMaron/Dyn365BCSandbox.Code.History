@@ -316,7 +316,7 @@ table 11000000 "Proposal Line"
         }
         field(17; "Our Bank Account No."; Text[30])
         {
-            CalcFormula = Lookup("Bank Account"."Bank Account No." where("No." = field("Our Bank No.")));
+            CalcFormula = lookup("Bank Account"."Bank Account No." where("No." = field("Our Bank No.")));
             Caption = 'Our Bank Account No.';
             Editable = false;
             FieldClass = FlowField;
@@ -571,12 +571,11 @@ table 11000000 "Proposal Line"
 
             trigger OnValidate()
             begin
-                if "Foreign Currency" <> xRec."Foreign Currency" then begin
+                if "Foreign Currency" <> xRec."Foreign Currency" then
                     if "Foreign Currency" = "Currency Code" then
                         "Foreign Amount" := Amount
                     else
                         "Foreign Amount" := 0;
-                end;
             end;
         }
         field(11401; "Foreign Amount"; Decimal)
@@ -671,7 +670,7 @@ table 11000000 "Proposal Line"
         Vend: Record Vendor;
         Empl: Record Employee;
     begin
-        if "Account No." <> '' then begin
+        if "Account No." <> '' then
             case "Account Type" of
                 "Account Type"::Customer:
                     begin
@@ -689,7 +688,7 @@ table 11000000 "Proposal Line"
                         exit(Empl.FullName());
                     end;
             end
-        end else
+        else
             exit('');
     end;
 

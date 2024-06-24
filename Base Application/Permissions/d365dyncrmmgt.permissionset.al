@@ -2,7 +2,9 @@ namespace System.Security.AccessControl;
 
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+#if not CLEAN25
 using Microsoft.Integration.FieldService;
+#endif
 using Microsoft.Sales.Customer;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.CRM.Interaction;
@@ -20,15 +22,9 @@ permissionset 617 "D365 DYN CRM MGT"
                   tabledata "CDS Connection Setup" = IMD,
                   tabledata "CDS Coupled Business Unit" = IMD,
                   tabledata "CDS Environment" = IMD,
-#if not CLEAN22
-                  tabledata "CDS Failed Option Mapping" = IMD,
-#endif
                   tabledata "CDS Solution" = IMD,
                   tabledata "CDS Teammembership" = IMD,
                   tabledata "CDS Teamroles" = IMD,
-#if not CLEAN22
-                  tabledata "Coupling Field Buffer" = IMD,
-#endif
                   tabledata "Coupling Record Buffer" = IMD,
                   tabledata "Dataverse Entity Change" = ID,
                   tabledata "CRM Account" = IMD,
@@ -78,6 +74,7 @@ permissionset 617 "D365 DYN CRM MGT"
                   tabledata "CRM Transactioncurrency" = IMD,
                   tabledata "CRM Uom" = IMD,
                   tabledata "CRM Uomschedule" = IMD,
+#if not CLEAN25
                   tabledata "FS Connection Setup" = IMD,
                   tabledata "FS Bookable Resource" = IMD,
                   tabledata "FS Bookable Resource Booking" = IMD,
@@ -92,6 +89,7 @@ permissionset 617 "D365 DYN CRM MGT"
                   tabledata "FS Work Order Service" = IMD,
                   tabledata "FS Work Order Substatus" = IMD,
                   tabledata "FS Work Order Type" = IMD,
+#endif
                   tabledata "Customer Templ." = IMD,
                   tabledata "Vendor Templ." = IMD,
                   tabledata "Integration Field Mapping" = IMD,

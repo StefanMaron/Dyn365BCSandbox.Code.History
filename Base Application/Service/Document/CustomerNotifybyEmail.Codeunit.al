@@ -16,9 +16,15 @@ codeunit 5915 "Customer-Notify by Email"
     var
         ServHeader: Record "Service Header";
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'We have finished carrying out service order %1.';
+#pragma warning restore AA0470
         Text001: Label 'You can collect your serviced items when it is convenient for you.';
+#pragma warning disable AA0470
         Text002: Label 'The customer will be notified as requested because service order %1 is now %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     local procedure NotifyByEMailWhenServiceIsDone()
     var
@@ -45,6 +51,7 @@ codeunit 5915 "Customer-Notify by Email"
         ServEmailQueue."Document Type" := ServEmailQueue."Document Type"::"Service Order";
         ServEmailQueue."Document No." := ServHeader."No.";
         ServEmailQueue.Status := ServEmailQueue.Status::" ";
+        OnBeforeInsertOnNotifyByEMailWhenServiceIsDone(ServHeader, ServEmailQueue);
         ServEmailQueue.Insert(true);
         ServEmailQueue.ScheduleInJobQueue();
         Message(
@@ -54,6 +61,11 @@ codeunit 5915 "Customer-Notify by Email"
 
     [IntegrationEvent(false, false)]
     local procedure OnGetEmailForNotifyByEMailWhenServiceIsDone(ServiceHeader: Record "Service Header"; var EmailAddress: Text[80])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertOnNotifyByEMailWhenServiceIsDone(ServiceHeader: Record "Service Header"; var ServiceEmailQueue: Record "Service Email Queue")
     begin
     end;
 }

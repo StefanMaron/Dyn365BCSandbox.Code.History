@@ -27,14 +27,15 @@ codeunit 903 "Release Assembly Document"
             Error(Text001, Rec."Document Type", Rec."No.");
 
         InvtSetup.Get();
-        if InvtSetup."Location Mandatory" then begin
-            AssemblyLine.SetRange(Type, AssemblyLine.Type::Item);
-            if AssemblyLine.FindSet() then
-                repeat
-                    if AssemblyLine.IsInventoriableItem() then
+        AssemblyLine.SetRange(Type, AssemblyLine.Type::Item);
+        if AssemblyLine.FindSet() then
+            repeat
+                if AssemblyLine.IsInventoriableItem() then begin
+                    if InvtSetup."Location Mandatory" then
                         AssemblyLine.TestField("Location Code");
-                until AssemblyLine.Next() = 0;
-        end;
+                    AssemblyLine.TestField("Unit of Measure Code");
+                end;
+            until AssemblyLine.Next() = 0;
 
         Rec.Status := Rec.Status::Released;
         Rec.Modify();
@@ -46,7 +47,9 @@ codeunit 903 "Release Assembly Document"
     end;
 
     var
+#pragma warning disable AA0074
         Text001: Label 'There is nothing to release for %1 %2.', Comment = '%1 = Document Type, %2 = No.';
+#pragma warning restore AA0074
 
     procedure Reopen(var AssemblyHeader: Record "Assembly Header")
     var

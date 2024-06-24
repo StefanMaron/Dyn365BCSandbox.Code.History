@@ -40,16 +40,6 @@ page 462 "Resources Setup"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether time sheets must be approved on a per job basis by the user specified for the job.';
                 }
-#if not CLEAN22
-                field("Use New Time Sheet Experience"; Rec."Use New Time Sheet Experience")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies if a new time sheet experience should be used.';
-                    ObsoleteReason = 'Remove old time sheet experience.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 field("Time Sheet Submission Policy"; Rec."Time Sheet Submission Policy")
                 {
                     ApplicationArea = Jobs;

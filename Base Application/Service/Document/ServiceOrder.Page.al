@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Service.Document;
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.Contact;
 using Microsoft.Finance.Currency;
@@ -775,10 +779,23 @@ page 5900 "Service Order"
                 SubPageLink = "No." = field("No."),
                               "Document Type" = field("Document Type");
             }
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Service Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = Service;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Service Header"),
                               "No." = field("No."),
                               "Document Type" = field("Document Type");
@@ -853,7 +870,7 @@ page 5900 "Service Order"
                         DemandOverview: Page "Demand Overview";
                     begin
                         DemandOverview.SetCalculationParameter(true);
-                        DemandOverview.Initialize(0D, 4, Rec."No.", '', '');
+                        DemandOverview.SetParameters(0D, Microsoft.Inventory.Requisition."Demand Order Source Type"::"Service Demand", Rec."No.", '', '');
                         DemandOverview.RunModal();
                     end;
                 }
@@ -924,7 +941,7 @@ page 5900 "Service Order"
                     Caption = 'Email &Queue';
                     Image = Email;
                     RunObject = Page "Service Email Queue";
-                    RunPageLink = "Document Type" = CONST("Service Order"),
+                    RunPageLink = "Document Type" = const("Service Order"),
                                   "Document No." = field("No.");
                     RunPageView = sorting("Document Type", "Document No.");
                     ToolTip = 'View the list of emails that are waiting to be sent automatically to notify customers about their service item.';
@@ -935,10 +952,10 @@ page 5900 "Service Order"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Service Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Service Header"),
+                    RunPageLink = "Table Name" = const("Service Header"),
                                   "Table Subtype" = field("Document Type"),
                                   "No." = field("No."),
-                                  Type = CONST(General);
+                                  Type = const(General);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(DocAttach)
@@ -1018,7 +1035,7 @@ page 5900 "Service Order"
                     Caption = 'Warehouse Shipment Lines';
                     Image = ShipmentLines;
                     RunObject = Page "Whse. Shipment Lines";
-                    RunPageLink = "Source Type" = CONST(5902),
+                    RunPageLink = "Source Type" = const(5902),
 #pragma warning disable AL0603
                                   "Source Subtype" = field("Document Type"),
 #pragma warning restore
@@ -1070,7 +1087,7 @@ page 5900 "Service Order"
                     RunObject = Page "Job Ledger Entries";
                     RunPageLink = "Service Order No." = field("No.");
                     RunPageView = sorting("Service Order No.", "Posting Date")
-                                  where("Entry Type" = CONST(Usage));
+                                  where("Entry Type" = const(Usage));
                     ToolTip = 'View all the project ledger entries that result from posting transactions in the service document that involve a project.';
                 }
             }
@@ -1160,9 +1177,9 @@ page 5900 "Service Order"
 
                     trigger OnAction()
                     var
-                        ReportPrint: Codeunit "Test Report-Print";
+                        ServTestReportPrint: Codeunit "Serv. Test Report Print";
                     begin
-                        ReportPrint.PrintServiceHeader(Rec);
+                        ServTestReportPrint.PrintServiceHeader(Rec);
                     end;
                 }
                 action(Post)
@@ -1243,10 +1260,10 @@ page 5900 "Service Order"
 
                 trigger OnAction()
                 var
-                    DocumentPrint: Codeunit "Document-Print";
+                    ServDocumentPrint: Codeunit "Serv. Document Print";
                 begin
                     CurrPage.Update(true);
-                    DocumentPrint.PrintServiceHeader(Rec);
+                    ServDocumentPrint.PrintServiceHeader(Rec);
                 end;
             }
             action(AttachAsPDF)
@@ -1260,11 +1277,11 @@ page 5900 "Service Order"
                 trigger OnAction()
                 var
                     ServiceHeader: Record "Service Header";
-                    DocumentPrint: Codeunit "Document-Print";
+                    ServDocumentPrint: Codeunit "Serv. Document Print";
                 begin
                     ServiceHeader := Rec;
                     ServiceHeader.SetRecFilter();
-                    DocumentPrint.PrintServiceHeaderToDocumentAttachment(ServiceHeader);
+                    ServDocumentPrint.PrintServiceHeaderToDocumentAttachment(ServiceHeader);
                 end;
             }
         }
@@ -1465,10 +1482,10 @@ page 5900 "Service Order"
 
     local procedure SetDocNoVisible()
     var
-        DocumentNoVisibility: Codeunit DocumentNoVisibility;
+        ServDocumentNoVisibility: Codeunit "Serv. Document No. Visibility";
         DocType: Option Quote,"Order",Invoice,"Credit Memo",Contract;
     begin
-        DocNoVisible := DocumentNoVisibility.ServiceDocumentNoIsVisible(DocType::"Order", Rec."No.");
+        DocNoVisible := ServDocumentNoVisibility.ServiceDocumentNoIsVisible(DocType::"Order", Rec."No.");
     end;
 
     local procedure SetControlAppearance()

@@ -306,6 +306,11 @@ page 1 "Company Information"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the country/region code of the address that the items are shipped to.';
                 }
+                field("Ship-to Phone No."; Rec."Ship-to Phone No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the telephone number of the company''s shipping address.';
+                }
                 field("Ship-to Contact"; Rec."Ship-to Contact")
                 {
                     ApplicationArea = Suite;
