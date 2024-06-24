@@ -44,7 +44,6 @@ using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;
-using Microsoft.Service.Item;
 using Microsoft.Utilities;
 using System;
 using System.Automation;
@@ -64,7 +63,6 @@ table 23 Vendor
     DrillDownPageID = "Vendor List";
     LookupPageID = "Vendor Lookup";
     Permissions = TableData "Vendor Ledger Entry" = r,
-                  TableData "Service Item" = rm,
                   TableData "Price List Header" = rd,
                   TableData "Price List Line" = rd,
 #if not CLEAN23
@@ -1586,7 +1584,7 @@ table 23 Vendor
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CalcFormula = - sum("Detailed Vendor Ledg. Entry".Amount where("Vendor No." = field("No."),
-                                                                           "Posting Date" = field(UPPERLIMIT("Date Filter")),
+                                                                           "Posting Date" = field(upperlimit("Date Filter")),
                                                                            "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                            "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
                                                                            "Currency Code" = field("Currency Filter")));
@@ -1598,7 +1596,7 @@ table 23 Vendor
         {
             AutoFormatType = 1;
             CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Vendor No." = field("No."),
-                                                                                   "Posting Date" = field(UPPERLIMIT("Date Filter")),
+                                                                                   "Posting Date" = field(upperlimit("Date Filter")),
                                                                                    "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                    "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
                                                                                    "Currency Code" = field("Currency Filter")));
@@ -1746,9 +1744,6 @@ table 23 Vendor
         ItemVendor: Record "Item Vendor";
         PurchPrepmtPct: Record "Purchase Prepayment %";
         CustomReportSelection: Record "Custom Report Selection";
-#if not CLEAN22
-        IntrastatSetup: Record "Intrastat Setup";
-#endif
         ItemReference: Record "Item Reference";
         VATRegistrationLogMgt: Codeunit "VAT Registration Log Mgt.";
     begin
@@ -1795,9 +1790,6 @@ table 23 Vendor
             PurchPrepmtPct.DeleteAll(true);
 
         VATRegistrationLogMgt.DeleteVendorLog(Rec);
-#if not CLEAN22
-        IntrastatSetup.CheckDeleteIntrastatContact(IntrastatSetup."Intrastat Contact Type"::Vendor, "No.");
-#endif
         CalendarManagement.DeleteCustomizedBaseCalendarData(CustomizedCalendarChange."Source Type"::Vendor, "No.");
     end;
 
@@ -1909,11 +1901,15 @@ table 23 Vendor
         InsertFromContact: Boolean;
         ForceUpdateContact: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot delete %1 %2 because there is at least one outstanding Purchase %3 for this vendor.';
         Text003: Label 'Do you wish to create a contact for %1 %2?';
         Text004: Label 'Contact %1 %2 is not related to vendor %3 %4.';
+#pragma warning restore AA0470
         Text005: Label 'post';
         Text006: Label 'create';
+#pragma warning disable AA0470
         Text007: Label 'You cannot %1 this type of document when Vendor %2 is blocked with type %3';
         Text008: Label 'The %1 %2 has been assigned to %3 %4.\The same %1 cannot be entered on more than one %3.';
         Text009: Label 'Reconciling IC transactions may be difficult if you change IC Partner Code because this %1 has ledger entries in a fiscal year that has not yet been closed.\ Do you still want to change the IC Partner Code?';
@@ -1921,6 +1917,8 @@ table 23 Vendor
         Text10000: Label '%1 is not a valid RFC No.';
         Text10001: Label '%1 is not a valid CURP No.';
         Text10002: Label 'The RFC No. %1 is used by another company.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         SelectVendorErr: Label 'You must select an existing vendor.';
         CreateNewVendTxt: Label 'Create a new vendor card for %1.', Comment = '%1 is the name to be used to create the customer. ';
         VendNotRegisteredTxt: Label 'This vendor is not registered. To continue, choose one of the following options:';

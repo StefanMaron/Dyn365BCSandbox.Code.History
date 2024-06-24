@@ -114,6 +114,21 @@ codeunit 130509 "Library - Sales"
         CustContUpdate.OnModify(Customer);
     end;
 
+    procedure CreateCustomerWithAddressAndContactInfo(var Customer: Record Customer)
+    begin
+        CreateCustomerWithAddress(Customer);
+        CreateCustomerContactInfo(Customer);
+    end;
+
+    procedure CreateCustomerContactInfo(var Customer: Record Customer)
+    var
+        CustContUpdate: Codeunit "CustCont-Update";
+    begin
+        Customer.Validate("Phone No.", LibraryUtility.GenerateRandomPhoneNo());
+        Customer.Modify(true);
+        CustContUpdate.OnModify(Customer);
+    end;
+
     procedure CreateCustomerNo(): Code[20]
     var
         Customer: Record Customer;
@@ -799,6 +814,9 @@ codeunit 130509 "Library - Sales"
         SalesPostPrint: Codeunit "Sales-Post + Print";
         Assert: Codeunit Assert;
         NoSeries: Codeunit "No. Series";
+        RecRef: RecordRef;
+        FieldRef: FieldRef;
+        DocumentFieldNo: Integer;
     begin
         OnBeforePostSalesDocument(SalesHeader, NewShipReceive, NewInvoice, AfterPostSalesDocumentSendAsEmail);
 
@@ -819,19 +837,19 @@ codeunit 130509 "Library - Sales"
                 if SalesHeader.Invoice and (SalesHeader."Posting No. Series" <> '') then begin
                     if (SalesHeader."Posting No." = '') then
                         SalesHeader."Posting No." := NoSeries.GetNextNo(SalesHeader."Posting No. Series", LibraryUtility.GetNextNoSeriesSalesDate(SalesHeader."Posting No. Series"));
-                    DocumentNo := SalesHeader."Posting No.";
+                    DocumentFieldNo := SalesHeader.FieldNo("Last Posting No.");
                 end;
             SalesHeader."Document Type"::Order:
                 begin
                     if SalesHeader.Ship and (SalesHeader."Shipping No. Series" <> '') then begin
                         if (SalesHeader."Shipping No." = '') then
                             SalesHeader."Shipping No." := NoSeries.GetNextNo(SalesHeader."Shipping No. Series", LibraryUtility.GetNextNoSeriesSalesDate(SalesHeader."Shipping No. Series"));
-                        DocumentNo := SalesHeader."Shipping No.";
+                        DocumentFieldNo := SalesHeader.FieldNo("Last Shipping No.");
                     end;
                     if SalesHeader.Invoice and (SalesHeader."Posting No. Series" <> '') then begin
                         if (SalesHeader."Posting No." = '') then
                             SalesHeader."Posting No." := NoSeries.GetNextNo(SalesHeader."Posting No. Series", LibraryUtility.GetNextNoSeriesSalesDate(SalesHeader."Posting No. Series"));
-                        DocumentNo := SalesHeader."Posting No.";
+                        DocumentFieldNo := SalesHeader.FieldNo("Last Posting No.");
                     end;
                 end;
             SalesHeader."Document Type"::"Return Order":
@@ -839,12 +857,12 @@ codeunit 130509 "Library - Sales"
                     if SalesHeader.Receive and (SalesHeader."Return Receipt No. Series" <> '') then begin
                         if (SalesHeader."Return Receipt No." = '') then
                             SalesHeader."Return Receipt No." := NoSeries.GetNextNo(SalesHeader."Return Receipt No. Series", LibraryUtility.GetNextNoSeriesSalesDate(SalesHeader."Return Receipt No. Series"));
-                        DocumentNo := SalesHeader."Return Receipt No.";
+                        DocumentFieldNo := SalesHeader.FieldNo("Last Return Receipt No.");
                     end;
                     if SalesHeader.Invoice and (SalesHeader."Posting No. Series" <> '') then begin
                         if (SalesHeader."Posting No." = '') then
                             SalesHeader."Posting No." := NoSeries.GetNextNo(SalesHeader."Posting No. Series", LibraryUtility.GetNextNoSeriesSalesDate(SalesHeader."Posting No. Series"));
-                        DocumentNo := SalesHeader."Posting No.";
+                        DocumentFieldNo := SalesHeader.FieldNo("Last Posting No.");
                     end;
                 end;
             else
@@ -855,6 +873,10 @@ codeunit 130509 "Library - Sales"
             SalesPostPrint.PostAndEmail(SalesHeader)
         else
             SalesPost.Run(SalesHeader);
+
+        RecRef.GetTable(SalesHeader);
+        FieldRef := RecRef.Field(DocumentFieldNo);
+        DocumentNo := FieldRef.Value();
     end;
 
     procedure PostSalesPrepaymentCrMemo(var SalesHeader: Record "Sales Header")
@@ -1111,6 +1133,32 @@ codeunit 130509 "Library - Sales"
         SalesReceivablesSetup.Get();
         SalesReceivablesSetup.Validate("Copy Comments Order to Invoice", CopyCommentsOrderToInvoice);
         SalesReceivablesSetup.Modify(true);
+    end;
+
+    procedure ModifySalesInvoiceHeader(var SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        BankAccount: Record "Bank Account";
+        PaymentMethod: Record "Payment Method";
+        ShippingAgent: Record "Shipping Agent";
+    begin
+        LibraryERM.CreatePaymentMethod(PaymentMethod);
+        LibraryInventory.CreateShippingAgent(ShippingAgent);
+        LibraryERM.CreateBankAccount(BankAccount);
+        BankAccount."Currency Code" := SalesInvoiceHeader."Currency Code";
+        BankAccount.Modify();
+    
+        SalesInvoiceHeader."Payment Method Code" := PaymentMethod.Code;
+        SalesInvoiceHeader."Payment Reference" := LibraryRandom.RandText(MaxStrLen(SalesInvoiceHeader."Payment Reference")).ToUpper();
+        SalesInvoiceHeader."Company Bank Account Code" := BankAccount."No.";
+        SalesInvoiceHeader."Posting Description" := LibraryRandom.RandText(MaxStrLen(SalesInvoiceHeader."Posting Description"));
+        SalesInvoiceHeader."Shipping Agent Code" := ShippingAgent.Code;
+        SalesInvoiceHeader."Package Tracking No." := LibraryRandom.RandText(MaxStrLen(SalesInvoiceHeader."Package Tracking No."));
+        SalesInvoiceHeader."Shipping Agent Service Code" := LibraryRandom.RandText(MaxStrLen(SalesInvoiceHeader."Shipping Agent Service Code")).ToUpper();
+    end;
+    
+    procedure UpdateSalesInvoiceHeader(SalesInvoiceHeaderEdit: Record "Sales Invoice Header")
+    begin
+        Codeunit.Run(Codeunit::"Sales Inv. Header - Edit", SalesInvoiceHeaderEdit);
     end;
 
     procedure UndoSalesShipmentLine(var SalesShipmentLine: Record "Sales Shipment Line")

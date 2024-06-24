@@ -69,13 +69,19 @@ page 461 "Inventory Setup"
                 {
                     ApplicationArea = Comments;
                     Importance = Additional;
-                    ToolTip = 'Specifies that you want the program to copy the comments entered on the transfer order to the transfer shipment.';
+                    ToolTip = 'Specifies that you want to copy the comments entered on the transfer order to the transfer shipment.';
                 }
                 field("Copy Comments Order to Rcpt."; Rec."Copy Comments Order to Rcpt.")
                 {
                     ApplicationArea = Comments;
                     Importance = Additional;
-                    ToolTip = 'Specifies that you want the program to copy the comments entered on the transfer order to the transfer receipt.';
+                    ToolTip = 'Specifies that you want to copy the comments entered on the transfer order to the transfer receipt.';
+                }
+                field("Copy Comments to Invt. Doc."; Rec."Copy Comments to Invt. Doc.")
+                {
+                    ApplicationArea = Comments;
+                    Importance = Additional;
+                    ToolTip = 'Specifies that you want to copy the comments entered on the inventory document to the posted document.';
                 }
                 field("Outbound Whse. Handling Time"; Rec."Outbound Whse. Handling Time")
                 {

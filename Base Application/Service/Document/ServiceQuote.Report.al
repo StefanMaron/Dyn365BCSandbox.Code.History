@@ -574,6 +574,9 @@ report 5902 "Service Quote"
                         column(Ship_to_AddressCaption; Ship_to_AddressCaptionLbl)
                         {
                         }
+                        column(ShipToPhoneNo; "Service Header"."Ship-to Phone")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -743,9 +746,12 @@ report 5902 "Service Quote"
         TotGrossAmt: Decimal;
         OutputNo: Integer;
         LogInteractionEnable: Boolean;
-
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'Service Quote %1';
         Text002: Label 'Page %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         Service_Header___Order_Date_CaptionLbl: Label 'Order Date';
         Invoice_toCaptionLbl: Label 'Invoice to';
         CompanyInfo__Phone_No__CaptionLbl: Label 'Phone No.';
@@ -776,12 +782,14 @@ report 5902 "Service Quote"
     end;
 
     local procedure FormatAddressFields(var ServiceHeader: Record "Service Header")
+    var
+        ServiceFormatAddress: Codeunit "Service Format Address";
     begin
         FormatAddr.GetCompanyAddr(ServiceHeader."Responsibility Center", RespCenter, CompanyInfo, CompanyAddr);
-        FormatAddr.ServiceOrderSellto(CustAddr, ServiceHeader);
+        ServiceFormatAddress.ServiceOrderSellto(CustAddr, ServiceHeader);
         ShowShippingAddr := ServiceHeader."Ship-to Code" <> '';
         if ShowShippingAddr then
-            FormatAddr.ServiceOrderShipto(ShipToAddr, ServiceHeader);
+            ServiceFormatAddress.ServiceOrderShipto(ShipToAddr, ServiceHeader);
     end;
 
     [IntegrationEvent(false, false)]

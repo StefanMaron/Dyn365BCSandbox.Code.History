@@ -1,8 +1,10 @@
 ﻿namespace Microsoft.Projects.Project.Job;
 
+using Microsoft.Assembly.Document;
 using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
+using Microsoft.Inventory.BOM;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -19,6 +21,9 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reports;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Structure;
 using System.Integration.PowerBI;
 
 page 89 "Job List"
@@ -157,10 +162,22 @@ page 89 "Job List"
                 Caption = 'Project Details';
                 SubPageLink = "No." = field("No.");
             }
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::Job),
+                              "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::Job),
                               "No." = field("No.");
             }
@@ -262,6 +279,21 @@ page 89 "Job List"
                                   "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
+                action(AssemblyOrders)
+                {
+                    AccessByPermission = TableData "BOM Component" = R;
+                    ApplicationArea = Assembly;
+                    Caption = 'Assembly Orders';
+                    Image = AssemblyOrder;
+                    ToolTip = 'View ongoing assembly orders related to the project. ';
+
+                    trigger OnAction()
+                    var
+                        AssembleToOrderLink: Record "Assemble-to-Order Link";
+                    begin
+                        AssembleToOrderLink.ShowAsmOrders(Rec, '');
+                    end;
+                }
             }
             group("W&IP")
             {
@@ -288,6 +320,14 @@ page 89 "Job List"
                     RunPageView = sorting("Job No.")
                                   order(descending);
                     ToolTip = 'View the project''s WIP G/L entries.';
+                }
+                action("WIP Cockpit")
+                {
+                    ApplicationArea = Jobs;
+                    Caption = 'Project WIP Cockpit';
+                    Image = WIPLedger;
+                    RunObject = Page "Job WIP Cockpit";
+                    ToolTip = 'View the Project WIP Cockpit.';
                 }
             }
 #if not CLEAN23
@@ -534,6 +574,50 @@ page 89 "Job List"
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
             }
+            group(Warehouse_Related)
+            {
+                Caption = 'Warehouse';
+                Image = Worksheets;
+                action("Put-away/Pick Lines/Movement Lines")
+                {
+                    ApplicationArea = Warehouse;
+                    Caption = 'Put-away/Pick Lines/Movement Lines';
+                    Image = PutawayLines;
+                    ToolTip = 'View the list of ongoing inventory put-aways, picks, or movements for the project.';
+
+                    trigger OnAction()
+                    var
+                        WarehouseActivityLine: Record "Warehouse Activity Line";
+                        WarehouseActivityLines: Page "Warehouse Activity Lines";
+                    begin
+                        WarehouseActivityLine.SetCurrentKey("Whse. Document No.", "Whse. Document Type", "Activity Type");
+                        WarehouseActivityLine.SetRange("Whse. Document Type", WarehouseActivityLine."Whse. Document Type"::Job);
+                        WarehouseActivityLine.SetRange("Whse. Document No.", Rec."No.");
+                        if WarehouseActivityLine.IsEmpty() then begin
+                            WarehouseActivityLine.Reset();
+                            WarehouseActivityLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk");
+                            WarehouseActivityLine.SetRange("Source Type", Database::Job);
+                            WarehouseActivityLine.SetRange("Source Subtype", 0);
+                            WarehouseActivityLine.SetRange("Source No.", Rec."No.");
+                        end;
+                        WarehouseActivityLines.SetTableView(WarehouseActivityLine);
+                        WarehouseActivityLines.Run();
+                    end;
+                }
+                action("Registered P&ick Lines")
+                {
+                    ApplicationArea = Warehouse;
+                    Caption = 'Registered Pick Lines';
+                    Image = RegisteredDocs;
+                    RunObject = Page "Registered Whse. Act.-Lines";
+                    RunPageLink = "Source Type" = filter(167),
+                                  "Source Subtype" = const("0"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                    ToolTip = 'View the list of warehouse picks that have been made for the project.';
+                }
+
+            }
         }
         area(processing)
         {
@@ -612,6 +696,37 @@ page 89 "Job List"
                         end;
                     }
                 }
+            }
+            group(Warehouse)
+            {
+                Caption = 'Warehouse';
+                Image = Worksheets;
+                action("Create Inventory Pick")
+                {
+                    ApplicationArea = Warehouse;
+                    Caption = 'Create Inventory Pick';
+                    Image = CreateInventoryPick;
+                    ToolTip = 'Create inventory picks for the item on the project planning lines.';
+
+                    trigger OnAction()
+                    begin
+                        Rec.CreateInvtPutAwayPick();
+                    end;
+                }
+                action("Create Warehouse Pick")
+                {
+                    AccessByPermission = TableData "Bin Content" = R;
+                    ApplicationArea = Warehouse;
+                    Caption = 'Create Warehouse Pick';
+                    Image = CreateWarehousePick;
+                    ToolTip = 'Create warehouse pick documents for the project planning lines.';
+
+                    trigger OnAction()
+                    begin
+                        Rec.CreateWarehousePick();
+                    end;
+                }
+
             }
         }
         area(reporting)
@@ -897,6 +1012,9 @@ page 89 "Job List"
                 {
                 }
                 actionref("WIP &G/L Entries_Promoted"; "WIP &G/L Entries")
+                {
+                }
+                actionref("WIP Cockpit_Promoted"; "WIP Cockpit")
                 {
                 }
             }

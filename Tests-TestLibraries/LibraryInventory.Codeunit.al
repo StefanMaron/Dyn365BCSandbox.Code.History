@@ -74,8 +74,10 @@ codeunit 132201 "Library - Inventory"
     procedure ClearItemJournal(ItemJournalTemplate: Record "Item Journal Template"; ItemJournalBatch: Record "Item Journal Batch")
     var
         ItemJournalLine: Record "Item Journal Line";
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
     begin
         Clear(ItemJournalLine);
+        Clear(SequenceNoMgt);
         ItemJournalLine.SetRange("Journal Template Name", ItemJournalTemplate.Name);
         ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
         ItemJournalLine.DeleteAll();

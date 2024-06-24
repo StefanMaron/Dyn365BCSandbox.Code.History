@@ -5,7 +5,6 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Purchases.Posting;
 using Microsoft.Sales.Posting;
-using Microsoft.Service.Posting;
 using System.Apps;
 using System.Environment;
 using System.Telemetry;
@@ -16,6 +15,7 @@ using Microsoft.Pricing.Calculation;
 codeunit 265 "Feature Key Management"
 {
     Access = Internal;
+    SingleInstance = true;
 
     var
         FeatureManagementFacade: Codeunit "Feature Management Facade";
@@ -36,6 +36,9 @@ codeunit 265 "Feature Key Management"
 #if not CLEAN24
         GLCurrencyRevaluationTxt: Label 'GLCurrencyRevaluation', Locked = true;
 #endif
+        ConcurrentWarehousingPostingLbl: Label 'ConcurrentWarehousingPosting', Locked = true;
+        ConcurrentWarehousingPosting: Boolean;
+        ConcurrentWarehousingPostingRead: Boolean;
 
 #if not CLEAN23
     [Obsolete('Feature Multiple Posting Groups enabled by default.', '23.0')]
@@ -89,6 +92,14 @@ codeunit 265 "Feature Key Management"
         exit(FeatureManagementFacade.IsEnabled(GetEU3PartyTradePurchaseFeatureKeyId()));
     end;
 #endif
+
+    procedure IsConcurrentWarehousingPostingEnabled(): Boolean
+    begin
+        if not ConcurrentWarehousingPostingRead then
+            ConcurrentWarehousingPosting := FeatureManagementFacade.IsEnabled(ConcurrentWarehousingPostingLbl);
+        ConcurrentWarehousingPostingRead := true;
+        exit(ConcurrentWarehousingPosting);
+    end;
 
 #if not CLEAN23
     internal procedure GetAllowMultipleCustVendPostingGroupsFeatureKey(): Text[50]
@@ -165,6 +176,13 @@ codeunit 265 "Feature Key Management"
                 FeatureTelemetry.LogUptake('0000JRA', ExtensibleInvoicePostingEngineLbl, Enum::"Feature Uptake Status"::Discovered);
             EU3PartyTradePurchaseTxt:
                 FeatureTelemetry.LogUptake('0000JRC', EU3PartyTradePurchaseTxt, Enum::"Feature Uptake Status"::Discovered);
+        end;
+#endif
+#if not CLEAN24
+        // Log feature uptake
+        case FeatureKey.ID of
+            GLCurrencyRevaluationTxt:
+                FeatureTelemetry.LogUptake('0000JRR', GLCurrencyRevaluationTxt, Enum::"Feature Uptake Status"::Discovered);
         end;
 #endif
     end;
@@ -431,22 +449,22 @@ codeunit 265 "Feature Key Management"
         AddEvent(Codeunit::"Purch.-Post", 'OnBeforeCheckItemQuantityPurchCredit', TempPublisherForEventSubscription);
 
         // Service
-        AddEvent(Codeunit::"Serv-Documents Mgt.", 'OnPostDocumentLinesOnBeforePostInvoicePostBuffer', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Posting Journals Mgt.", 'OnAfterPostCustomerEntry', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Posting Journals Mgt.", 'OnAfterPostBalancingEntry', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Posting Journals Mgt.", 'OnAfterPostInvoicePostBuffer', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Posting Journals Mgt.", 'OnBeforePostCustomerEntry', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Posting Journals Mgt.", 'OnBeforePostBalancingEntry', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Posting Journals Mgt.", 'OnBeforePostInvoicePostBuffer', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Posting Journals Mgt.", 'OnPostBalancingEntryOnBeforeFindCustLedgerEntry', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnAfterFillInvoicePostBuffer', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnAfterFillInvoicePostBufferProcedure', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnAfterUpdateInvPostBuffer', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnBeforeFillInvPostingBuffer', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnBeforeFillInvoicePostBuffer', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnBeforeInvPostingBufferCalcInvoiceDiscountAmount', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnBeforeInvPostingBufferCalcLineDiscountAmount', TempPublisherForEventSubscription);
-        AddEvent(Codeunit::"Serv-Amounts Mgt.", 'OnBeforeUpdateInvPostBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Documents Mgt.", 'OnPostDocumentLinesOnBeforePostInvoicePostBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Posting Journals Mgt.", 'OnAfterPostCustomerEntry', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Posting Journals Mgt.", 'OnAfterPostBalancingEntry', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Posting Journals Mgt.", 'OnAfterPostInvoicePostBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Posting Journals Mgt.", 'OnBeforePostCustomerEntry', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Posting Journals Mgt.", 'OnBeforePostBalancingEntry', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Posting Journals Mgt.", 'OnBeforePostInvoicePostBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Posting Journals Mgt.", 'OnPostBalancingEntryOnBeforeFindCustLedgerEntry', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnAfterFillInvoicePostBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnAfterFillInvoicePostBufferProcedure', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnAfterUpdateInvPostBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnBeforeFillInvPostingBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnBeforeFillInvoicePostBuffer', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnBeforeInvPostingBufferCalcInvoiceDiscountAmount', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnBeforeInvPostingBufferCalcLineDiscountAmount', TempPublisherForEventSubscription);
+        AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnBeforeUpdateInvPostBuffer', TempPublisherForEventSubscription);
     end;
 
     local procedure AddEvent(ObjectID: Integer; EventName: Text[250]; var TempPublisherForEventSubscription: Record "Event Subscription" temporary)

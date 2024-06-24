@@ -67,10 +67,9 @@ codeunit 27030 "SAT Utilities"
         PaymentMethod: Record "Payment Method";
         SATPaymentMethod: Record "SAT Payment Method";
     begin
-        if PaymentMethod.Get(PaymentMeth) then begin
+        if PaymentMethod.Get(PaymentMeth) then
             if SATPaymentMethod.Get(PaymentMethod."SAT Method of Payment") then
                 exit(SATPaymentMethod.Description);
-        end;
         exit(PaymentMeth);
     end;
 
@@ -117,10 +116,9 @@ codeunit 27030 "SAT Utilities"
         PaymentTerms: Record "Payment Terms";
         SATPaymentTerm: Record "SAT Payment Term";
     begin
-        if PaymentTerms.Get(PaymentTerm) then begin
+        if PaymentTerms.Get(PaymentTerm) then
             if SATPaymentTerm.Get(PaymentTerms."SAT Payment Term") then
                 exit(SATPaymentTerm.Description);
-        end;
         exit(PaymentTerm);
     end;
 

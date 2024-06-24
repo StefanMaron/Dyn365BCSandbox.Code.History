@@ -757,10 +757,9 @@ codeunit 10145 "E-Invoice Mgt."
             '0000C73', StrSubstNo(StampReqSuccessMsg, GetDocTypeTextFromDatabaseId(DocumentHeaderRecordRef.Number)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
 
         // If Advance Settle, and everything went well, then need to create CFDI document for Advance reverse.
-        if AdvanceSettle then begin
+        if AdvanceSettle then
             if SalesInvoiceHeader."Electronic Document Status" = SalesInvoiceHeader."Electronic Document Status"::"Stamp Received" then
                 RequestStamp(DocumentHeaderRecordRef, true, true);
-        end;
 
         OnAfterRequestStamp(DocumentHeaderRecordRef);
     end;
@@ -5391,7 +5390,7 @@ codeunit 10145 "E-Invoice Mgt."
                 AddAttribute(XMLDoc, XMLCurrNode, 'MonedaDR', ConvertCurrency(CustLedgerEntry2."Currency Code"));
 
                 EquivalenciaDR := TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                AddAttribute(XMLDoc, XMLCurrNode, 'EquivalenciaDR', FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()));
+                    AddAttribute(XMLDoc, XMLCurrNode, 'EquivalenciaDR', FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()));
 
                 SumStampedPayments(CustLedgerEntry2, SumOfStamped, PaymentNo);
                 AddAttribute(XMLDoc, XMLCurrNode, 'NumParcialidad', Format(PaymentNo));
@@ -5405,7 +5404,7 @@ codeunit 10145 "E-Invoice Mgt."
 
                 AddNodePagoImpuestosDR(TempVATAmountLine, XMLDoc, XMLCurrNode, XMLNewChild);
 
-                XMLCurrNode := XMLCurrNode.ParentNode; // DoctoRelacionado
+                    XMLCurrNode := XMLCurrNode.ParentNode; // DoctoRelacionado
             until TempDetailedCustLedgEntry.Next() = 0;
         // ImpuestosP
         AddNodePagoImpuestosP(XMLDoc, XMLCurrNode, XMLNewChild, TempVATAmountLinePmt);
@@ -5523,7 +5522,7 @@ codeunit 10145 "E-Invoice Mgt."
                 WriteOutStr(OutStream, ConvertCurrency(CustLedgerEntry2."Currency Code") + '|');
                 // MonedaDR
                 EquivalenciaDR := TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                WriteOutStr(OutStream, FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()) + '|');
+                    WriteOutStr(OutStream, FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()) + '|');
 
                 SumStampedPayments(CustLedgerEntry2, SumOfStamped, PaymentNo);
                 WriteOutStr(OutStream, Format(PaymentNo) + '|');// NumParcialidad
@@ -5713,7 +5712,7 @@ codeunit 10145 "E-Invoice Mgt."
         exit(DATABASE::"Sales Cr.Memo Header");
     end;
 
-    local procedure GetRelatedDocumentData(DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; DocumentNo: Code[20]; EntrySourceCode: Code[10]; VAR TempVATAmountLine: Record "VAT Amount Line" temporary; VAR FiscalInvoiceNumberPAC: Text[50]; VAR DocAmountInclVAT: Decimal; VAR SubjectToTax: Text);
+    local procedure GetRelatedDocumentData(DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; DocumentNo: Code[20]; EntrySourceCode: Code[10]; var TempVATAmountLine: Record "VAT Amount Line" temporary; var FiscalInvoiceNumberPAC: Text[50]; var DocAmountInclVAT: Decimal; var SubjectToTax: Text);
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
         ServiceInvoiceHeader: Record "Service Invoice Header";
@@ -6063,10 +6062,10 @@ IsVATExemptLine(TempDocumentLine));
             repeat
                 AddElementCFDI(XMLCurrNode, 'Retencion', '', DocNameSpace, XMLNewChild);
                 AddNodeTrasladoRetentionPerLine(
-    XMLDoc, XMLCurrNode, XMLNewChild,
-    TempDocumentLine.Amount, TempDocumentLineRetention."Retention VAT %",
-    TempDocumentLineRetention."Unit Price/Direct Unit Cost" * TempDocumentLineRetention.Quantity,
-    IsVATExemptLine(TempDocumentLineRetention));
+                    XMLDoc, XMLCurrNode, XMLNewChild,
+                    TempDocumentLine.Amount, TempDocumentLineRetention."Retention VAT %",
+                    TempDocumentLineRetention."Unit Price/Direct Unit Cost" * TempDocumentLineRetention.Quantity,
+                    IsVATExemptLine(TempDocumentLineRetention));
             until TempDocumentLineRetention.Next() = 0;
             XMLCurrNode := XMLCurrNode.ParentNode; // Retenciones
         end;
@@ -7533,7 +7532,7 @@ IsVATExemptLine(TempDocumentLine));
             Database::"Sales Cr.Memo Header":
                 exit('Sales Cr.Memo');
             Database::"Service Invoice Header":
-                Exit('Service Invoice');
+                exit('Service Invoice');
             Database::"Service Cr.Memo Header":
                 exit('Service Cr.Memo');
             Database::"Sales Shipment Header":

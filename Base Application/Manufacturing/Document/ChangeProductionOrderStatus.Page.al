@@ -346,8 +346,12 @@ page 99000914 "Change Production Order Status"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Changing status to %1...\\';
         Text001: Label 'Prod. Order #1###### @2@@@@@@@@@@@@@';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ProdOrderStatus: Option Simulated,Planned,"Firm Planned",Released;
         StartingDate: Date;
         EndingDate: Date;

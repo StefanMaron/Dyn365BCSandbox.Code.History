@@ -725,16 +725,14 @@ codeunit 136214 "Marketing Campaign Pricing"
         CustomerTemplate: Record "Customer Templ.";
         VATPostingSetup: Record "VAT Posting Setup";
     begin
-        with CustomerTemplate do begin
-            SetRange("Currency Code", '');
-            FindFirst();
-            if "VAT Bus. Posting Group" = '' then begin
-                LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
-                Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
-                Modify(true);
-            end;
-            exit(Code);
+        CustomerTemplate.SetRange("Currency Code", '');
+        CustomerTemplate.FindFirst();
+        if CustomerTemplate."VAT Bus. Posting Group" = '' then begin
+            LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+            CustomerTemplate.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+            CustomerTemplate.Modify(true);
         end;
+        exit(CustomerTemplate.Code);
     end;
 
     local procedure FindContactBusinessRelation(ContactNo: Code[20]): Code[20]

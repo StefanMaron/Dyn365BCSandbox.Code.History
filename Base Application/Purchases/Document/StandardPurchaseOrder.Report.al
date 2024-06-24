@@ -415,6 +415,9 @@ report 1322 "Standard Purchase - Order"
             column(ShiptoAddress_Lbl; ShiptoAddressCaptionLbl)
             {
             }
+            column(ShipToPhoneNo; "Purchase Header"."Ship-to Phone No.")
+            {
+            }
             column(SellToCustNo_PurchHeader_Lbl; FieldCaption("Sell-to Customer No."))
             {
             }
@@ -671,12 +674,11 @@ report 1322 "Standard Purchase - Order"
                                        (TempSalesTaxAmtLine."Tax %" <> PrevTaxPercent)
                                     then begin
                                         BrkIdx := BrkIdx + 1;
-                                        if BrkIdx > 1 then begin
+                                        if BrkIdx > 1 then
                                             if TaxArea."Country/Region" = TaxArea."Country/Region"::CA then
                                                 BreakdownTitle := TaxBreakdownLbl
                                             else
                                                 BreakdownTitle := SalesTaxBreakdownLbl;
-                                        end;
                                         if BrkIdx > ArrayLen(BreakdownAmt) then begin
                                             BrkIdx := BrkIdx - 1;
                                             BreakdownLabel[BrkIdx] := OtherTaxesLbl;
@@ -1126,6 +1128,7 @@ report 1322 "Standard Purchase - Order"
 
         trigger OnOpenPage()
         begin
+            InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
     }

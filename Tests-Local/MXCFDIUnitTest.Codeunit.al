@@ -2096,9 +2096,7 @@
         LibrarySales.CreateSalesLine(
           SalesLineRetention, SalesHeader, SalesLineRetention.Type::Item, LibraryInventory.CreateItemNo(), 1);
         asserterror SalesLineRetention.Validate("Retention Attached to Line No.", SalesLine."Line No.");
-        Assert.ExpectedErrorCode('TestField');
-        Assert.ExpectedError(
-          StrSubstNo('%1 must be equal to ''0''', SalesLineRetention.FieldCaption("Retention Attached to Line No.")));
+        Assert.ExpectedTestFieldError(SalesLineRetention.FieldCaption("Retention Attached to Line No."), Format(0));
     end;
 
     [Test]
@@ -2855,17 +2853,15 @@
     var
         CompanyInformation: Record "Company Information";
     begin
-        with CompanyInformation do begin
-            Get();
-            Name := LibraryUtility.GenerateGUID();
-            "RFC Number" := LibraryUtility.GenerateGUID();
-            Address := LibraryUtility.GenerateGUID();
-            City := LibraryUtility.GenerateGUID();
-            "Post Code" := LibraryUtility.GenerateGUID();
-            "E-Mail" := LibraryUtility.GenerateGUID();
-            "Tax Scheme" := LibraryUtility.GenerateGUID();
-            Modify();
-        end;
+        CompanyInformation.Get();
+        CompanyInformation.Name := LibraryUtility.GenerateGUID();
+        CompanyInformation."RFC Number" := LibraryUtility.GenerateGUID();
+        CompanyInformation.Address := LibraryUtility.GenerateGUID();
+        CompanyInformation.City := LibraryUtility.GenerateGUID();
+        CompanyInformation."Post Code" := LibraryUtility.GenerateGUID();
+        CompanyInformation."E-Mail" := LibraryUtility.GenerateGUID();
+        CompanyInformation."Tax Scheme" := LibraryUtility.GenerateGUID();
+        CompanyInformation.Modify();
     end;
 
     local procedure UpdateGLSetupPACCode(var GeneralLedgerSetup: Record "General Ledger Setup"; PACCode: Code[10]; ModifyRec: Boolean)

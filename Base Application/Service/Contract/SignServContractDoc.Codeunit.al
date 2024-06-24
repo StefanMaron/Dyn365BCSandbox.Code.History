@@ -32,31 +32,49 @@ codeunit 5944 SignServContractDoc
         InvoicingStartingPeriod: Boolean;
         InvoiceNow: Boolean;
         GoOut: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'You cannot convert the service contract quote %1 to a contract,\because some Service Contract Lines have a missing %2.';
         Text003: Label '%1 must be the first day of the month.';
         Text004: Label 'You cannot sign service contract %1,\because some Service Contract Lines have a missing %2.';
         Text005: Label '%1 is not the last day of the month.\\Confirm that this is the correct date.';
         Text010: Label 'Do you want to sign service contract %1?';
+#pragma warning restore AA0470
         Text011: Label 'Do you want to convert the contract quote into a contract?';
+#pragma warning disable AA0470
         Text012: Label 'Signing contract          #1######\';
         Text013: Label 'Processing contract lines #2######\';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         WPostLine: Integer;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text015: Label 'Do you want to create an invoice for the period %1 .. %2?';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         AppliedEntry: Integer;
         InvoiceFrom: Date;
         InvoiceTo: Date;
         FirstPrepaidPostingDate: Date;
         LastPrepaidPostingDate: Date;
         PostingDate: Date;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text016: Label 'Service Invoice %1 was created.';
+#pragma warning restore AA0470
         Text018: Label 'It is not possible to add new lines to this service contract with the current working date\because it will cause a gap in the invoice period.';
+#pragma warning restore AA0074
         HideDialog: Boolean;
+#pragma warning disable AA0074
         Text019: Label 'You cannot sign service contract with negative annual amount.';
         Text020: Label 'You cannot sign service contract with zero annual amount when invoice period is different from None.';
+#pragma warning disable AA0470
         Text021: Label 'One or more service items on contract quote %1 does not belong to customer %2.';
         Text022: Label 'The %1 field is empty on one or more service contract lines, and service orders cannot be created automatically. Do you want to continue?';
         Text023: Label 'You cannot sign a service contract if its %1 is not equal to the %2 value.';
+#pragma warning restore AA0470
         Text024: Label 'You cannot sign a canceled service contract.';
+#pragma warning restore AA0074
 
     procedure SignContractQuote(FromServContractHeader: Record "Service Contract Header")
     var

@@ -137,7 +137,9 @@ report 5914 "Delete Invoiced Service Orders"
         ServAllocMgt: Codeunit ServAllocationManagement;
         Window: Dialog;
 
+#pragma warning disable AA0470
         Text000Txt: Label 'Processing Service orders #1##########';
+#pragma warning restore AA0470
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDeleteServiceHeader(var ServiceHeader: Record "Service Header")
