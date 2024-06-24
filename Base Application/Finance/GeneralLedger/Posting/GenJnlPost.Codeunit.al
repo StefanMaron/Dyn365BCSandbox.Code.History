@@ -26,12 +26,16 @@ codeunit 231 "Gen. Jnl.-Post"
     var
         JournalErrorsMgt: Codeunit "Journal Errors Mgt.";
         JournalsScheduledMsg: Label 'Journal lines have been scheduled for posting.';
+#pragma warning disable AA0074
         Text000: Label 'cannot be filtered when posting recurring journals';
         Text001: Label 'Do you want to post the journal lines?';
         Text003: Label 'The journal lines were successfully posted.';
+#pragma warning disable AA0470
         Text004: Label 'The journal lines were successfully posted. You are now in the %1 journal.';
         Text005: Label 'Using %1 for Declining Balance can result in misleading numbers for subsequent years. You should manually check the postings and correct them if necessary. Do you want to continue?';
         Text006: Label '%1 in %2 must not be equal to %3 in %4.', Comment = 'Source Code in Genenral Journal Template must not be equal to Job G/L WIP in Source Code Setup.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         GenJnlsScheduled: Boolean;
         PreviewMode: Boolean;
 
@@ -47,6 +51,7 @@ codeunit 231 "Gen. Jnl.-Post"
         TempJnlBatchName: Code[10];
         HideDialog: Boolean;
         IsHandled: Boolean;
+        ShouldExit: Boolean;
     begin
         HideDialog := false;
         OnBeforeCode(GenJnlLine, HideDialog);
@@ -65,7 +70,11 @@ codeunit 231 "Gen. Jnl.-Post"
         OnCodeOnAfterCheckTemplate(GenJnlLine);
 
         IsHandled := false;
-        OnCodeOnBeforeConfirmPostJournalLinesResponse(GenJnlLine, IsHandled);
+        ShouldExit := false;
+        OnCodeOnBeforeConfirmPostJournalLinesResponse(GenJnlLine, IsHandled, ShouldExit);
+        if ShouldExit then
+            exit;
+
         if not IsHandled then
             if not (PreviewMode or HideDialog) then
                 if not ConfirmManagement.GetResponseOrDefault(Text001, true) then
@@ -82,6 +91,8 @@ codeunit 231 "Gen. Jnl.-Post"
         if not HideDialog then
             if not GenJnlPostBatch.ConfirmPostingUnvoidableChecks(GenJnlLine."Journal Batch Name", GenJnlLine."Journal Template Name") then
                 exit;
+
+        OnCodeOnAfterConfirmPostingUnvoidableChecks(GenJnlLine);
 
         TempJnlBatchName := GenJnlLine."Journal Batch Name";
 
@@ -195,12 +206,17 @@ codeunit 231 "Gen. Jnl.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeConfirmPostJournalLinesResponse(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    local procedure OnCodeOnBeforeConfirmPostJournalLinesResponse(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean; var ShouldExit: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterOnRun(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnAfterConfirmPostingUnvoidableChecks(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }

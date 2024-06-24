@@ -532,7 +532,9 @@ report 408 "Purchase - Receipt"
     end;
 
     var
+#pragma warning disable AA0074
         Text002: Label 'Purchase - Receipt %1', Comment = '%1 = Document No.';
+#pragma warning restore AA0074
         SalesPurchPerson: Record "Salesperson/Purchaser";
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
@@ -544,7 +546,6 @@ report 408 "Purchase - Receipt"
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
         VendAddr: array[8] of Text[100];
-        ShipToAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
         PurchaserText: Text[50];
         ReferenceText: Text[80];
@@ -583,6 +584,7 @@ report 408 "Purchase - Receipt"
 
     protected var
         CompanyInfo: Record "Company Information";
+        ShipToAddr: array[8] of Text[100];
 
     procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewLogInteraction: Boolean; NewShowCorrectionLines: Boolean)
     begin

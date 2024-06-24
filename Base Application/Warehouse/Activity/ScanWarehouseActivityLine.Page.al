@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -8,6 +8,7 @@ using Microsoft.Inventory.Item.Picture;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Warehouse.Structure;
 using System.Device;
+using System.Telemetry;
 
 page 7388 "Scan Warehouse Activity Line"
 {
@@ -241,9 +242,12 @@ page 7388 "Scan Warehouse Activity Line"
                 trigger BarcodeReceived(Barcode: Text; Format: Text)
                 var
                     ScanWarehouseLine: Codeunit "Scan Warehouse Activity Line";
+                    FeatureTelemetry: Codeunit "Feature Telemetry";
                 begin
                     if Barcode = '' then
                         exit;
+
+                    FeatureTelemetry.LogUsage('0000MZQ', FeatureTelemetryNameLbl, ScannedBarcodeAvailableLbl);
 
                     // Remove leading and trailing "
                     Barcode := DelChr(Barcode, '=', '"');
@@ -286,6 +290,9 @@ page 7388 "Scan Warehouse Activity Line"
         ScanBinVisible: Boolean;
         BarcodeScannerNotSupportedMsg: Label 'Barcode scanner is not supported on this device.';
         BarcodeNotFoundErr: Label 'Barcode not found. Please try again or enter the value manually.';
+        FeatureTelemetryNameLbl: Label 'Barcode Scanning', Locked = true;
+        ScannedBarcodeAvailableLbl: Label 'Scanned barcode from laser scanner available for processing.', Locked = true;
+
 
     local procedure SetFieldsVisibility()
     var

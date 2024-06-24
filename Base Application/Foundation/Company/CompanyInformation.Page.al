@@ -354,6 +354,11 @@ page 1 "Company Information"
                         HandleAddressLookupVisibility();
                     end;
                 }
+                field("Ship-to Phone No."; Rec."Ship-to Phone No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the telephone number of the company''s shipping address.';
+                }
                 field("Ship-to Contact"; Rec."Ship-to Contact")
                 {
                     ApplicationArea = Suite;

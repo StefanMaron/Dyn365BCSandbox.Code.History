@@ -1,8 +1,5 @@
 ﻿namespace Microsoft.Warehouse.Journal;
 
-#if not CLEAN23
-using Microsoft.Assembly.Document;
-#endif
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -10,10 +7,6 @@ using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
-#if not CLEAN23
-using Microsoft.Manufacturing.Capacity;
-using Microsoft.Manufacturing.Setup;
-#endif
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Projects.Project.Job;
@@ -23,9 +16,6 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-#if not CLEAN23
-using Microsoft.Service.Document;
-#endif
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.History;
@@ -58,15 +48,19 @@ codeunit 7302 "WMS Management"
         NextLineNo: Integer;
         LogErrors: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'must not be %1';
         Text002: Label '\Do you still want to use this %1 ?';
         Text003: Label 'You must set-up a default location code for user %1.';
         Text004: Label '%1 to place (%2) exceeds the available capacity (%3) on %4 %5.';
         Text005: Label '%1 = ''%2'', %3 = ''%4'':\The total base quantity to take %5 must be equal to the total base quantity to place %6.';
         Text006: Label 'You must enter a %1 in %2 %3 = %4, %5 = %6.';
+#pragma warning restore AA0470
         Text007: Label 'Cancelled.';
         Text008: Label 'Destination Name';
         Text009: Label 'Sales Order';
+#pragma warning disable AA0470
         Text010: Label 'You cannot change the %1 because this item journal line is created from warehouse entries.\%2 %3 is set up with %4 and therefore changes must be made in a %5. ';
         Text011: Label 'You cannot use %1 %2 because it is set up with %3.\Adjustments to this location must therefore be made in a %4.';
         Text012: Label 'You cannot reclassify %1 %2 because it is set up with %3.\You can change this location code by creating a %4.';
@@ -74,7 +68,11 @@ codeunit 7302 "WMS Management"
         Text014: Label 'You cannot change item tracking because the %1 is set up with warehouse tracking and %2 %3 is set up with %4.\Adjustments to item tracking must therefore be made in a warehouse journal.';
         Text015: Label 'You cannot use a %1 because %2 %3 is set up with %4.';
         Text016: Label '%1 = ''%2'', %3 = ''%4'', %5 = ''%6'', %7 = ''%8'': The total base quantity to take %9 must be equal to the total base quantity to place %10.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+#pragma warning disable AA0470
         UserIsNotWhseEmployeeErr: Label 'You must first set up user %1 as a warehouse employee.';
+#pragma warning restore AA0470
         OpenWarehouseEmployeesPageQst: Label 'Do you want to do that now?';
         UserIsNotWhseEmployeeAtWMSLocationErr: Label 'You must first set up user %1 as a warehouse employee at a location with the Bin Mandatory setting.', Comment = '%1: USERID';
         DefaultLocationNotDirectedPutawayPickErr: Label 'You must set up a default location with the Directed Put-away and Pick setting and assign it to user %1.', Comment = '%1: USERID';
@@ -1265,7 +1263,7 @@ codeunit 7302 "WMS Management"
     [Obsolete('Replaced by same procedure in codeunit "Assembly Warehouse Mgt."', '23.0')]
     procedure ShowAssemblyLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     var
-        AssemblyWarehouseMgt: Codeunit "Assembly Warehouse Mgt.";
+        AssemblyWarehouseMgt: Codeunit Microsoft.Assembly.Document."Assembly Warehouse Mgt.";
     begin
         AssemblyWarehouseMgt.ShowAssemblyLine(WhseDocNo, WhseDocLineNo);
     end;
@@ -1456,6 +1454,7 @@ codeunit 7302 "WMS Management"
 
         WarehouseEntry.SetRange("Location Code", LocationCode);
         WarehouseEntry.SetFilter("Bin Code", '<>%1', Location."Adjustment Bin Code");
+        OnSerialNoOnInventoryOnBeforeCalcQtyBase(WarehouseEntry);
         WarehouseEntry.CalcSums("Qty. (Base)");
         exit(WarehouseEntry."Qty. (Base)" > 0);
     end;
@@ -1885,7 +1884,7 @@ codeunit 7302 "WMS Management"
     begin
         exit(
             ProdOrderWarehouseMgt.GetLastOperationFromBinCode(
-                RoutingNo, RoutingVersionCode, LocationCode, UseFlushingMethod, Enum::"Flushing Method".FromInteger(FlushingMethod)));
+                RoutingNo, RoutingVersionCode, LocationCode, UseFlushingMethod, Enum::Microsoft.Manufacturing.Setup."Flushing Method".FromInteger(FlushingMethod)));
     end;
 #endif
 
@@ -1911,7 +1910,7 @@ codeunit 7302 "WMS Management"
 
 #if not CLEAN23
     [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
-    procedure GetProdCenterLocationCode(Type: Enum "Capacity Type"; No: Code[20]): Code[10]
+    procedure GetProdCenterLocationCode(Type: Enum Microsoft.Manufacturing.Capacity."Capacity Type"; No: Code[20]): Code[10]
     var
         ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
@@ -1921,13 +1920,13 @@ codeunit 7302 "WMS Management"
 
 #if not CLEAN23
     [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
-    procedure GetProdCenterBinCode(Type: Enum "Capacity Type"; No: Code[20]; LocationCode: Code[10]; UseFlushingMethod: Boolean; FlushingMethod: Option Manual,Forward,Backward,"Pick + Forward","Pick + Backward"): Code[20]
+    procedure GetProdCenterBinCode(Type: Enum Microsoft.Manufacturing.Capacity."Capacity Type"; No: Code[20]; LocationCode: Code[10]; UseFlushingMethod: Boolean; FlushingMethod: Option Manual,Forward,Backward,"Pick + Forward","Pick + Backward"): Code[20]
     var
         ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
         exit(
             ProdOrderWarehouseMgt.GetProdCenterBinCode(
-                Type, No, LocationCode, UseFlushingMethod, Enum::"Flushing Method".FromInteger(FlushingMethod)));
+                Type, No, LocationCode, UseFlushingMethod, Enum::Microsoft.Manufacturing.Setup."Flushing Method".FromInteger(FlushingMethod)));
     end;
 #endif
 
@@ -2251,14 +2250,14 @@ codeunit 7302 "WMS Management"
 #endif
 
 #if not CLEAN23
-    internal procedure RunOnShowSourceDocLineOnBeforeShowServiceLines(var ServiceLine: Record "Service Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    internal procedure RunOnShowSourceDocLineOnBeforeShowServiceLines(var ServiceLine: Record Microsoft.Service.Document."Service Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
         OnShowSourceDocLineOnBeforeShowServiceLines(ServiceLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
     end;
 
     [IntegrationEvent(false, false)]
     [Obsolete('Replaced by event OnBeforeShowServiceLines() in codeunit "Service Warehouse Mgt."', '23.0')]
-    local procedure OnShowSourceDocLineOnBeforeShowServiceLines(var ServiceLine: Record "Service Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    local procedure OnShowSourceDocLineOnBeforeShowServiceLines(var ServiceLine: Record Microsoft.Service.Document."Service Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
 #endif
@@ -2277,14 +2276,14 @@ codeunit 7302 "WMS Management"
 #endif
 
 #if not CLEAN23
-    internal procedure RunOnShowSourceDocLineOnBeforeShowAssemblyLines(var AssemblyLine: Record "Assembly Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    internal procedure RunOnShowSourceDocLineOnBeforeShowAssemblyLines(var AssemblyLine: Record Microsoft.Assembly.Document."Assembly Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
         OnShowSourceDocLineOnBeforeShowAssemblyLines(AssemblyLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
     end;
 
     [IntegrationEvent(false, false)]
     [Obsolete('Replaced by event OnBeforeShowAssemblyLines() in codeunit "Assembly Warehouse Mgt."', '23.0')]
-    local procedure OnShowSourceDocLineOnBeforeShowAssemblyLines(var AssemblyLine: Record "Assembly Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    local procedure OnShowSourceDocLineOnBeforeShowAssemblyLines(var AssemblyLine: Record Microsoft.Assembly.Document."Assembly Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
 #endif
@@ -2367,6 +2366,11 @@ codeunit 7302 "WMS Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetDestinationEntityName(DestinationType: Enum "Warehouse Destination Type"; DestinationNo: Code[20]; var DestinationName: Text[100]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSerialNoOnInventoryOnBeforeCalcQtyBase(var WarehouseEntry: Record "Warehouse Entry")
     begin
     end;
 }

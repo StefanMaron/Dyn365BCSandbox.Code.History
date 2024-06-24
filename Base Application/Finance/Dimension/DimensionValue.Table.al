@@ -251,12 +251,20 @@ table 349 "Dimension Value"
         CostAccMgt: Codeunit "Cost Account Mgt";
         DimMgt: Codeunit DimensionManagement;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1\You cannot delete it.';
+#pragma warning restore AA0470
         Text002: Label '(CONFLICT)';
+#pragma warning disable AA0470
         Text003: Label '%1 can not be (CONFLICT). This name is used internally by the system.';
         Text004: Label '%1\You cannot change the type.';
+#pragma warning restore AA0470
         Text005: Label 'This dimension value has been used in posted or budget entries and is included in a dimension set.';
+#pragma warning disable AA0470
         Text006: Label 'You cannot change the value of %1.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     procedure CheckIfDimValueUsed() Result: Boolean
     begin

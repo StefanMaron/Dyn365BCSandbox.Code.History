@@ -255,9 +255,11 @@ codeunit 1752 "Data Class. Eval. Data Country"
     var
         DataClassificationEvalData: Codeunit "Data Classification Eval. Data";
     begin
+#if not CLEAN25
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"MTD-Return Details");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"MTD-Liability");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"MTD-Payment");
+#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"MTD-Missing Fraud Prev. Hdr");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"MTD-Session Fraud Prev. Hdr");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"MTD-Default Fraud Prev. Hdr");

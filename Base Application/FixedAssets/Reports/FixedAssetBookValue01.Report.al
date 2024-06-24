@@ -415,6 +415,7 @@ report 5605 "Fixed Asset - Book Value 01"
         StartText: Text[30];
         EndText: Text[30];
 
+#pragma warning disable AA0074
         Text000: Label 'Fixed Asset - Book Value 01';
         Text001: Label '(Budget Report)';
         Text002: Label 'Group Total';
@@ -422,7 +423,10 @@ report 5605 "Fixed Asset - Book Value 01"
         Text004: Label 'in Period';
         Text005: Label 'Disposal';
         Text006: Label 'Addition';
+#pragma warning disable AA0470
         Text007: Label '%1 has been modified in fixed asset %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         PageCaptionLbl: Label 'Page';
         TotalCaptionLbl: Label 'Total';
         GroupTotalsTxt: Label ' ,FA Class,FA Subclass,FA Location,Main Asset,Global Dimension 1,Global Dimension 2,FA Posting Group';

@@ -5,7 +5,6 @@ using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Transfer;
-using Microsoft.Service.Resources;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
 
@@ -556,15 +555,6 @@ page 5703 "Location Card"
             {
                 Caption = '&Location';
                 Image = Warehouse;
-                action("&Resource Locations")
-                {
-                    ApplicationArea = Location;
-                    Caption = '&Resource Locations';
-                    Image = Resource;
-                    RunObject = Page "Resource Locations";
-                    RunPageLink = "Location Code" = field(Code);
-                    ToolTip = 'View or edit information about where resources are located. In this window, you can assign resources to locations.';
-                }
                 action("&Zones")
                 {
                     ApplicationArea = Warehouse;
@@ -633,9 +623,6 @@ page 5703 "Location Card"
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
                 actionref("Online Map_Promoted"; "Online Map")
-                {
-                }
-                actionref("&Resource Locations_Promoted"; "&Resource Locations")
                 {
                 }
                 actionref("&Zones_Promoted"; "&Zones")

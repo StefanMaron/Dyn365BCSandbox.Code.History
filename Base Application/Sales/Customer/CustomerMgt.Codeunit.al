@@ -74,7 +74,13 @@ codeunit 1302 "Customer Mgt."
     procedure CalculateStatisticsWithCurrentCustomerValues(var Customer: Record Customer; var AdjmtCostLCY: Decimal; var AdjCustProfit: Decimal; var AdjProfitPct: Decimal; var CustInvDiscAmountLCY: Decimal; var CustPaymentsLCY: Decimal; var CustSalesLCY: Decimal; var CustProfit: Decimal)
     var
         CostCalcuMgt: Codeunit "Cost Calculation Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCalculateStatisticsWithCurrentCustomerValues(Customer, AdjmtCostLCY, AdjCustProfit, AdjProfitPct, CustInvDiscAmountLCY, CustPaymentsLCY, CustSalesLCY, CustProfit, IsHandled);
+        if IsHandled then
+            exit;
+
         // Costs (LCY):
         CustSalesLCY := Customer."Sales (LCY)";
         CustProfit := Customer."Profit (LCY)" + CostCalcuMgt.NonInvtblCostAmt(Customer);
@@ -374,6 +380,44 @@ codeunit 1302 "Customer Mgt."
     end;
 #endif
 
+    procedure SearchForExternalDocNo(var OriginalSalesHeader: Record "Sales Header"): Boolean
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        IsHandled: Boolean;
+        ResultFound: Boolean;
+    begin
+        OnBeforeSearchForExternalDocNo(OriginalSalesHeader, ResultFound, IsHandled);
+        if IsHandled then
+            exit(ResultFound);
+
+        SalesHeader.SetLoadFields("Document Type", "No.", "Sell-to Customer No.", "External Document No.");
+        SalesHeader.SetRange("Document Type", OriginalSalesHeader."Document Type");
+        SalesHeader.SetFilter("No.", '<>%1', OriginalSalesHeader."No.");
+        SalesHeader.SetRange("Sell-to Customer No.", OriginalSalesHeader."Sell-to Customer No.");
+        SalesHeader.SetRange("External Document No.", OriginalSalesHeader."External Document No.");
+        if not SalesHeader.IsEmpty() then
+            exit(true);
+
+        case OriginalSalesHeader."Document Type" of
+            OriginalSalesHeader."Document Type"::Invoice, OriginalSalesHeader."Document Type"::Order:
+                begin
+                    SalesInvoiceHeader.SetLoadFields("Sell-to Customer No.", "External Document No.");
+                    SalesInvoiceHeader.SetRange("Sell-to Customer No.", OriginalSalesHeader."Sell-to Customer No.");
+                    SalesInvoiceHeader.SetRange("External Document No.", OriginalSalesHeader."External Document No.");
+                    exit(not SalesInvoiceHeader.IsEmpty());
+                end;
+            OriginalSalesHeader."Document Type"::"Credit Memo":
+                begin
+                    SalesCrMemoHeader.SetLoadFields("Sell-to Customer No.", "External Document No.");
+                    SalesCrMemoHeader.SetRange("Sell-to Customer No.", OriginalSalesHeader."Sell-to Customer No.");
+                    SalesCrMemoHeader.SetRange("External Document No.", OriginalSalesHeader."External Document No.");
+                    exit(not SalesCrMemoHeader.IsEmpty());
+                end;
+        end;
+    end;
+
     procedure CalculateShipBillToOptions(var ShipToOptions: Enum "Sales Ship-to Options"; var BillToOptions: Enum "Sales Bill-to Options"; var SalesHeader: Record "Sales Header")
     var
         ShipToNameEqualsSellToName: Boolean;
@@ -427,6 +471,11 @@ codeunit 1302 "Customer Mgt."
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSearchForExternalDocNo(var OriginalSalesHeader: Record "Sales Header"; var ResultFound: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
 #if not CLEAN24
     [Obsolete('Replaced by event OnAfterCalculateShipToBillToEnums()', '24.0')]
     [IntegrationEvent(false, false)]
@@ -434,5 +483,10 @@ codeunit 1302 "Customer Mgt."
     begin
     end;
 #endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateStatisticsWithCurrentCustomerValues(var Customer: Record Customer; var AdjmtCostLCY: Decimal; var AdjCustProfit: Decimal; var AdjProfitPct: Decimal; var CustInvDiscAmountLCY: Decimal; var CustPaymentsLCY: Decimal; var CustSalesLCY: Decimal; var CustProfit: Decimal; var IsHandled: Boolean)
+    begin
+    end;
 }
 

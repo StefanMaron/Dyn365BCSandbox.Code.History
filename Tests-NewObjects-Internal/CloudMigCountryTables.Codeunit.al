@@ -10,10 +10,14 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"GovTalk Setup");
         ListOfTablesToMigrate.Add(Database::"GovTalkMessage");
         ListOfTablesToMigrate.Add(Database::"MTD-Default Fraud Prev. Hdr");
+#if not CLEAN25
         ListOfTablesToMigrate.Add(Database::"MTD-Liability");
+#endif
         ListOfTablesToMigrate.Add(Database::"MTD-Missing Fraud Prev. Hdr");
+#if not CLEAN25
         ListOfTablesToMigrate.Add(Database::"MTD-Payment");
         ListOfTablesToMigrate.Add(Database::"MTD-Return Details");
+#endif
         ListOfTablesToMigrate.Add(Database::"MTD-Session Fraud Prev. Hdr");
 #if not CLEAN23
         ListOfTablesToMigrate.Add(Database::"Payment Application Buffer");

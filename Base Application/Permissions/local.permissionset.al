@@ -22,9 +22,11 @@ permissionset 1001 "LOCAL"
                   tabledata "GovTalk Message Parts" = RIMD,
                   tabledata "GovTalk Setup" = r,
                   tabledata GovTalkMessage = RIMD,
+#if not CLEAN25
                   tabledata "MTD-Liability" = RIMD,
                   tabledata "MTD-Payment" = RIMD,
                   tabledata "MTD-Return Details" = RIMD,
+#endif
                   tabledata "MTD-Missing Fraud Prev. Hdr" = RIMD,
                   tabledata "MTD-Session Fraud Prev. Hdr" = RIMD,
                   tabledata "MTD-Default Fraud Prev. Hdr" = RIMD,

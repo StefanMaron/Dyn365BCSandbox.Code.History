@@ -64,6 +64,7 @@ permissionset 7071 "Recievables - Edit"
                   tabledata "Line Fee Note on Report Hist." = R,
                   tabledata "Reminder Comment Line" = RIMD,
                   tabledata "Reminder Attachment Text" = R,
+                  tabledata "Reminder Attachment Text Line" = R,
                   tabledata "Reminder Header" = RIMD,
                   tabledata "Reminder Email Text" = R,
                   tabledata "Reminder Level" = R,

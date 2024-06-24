@@ -6,8 +6,6 @@ using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Document;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Utilities;
-using Microsoft.Service.Document;
 
 codeunit 99 "Posting Selection Management"
 {
@@ -199,77 +197,15 @@ codeunit 99 "Posting Selection Management"
         exit(true);
     end;
 
-    procedure ConfirmPostServiceDocument(var ServiceHeaderToPost: Record "Service Header"; var Ship: Boolean; var Consume: Boolean; var Invoice: Boolean; DefaultOption: Integer; WithPrint: Boolean; WithEmail: Boolean; PreviewMode: Boolean) Result: Boolean
+#if not CLEAN25
+    [Obsolete('Replaced by same procedure in codeunit Serv. Posting Selection Mgt.', '25.0')]
+    procedure ConfirmPostServiceDocument(var ServiceHeaderToPost: Record Microsoft.Service.Document."Service Header"; var Ship: Boolean; var Consume: Boolean; var Invoice: Boolean; DefaultOption: Integer; WithPrint: Boolean; WithEmail: Boolean; PreviewMode: Boolean) Result: Boolean
     var
-        ServiceHeader: Record "Service Header";
-        UserSetupManagement: Codeunit "User Setup Management";
-        ConfirmManagement: Codeunit "Confirm Management";
-        DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
-        Selection: Integer;
-        ShipInvoiceConsumeQst: Label '&Ship,&Invoice,Ship &and Invoice,Ship and &Consume';
-        ShipConsumeQst: Label '&Ship,Ship and &Consume';
+        ServPostingSelectionMgt: Codeunit Microsoft.Service.Document."Serv. Posting Selection Mgt.";
     begin
-        if (ServiceHeaderToPost."Document Type" <> ServiceHeaderToPost."Document Type"::Order) and PreviewMode then
-            exit(true);
-
-        if DefaultOption > 4 then
-            DefaultOption := 4;
-        if DefaultOption <= 0 then
-            DefaultOption := 1;
-
-        ServiceHeader.Copy(ServiceHeaderToPost);
-
-        case ServiceHeader."Document Type" of
-            ServiceHeader."Document Type"::Order:
-                begin
-                    UserSetupManagement.GetServiceInvoicePostingPolicy(Ship, Consume, Invoice);
-                    case true of
-                        Ship and not Consume and Invoice:
-                            if not ConfirmManagement.GetResponseOrDefault(GetShipInvoiceConfirmationMessage(), true) then
-                                exit(false);
-                        Ship and not Consume and not Invoice:
-                            if not ConfirmManagement.GetResponseOrDefault(GetShipConfirmationMessage(), true) then
-                                exit(false);
-                        Ship and Consume and not Invoice:
-                            begin
-                                Selection := StrMenu(ShipConsumeQst, 1);
-                                if Selection = 0 then
-                                    exit(false);
-                                Ship := Selection in [1, 2];
-                                Consume := Selection in [2];
-                            end;
-                        else begin
-                            Selection := StrMenu(ShipInvoiceConsumeQst, DefaultOption);
-                            if Selection = 0 then begin
-                                if PreviewMode then
-                                    Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
-                                exit(false);
-                            end;
-                            Ship := Selection in [1, 3, 4];
-                            Consume := Selection in [4];
-                            Invoice := Selection in [2, 3];
-                        end;
-                    end;
-                end;
-            ServiceHeader."Document Type"::Invoice, ServiceHeader."Document Type"::"Credit Memo":
-                begin
-                    CheckUserCanInvoiceService();
-
-                    if not ConfirmManagement.GetResponseOrDefault(
-                            GetPostConfirmationMessage(ServiceHeader."Document Type" = ServiceHeader."Document Type"::Invoice, WithPrint, WithEmail), true)
-                    then
-                        exit(false);
-                end;
-            else
-                if not ConfirmManagement.GetResponseOrDefault(
-                        GetPostConfirmationMessage(Format(ServiceHeader."Document Type"), WithPrint, WithEmail), true)
-                then
-                    exit(false);
-        end;
-
-        ServiceHeaderToPost.Copy(ServiceHeader);
-        exit(true);
+        exit(ServPostingSelectionMgt.ConfirmPostServiceDocument(ServiceHeaderToPost, Ship, Consume, Invoice, DefaultOption, WithPrint, WithEmail, PreviewMode));
     end;
+#endif
 
     procedure ConfirmPostWarehouseActivity(var WarehouseActivityLine: Record "Warehouse Activity Line"; var Selection: Integer; DefaultOption: Integer; WithPrint: Boolean) Result: Boolean
     var
@@ -358,21 +294,15 @@ codeunit 99 "Posting Selection Management"
         exit(Receive and Invoice);
     end;
 
+#if not CLEAN25
+    [Obsolete('Replaced by same procedure in codeunit Serv. Posting Selection Mgt.', '25.0')]
     procedure CheckUserCanInvoiceService()
     var
-        UserSetup: Record "User Setup";
-        UserSetupManagement: Codeunit "User Setup Management";
-        Ship: Boolean;
-        Consume: Boolean;
-        Invoice: Boolean;
+        ServPostingSelectionMgt: Codeunit Microsoft.Service.Document."Serv. Posting Selection Mgt.";
     begin
-        UserSetupManagement.GetServiceInvoicePostingPolicy(Ship, Consume, Invoice);
-        if Ship and not Invoice then
-            Error(
-              PostingInvoiceProhibitedErr,
-              UserSetup.FieldCaption("Service Invoice Posting Policy"), Format("Invoice Posting Policy"::Prohibited),
-              UserSetup.TableCaption);
+        ServPostingSelectionMgt.CheckUserCanInvoiceService();
     end;
+#endif
 
     local procedure GetShipInvoiceSelectionForWhseActivity(SourceDocument: Enum "Warehouse Activity Source Document"; DefaultOption: Integer; var Selection: Integer): Boolean
     var
@@ -445,7 +375,7 @@ codeunit 99 "Posting Selection Management"
         exit(true);
     end;
 
-    local procedure GetPostConfirmationMessage(What: Text; WithPrint: Boolean; WithEmail: Boolean): Text
+    procedure GetPostConfirmationMessage(What: Text; WithPrint: Boolean; WithEmail: Boolean): Text
     begin
         if WithPrint then
             exit(StrSubstNo(PostAndPrintConfirmQst, What));
@@ -456,7 +386,7 @@ codeunit 99 "Posting Selection Management"
         exit(StrSubstNo(PostDocConfirmQst, What));
     end;
 
-    local procedure GetPostConfirmationMessage(IsInvoice: Boolean; WithPrint: Boolean; WithEmail: Boolean): Text
+    procedure GetPostConfirmationMessage(IsInvoice: Boolean; WithPrint: Boolean; WithEmail: Boolean): Text
     begin
         if IsInvoice then begin
             if WithPrint then
@@ -477,17 +407,17 @@ codeunit 99 "Posting Selection Management"
         end;
     end;
 
-    local procedure GetShipConfirmationMessage(): Text
+    procedure GetShipConfirmationMessage(): Text
     begin
         exit(ShipConfirmQst);
     end;
 
-    local procedure GetShipInvoiceConfirmationMessage(): Text
+    procedure GetShipInvoiceConfirmationMessage(): Text
     begin
         exit(ShipInvoiceConfirmQst);
     end;
 
-    local procedure GetReceiveConfirmationMessage(): Text
+    procedure GetReceiveConfirmationMessage(): Text
     begin
         exit(ReceiveConfirmQst);
     end;
@@ -495,6 +425,11 @@ codeunit 99 "Posting Selection Management"
     local procedure GetReceiveInvoiceConfirmationMessage(): Text
     begin
         exit(ReceiveInvoiceConfirmQst);
+    end;
+
+    procedure GetPostingInvoiceProhibitedErr(): Text
+    begin
+        exit(PostingInvoiceProhibitedErr);
     end;
 
     [IntegrationEvent(false, false)]

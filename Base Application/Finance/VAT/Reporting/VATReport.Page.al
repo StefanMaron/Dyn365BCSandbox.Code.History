@@ -147,13 +147,27 @@ page 740 "VAT Report"
         }
         area(factboxes)
         {
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"VAT Report Header"),
+                SubPageLink = "Table ID" = const(Database::"VAT Report Header"),
                               "No." = field("No."),
                               "VAT Report Config. Code" = field("VAT Report Config. Code");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
+                SubPageLink = "Table ID" = const(Database::"VAT Report Header"),
+                              "No." = field("No."),
+                              "VAT Report Config. Code" = field("VAT Report Config. Code");
+
             }
         }
     }
@@ -410,15 +424,6 @@ page 740 "VAT Report"
                 actionref("Cancel Submission_Promoted"; "Cancel Submission")
                 {
                 }
-#if not CLEAN22
-                actionref(Print_Promoted; Print)
-                {
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action is being demoted based on overall low usage.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
             }
             group(Category_Category4)
             {

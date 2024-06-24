@@ -495,7 +495,6 @@ codeunit 134096 "ERM VAT Return"
         LibraryApplicationArea.DisableApplicationAreaSetup();
     end;
 
-
     [Test]
     [Scope('OnPrem')]
     procedure VATNoteFieldIsVisibleInVATReturnSubformPageWhenReportVATNoteOptionEnabled()
@@ -558,23 +557,21 @@ codeunit 134096 "ERM VAT Return"
         i: Integer;
     begin
         GetVATStatementNameW1(VATStatementName);
-        with VATStatementLine do begin
-            SetRange("Statement Template Name", VATStatementName."Statement Template Name");
-            SetRange("Statement Name", VATStatementName.Name);
-            ModifyAll("Box No.", '');
-            FindLast();
+        VATStatementLine.SetRange("Statement Template Name", VATStatementName."Statement Template Name");
+        VATStatementLine.SetRange("Statement Name", VATStatementName.Name);
+        VATStatementLine.ModifyAll("Box No.", '');
+        VATStatementLine.FindLast();
 
-            "VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
-            "VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
+        VATStatementLine."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        VATStatementLine."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
 
-            InsertVATStatementLine(VATStatementLine, '1', "Amount Type"::Amount);
-            InsertVATStatementLine(VATStatementLine, '2', "Amount Type"::Base);
-            InsertVATStatementLine(VATStatementLine, '3', "Amount Type"::"Unrealized Amount");
-            InsertVATStatementLine(VATStatementLine, '4', "Amount Type"::"Unrealized Base");
+        InsertVATStatementLine(VATStatementLine, '1', VATStatementLine."Amount Type"::Amount);
+        InsertVATStatementLine(VATStatementLine, '2', VATStatementLine."Amount Type"::Base);
+        InsertVATStatementLine(VATStatementLine, '3', VATStatementLine."Amount Type"::"Unrealized Amount");
+        InsertVATStatementLine(VATStatementLine, '4', VATStatementLine."Amount Type"::"Unrealized Base");
 
-            for i := 5 to 9 do
-                InsertVATStatementLine(VATStatementLine, Format(i), "Amount Type"::Amount);
-        end;
+        for i := 5 to 9 do
+            InsertVATStatementLine(VATStatementLine, Format(i), VATStatementLine."Amount Type"::Amount);
     end;
 
     local procedure SetupSingleVATStatementLineForVATPostingSetup(var VATStatementLine: Record "VAT Statement Line"; VATPostingSetup: Record "VAT Posting Setup")
@@ -596,37 +593,33 @@ codeunit 134096 "ERM VAT Return"
 
     local procedure InsertVATStatementLine(var VATStatementLine: Record "VAT Statement Line"; BoxNo: Text[30]; AmountType: Enum "VAT Statement Line Amount Type")
     begin
-        with VATStatementLine do begin
-            "Line No." += 10000;
-            "Box No." := BoxNo;
-            "Gen. Posting Type" := "Gen. Posting Type"::Sale;
-            Type := Type::"VAT Entry Totaling";
-            "Amount Type" := AmountType;
-            "Print with" := "Print with"::Sign;
-            Insert();
-        end;
+        VATStatementLine."Line No." += 10000;
+        VATStatementLine."Box No." := BoxNo;
+        VATStatementLine."Gen. Posting Type" := VATStatementLine."Gen. Posting Type"::Sale;
+        VATStatementLine.Type := VATStatementLine.Type::"VAT Entry Totaling";
+        VATStatementLine."Amount Type" := AmountType;
+        VATStatementLine."Print with" := VATStatementLine."Print with"::Sign;
+        VATStatementLine.Insert();
     end;
 
     local procedure MockVATEntry(var VATEntry: Record "VAT Entry"; VATPostingSetup: Record "VAT Posting Setup"; PostingDate: Date)
     begin
-        with VATEntry do begin
-            "Entry No." := LibraryUtility.GetNewRecNo(VATEntry, FIELDNO("Entry No."));
-            Type := Type::Sale;
-            "Posting Date" := PostingDate;
-            "VAT Reporting Date" := PostingDate;
-            Closed := FALSE;
-            "VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
-            "VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
-            Amount := LibraryRandom.RandDec(1000, 2);
-            Base := LibraryRandom.RandDec(1000, 2);
-            "Remaining Unrealized Amount" := LibraryRandom.RandDec(1000, 2);
-            "Remaining Unrealized Base" := LibraryRandom.RandDec(1000, 2);
-            "Additional-Currency Amount" := LibraryRandom.RandDec(1000, 2);
-            "Additional-Currency Base" := LibraryRandom.RandDec(1000, 2);
-            "Add.-Curr. Rem. Unreal. Amount" := LibraryRandom.RandDec(1000, 2);
-            "Add.-Curr. Rem. Unreal. Base" := LibraryRandom.RandDec(1000, 2);
-            Insert();
-        end;
+        VATEntry."Entry No." := LibraryUtility.GetNewRecNo(VATEntry, VATEntry.FIELDNO("Entry No."));
+        VATEntry.Type := VATEntry.Type::Sale;
+        VATEntry."Posting Date" := PostingDate;
+        VATEntry."VAT Reporting Date" := PostingDate;
+        VATEntry.Closed := false;
+        VATEntry."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        VATEntry."VAT Prod. Posting Group" := VATPostingSetup."VAT Prod. Posting Group";
+        VATEntry.Amount := LibraryRandom.RandDec(1000, 2);
+        VATEntry.Base := LibraryRandom.RandDec(1000, 2);
+        VATEntry."Remaining Unrealized Amount" := LibraryRandom.RandDec(1000, 2);
+        VATEntry."Remaining Unrealized Base" := LibraryRandom.RandDec(1000, 2);
+        VATEntry."Additional-Currency Amount" := LibraryRandom.RandDec(1000, 2);
+        VATEntry."Additional-Currency Base" := LibraryRandom.RandDec(1000, 2);
+        VATEntry."Add.-Curr. Rem. Unreal. Amount" := LibraryRandom.RandDec(1000, 2);
+        VATEntry."Add.-Curr. Rem. Unreal. Base" := LibraryRandom.RandDec(1000, 2);
+        VATEntry.Insert();
     end;
 
     local procedure SuggestLines(VATReportHeader: Record "VAT Report Header"; Selection: Enum "VAT Statement Report Selection"; PeriodSelection: Enum "VAT Statement Report Period Selection"; PeriodYear: Integer; AmountInACY: Boolean);
@@ -718,14 +711,12 @@ codeunit 134096 "ERM VAT Return"
     var
         VATStatementReportLine: Record "VAT Statement Report Line";
     begin
-        with VATStatementReportLine do begin
-            SetRange("VAT Report No.", VATReportHeader."No.");
-            SetRange("VAT Report Config. Code", VATReportHeader."VAT Report Config. Code");
-            SetRange("Box No.", BoxNo);
-            FindFirst();
-            TestField(Base, ExpectedBase);
-            TestField(Amount, ExpectedAmount);
-        end;
+        VATStatementReportLine.SetRange("VAT Report No.", VATReportHeader."No.");
+        VATStatementReportLine.SetRange("VAT Report Config. Code", VATReportHeader."VAT Report Config. Code");
+        VATStatementReportLine.SetRange("Box No.", BoxNo);
+        VATStatementReportLine.FindFirst();
+        VATStatementReportLine.TestField(Base, ExpectedBase);
+        VATStatementReportLine.TestField(Amount, ExpectedAmount);
     end;
 
     [RequestPageHandler]

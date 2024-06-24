@@ -22,9 +22,11 @@ permissionset 1002 "LOCAL READ"
                   tabledata "GovTalk Message Parts" = R,
                   tabledata "GovTalk Setup" = r,
                   tabledata GovTalkMessage = R,
+#if not CLEAN25
                   tabledata "MTD-Liability" = R,
                   tabledata "MTD-Payment" = R,
                   tabledata "MTD-Return Details" = R,
+#endif
                   tabledata "MTD-Missing Fraud Prev. Hdr" = R,
                   tabledata "MTD-Session Fraud Prev. Hdr" = R,
                   tabledata "MTD-Default Fraud Prev. Hdr" = R,

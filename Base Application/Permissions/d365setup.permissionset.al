@@ -267,9 +267,6 @@ permissionset 191 "D365 SETUP"
                   tabledata "Contact Value" = D,
                   tabledata "Contact Web Source" = D,
                   tabledata "Contract Gain/Loss Entry" = D,
-#if not CLEAN22
-                  tabledata "Coupling Field Buffer" = RIMD,
-#endif
                   tabledata "Coupling Record Buffer" = RIMD,
                   tabledata "Credit Trans Re-export History" = D,
                   tabledata "Credit Transfer Entry" = D,
@@ -362,9 +359,6 @@ permissionset 191 "D365 SETUP"
                   tabledata "Inter. Log Entry Comment Line" = D,
                   tabledata "Interaction Log Entry" = D,
                   tabledata "Intermediate Data Import" = RimD,
-#if not CLEAN22
-                  tabledata "Intrastat Setup" = RIMD,
-#endif
                   tabledata "Inventory Adjmt. Entry (Order)" = d,
                   tabledata "Inventory Comment Line" = D,
                   tabledata "Inventory Page Data" = D,
@@ -493,6 +487,7 @@ permissionset 191 "D365 SETUP"
                   tabledata "Registered Whse. Activity Hdr." = d,
                   tabledata "Registered Whse. Activity Line" = d,
                   tabledata "Reminder Attachment Text" = RIMD,
+                  tabledata "Reminder Attachment Text Line" = RIMD,
                   tabledata "Reminder Comment Line" = D,
                   tabledata "Reminder Email Text" = RIMD,
                   tabledata "Reminder Header" = D,
@@ -590,10 +585,6 @@ permissionset 191 "D365 SETUP"
                   tabledata "Transaction Type" = RIMD,
                   tabledata "Transport Method" = RIMD,
                   tabledata "Untracked Planning Element" = D,
-#if not CLEAN22
-                  tabledata "User Group Member" = Rimd,
-                  tabledata "User Group Plan" = d,
-#endif
                   tabledata "User Security Status" = D,
                   tabledata "User Setup" = RIMD,
                   tabledata "User Task Group" = RIMD,

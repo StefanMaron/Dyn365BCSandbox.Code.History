@@ -73,9 +73,6 @@ codeunit 101084 "Create Acc. Schedule Name"
         "Acc. Schedule Name".Init();
         "Acc. Schedule Name".Validate(Name, Name);
         "Acc. Schedule Name".Validate(Description, Description);
-#if not CLEAN22
-        "Acc. Schedule Name"."Default Column Layout" := DefaultColumnLayout;
-#endif
         "Acc. Schedule Name".Validate("Analysis View Name", AnalysisViewName);
         "Acc. Schedule Name".Insert();
         FinancialReport.Init();

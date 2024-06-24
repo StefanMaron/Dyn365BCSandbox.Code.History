@@ -414,6 +414,9 @@ report 1322 "Standard Purchase - Order"
             column(ShiptoAddress_Lbl; ShiptoAddressCaptionLbl)
             {
             }
+            column(ShipToPhoneNo; "Purchase Header"."Ship-to Phone No.")
+            {
+            }
             column(SellToCustNo_PurchHeader_Lbl; FieldCaption("Sell-to Customer No."))
             {
             }
@@ -993,6 +996,7 @@ report 1322 "Standard Purchase - Order"
 
         trigger OnOpenPage()
         begin
+            InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
     }
