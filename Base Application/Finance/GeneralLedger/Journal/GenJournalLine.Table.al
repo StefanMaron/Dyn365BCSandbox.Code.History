@@ -604,6 +604,11 @@ table 81 "Gen. Journal Line"
                     Validate("Bal. VAT %");
                     UpdateLineBalance();
                 end;
+
+                if JobTaskIsSet() then begin
+                    CreateTempJobJnlLine();
+                    UpdatePricesFromJobJnlLine();
+                end;
             end;
         }
         field(17; "Balance (LCY)"; Decimal)
@@ -3673,6 +3678,7 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
+        PrecDocTypeInv: Boolean;
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -3705,12 +3711,14 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
+                      ((GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice) and PrecDocTypeInv) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
+                PrecDocTypeInv := GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice;
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -4289,6 +4297,8 @@ table 81 "Gen. Journal Line"
         OnShowDimensionsOnAfterEditDimensionSet(Rec, OldDimSetID);
 
         IsChanged := OldDimSetID <> "Dimension Set ID";
+
+        OnAfterShowDimensions(Rec, xRec, OldDimSetID, IsChanged);
     end;
 
     procedure SwitchLinesWithErrorsFilter(var ShowAllLinesEnabled: Boolean)
@@ -9143,6 +9153,12 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnAfterShowDimensions(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; OldDimSetID: Integer; var IsChanged: Boolean)
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeShowDimensions(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
@@ -9283,7 +9299,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(var GenJournalLine: Record "Gen. Journal Line"; CurrExchRate: Record "Currency Exchange Rate")
+    local procedure OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(var GenJournalLine: Record "Gen. Journal Line"; var CurrExchRate: Record "Currency Exchange Rate")
     begin
     end;
 
