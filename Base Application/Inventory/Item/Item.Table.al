@@ -3375,7 +3375,16 @@ table 27 Item
     local procedure CheckStdCostWksh(CurrentFieldNo: Integer)
     var
         StandardCostWorksheet: Record "Standard Cost Worksheet";
+        IsHandled: Boolean;
     begin
+        if "No." = '' then
+            exit;
+
+        IsHandled := false;
+        OnBeforeCheckStdCostWksh(Rec, CurrentFieldNo, IsHandled);
+        if IsHandled then
+            exit;
+
         StandardCostWorksheet.Reset();
         StandardCostWorksheet.SetRange(Type, StandardCostWorksheet.Type::Item);
         StandardCostWorksheet.SetRange("No.", "No.");
@@ -4577,6 +4586,11 @@ table 27 Item
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateTypeOnBeforeCheckExistsItemLedgerEntry(var Item: Record Item; xItem: Record Item; CallingFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckStdCostWksh(var Item: Record Item; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }

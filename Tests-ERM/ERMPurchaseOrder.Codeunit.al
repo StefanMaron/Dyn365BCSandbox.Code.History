@@ -99,6 +99,7 @@
         OrderDateErr: Label 'The purchase line order date is (%1), but it should be (%2).', Comment = '%1 - Actual Purchase Line Order Date; %2 - Expected Purchase Line Order Date';
         DescriptionErr: Label 'The purchase line description (%1) should be the same as the random generated description (%2).', Comment = '%1 - Purchase Line Description; %2 - Random Generated Description';
         QtyReceivedBaseErr: Label 'Qty. Received (Base) is not as expected.';
+        InteractionLogErr: Label 'Interaction log must be enabled.';
 
     [Test]
     [Scope('OnPrem')]
@@ -8302,6 +8303,25 @@
         PurchaseHeader.Delete(true);
     end;
 
+    [Test]
+    [HandlerFunctions('PrintPurchaseOrderRequestPageHandler')]
+    procedure StandardPurchaseOrderShouldHaveLogInteractionEnabled()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        // [SCENARIO 537088] Possible to create log interaction when printing purchase order.
+        Initialize();
+
+        // [GIVEN] Create a Purchase Order.
+        CreatePurchaseOrder(PurchaseHeader, PurchaseLine, CreateItem());
+
+        // [THEN] Run Standard Purchase - Order report and check log intereaction enabled.
+        PurchaseHeader.SetRange("No.", PurchaseHeader."No.");
+        Commit();
+        Report.Run(Report::"Standard Purchase - Order", true, false, PurchaseHeader);
+    end;
+
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";
@@ -10338,6 +10358,35 @@
         PurchaseInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeaderCharge, true, true);
     end;
 
+    local procedure CreateTwoItemReferences(var ItemReference: Record "Item Reference"; PurchaseHeader: Record "Purchase Header"; Item: Record Item)
+    begin
+        LibraryItemReference.CreateItemReference(ItemReference, Item."No.", ItemReference."Reference Type"::Vendor, PurchaseHeader."Buy-from Vendor No.");
+        ItemReference.Validate("Reference No.", Item."No.");
+        ItemReference.Insert(true);
+
+        LibraryItemReference.CreateItemReference(
+                  ItemReference, Item."No.", ItemReference."Reference Type"::" ", '');
+        ItemReference.Validate("Reference No.", Item."No.");
+        ItemReference.Insert(true);
+    end;
+
+    local procedure CreatePurchaseLineWithItemreferenceNo(
+        var PurchaseLine: Record "Purchase Line";
+        PurchaseHeader: Record "Purchase Header";
+        Item: Record Item;
+        ItemReference: Record "Item Reference")
+    begin
+        LibraryPurchase.CreatePurchaseLine(
+            PurchaseLine,
+            PurchaseHeader,
+            PurchaseLine.Type::Item, Item."No.",
+            LibraryRandom.RandInt(10));
+
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
+        PurchaseLine.Validate("Item Reference No.", ItemReference."Reference No.");
+        PurchaseLine.Modify(true);
+    end;
+
 #if not CLEAN23
     [EventSubscriber(ObjectType::table, Database::"Invoice Post. Buffer", 'OnAfterInvPostBufferPreparePurchase', '', false, false)]
     local procedure OnAfterInvPostBufferPreparePurchase(var PurchaseLine: Record "Purchase Line"; var InvoicePostBuffer: Record "Invoice Post. Buffer")
@@ -11243,36 +11292,7 @@
         ReturnShipmentLine.Type := ReturnShipmentLine.Type::Resource;
         ReturnShipmentLine."No." := LibraryResource.CreateResourceNo();
         ReturnShipmentLine.Insert();
-    end;
-
-    local procedure CreateTwoItemReferences(var ItemReference: Record "Item Reference"; PurchaseHeader: Record "Purchase Header"; Item: Record Item)
-    begin
-        LibraryItemReference.CreateItemReference(ItemReference, Item."No.", ItemReference."Reference Type"::Vendor, PurchaseHeader."Buy-from Vendor No.");
-        ItemReference.Validate("Reference No.", Item."No.");
-        ItemReference.Insert(true);
-
-        LibraryItemReference.CreateItemReference(
-                  ItemReference, Item."No.", ItemReference."Reference Type"::" ", '');
-        ItemReference.Validate("Reference No.", Item."No.");
-        ItemReference.Insert(true);
-    end;
-
-    local procedure CreatePurchaseLineWithItemreferenceNo(
-        var PurchaseLine: Record "Purchase Line";
-        PurchaseHeader: Record "Purchase Header";
-        Item: Record Item;
-        ItemReference: Record "Item Reference")
-    begin
-        LibraryPurchase.CreatePurchaseLine(
-            PurchaseLine,
-            PurchaseHeader,
-            PurchaseLine.Type::Item, Item."No.",
-            LibraryRandom.RandInt(10));
-
-        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
-        PurchaseLine.Validate("Item Reference No.", ItemReference."Reference No.");
-        PurchaseLine.Modify(true);
-    end;
+    end;    
 
     local procedure CreateItemWithBOMComponent(): Code[20]
     var
@@ -12096,5 +12116,11 @@
     begin
         VendorLookup.GotoKey(LibraryVariableStorage.DequeueText());
         VendorLookup.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure PrintPurchaseOrderRequestPageHandler(var StandardPurchaseOrder: TestRequestPage "Standard Purchase - Order")
+    begin
+        Assert.IsTrue(StandardPurchaseOrder.LogInteraction.Enabled(), InteractionLogErr);
     end;
 }
