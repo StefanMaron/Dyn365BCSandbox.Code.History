@@ -309,7 +309,9 @@ report 5808 "Item Age Composition - Value"
         AverageCost: array[5] of Decimal;
         AverageCostACY: array[5] of Decimal;
 
+#pragma warning disable AA0074
         Text002: Label 'Enter the ending date';
+#pragma warning restore AA0074
         ItemAgeCompositionValueCaptionLbl: Label 'Item Age Composition - Value';
         CurrReportPageNoCaptionLbl: Label 'Page';
         AfterCaptionLbl: Label 'After...';

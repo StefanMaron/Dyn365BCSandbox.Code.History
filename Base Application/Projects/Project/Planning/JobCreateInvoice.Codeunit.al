@@ -36,18 +36,28 @@ codeunit 1002 "Job Create-Invoice"
         UpdateExchangeRates: Boolean;
         NoOfSalesLinesCreated: Integer;
 
+#pragma warning disable AA0074
         Text000: Label 'The lines were successfully transferred to an invoice.';
         Text001: Label 'The lines were not transferred to an invoice.';
+#pragma warning disable AA0470
         Text002: Label 'There was no %1 with a %2 larger than 0. No lines were transferred.';
         Text003: Label '%1 may not be lower than %2 and may not exceed %3.';
+#pragma warning restore AA0470
         Text004: Label 'You must specify Invoice No. or New Invoice.';
         Text005: Label 'You must specify Credit Memo No. or New Invoice.';
+#pragma warning disable AA0470
         Text007: Label 'You must specify %1.';
+#pragma warning restore AA0470
         Text008: Label 'The lines were successfully transferred to a credit memo.';
+#pragma warning disable AA0470
         Text009: Label 'The selected planning lines must have the same %1.';
+#pragma warning restore AA0470
         Text010: Label 'The currency dates on all planning lines will be updated based on the invoice posting date because there is a difference in currency exchange rates. Recalculations will be based on the Exch. Calculation setup for the Cost and Price values for the project. Do you want to continue?';
         Text011: Label 'The currency exchange rate on all planning lines will be updated based on the exchange rate on the sales invoice. Do you want to continue?';
+#pragma warning disable AA0470
         Text012: Label 'The %1 %2 does not exist anymore. A printed copy of the document was created before the document was deleted.', Comment = 'The Sales Invoice Header 103001 does not exist in the system anymore. A printed copy of the document was created before deletion.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     procedure CreateSalesInvoice(var JobPlanningLine: Record "Job Planning Line"; CrMemo: Boolean)
     var
@@ -958,6 +968,7 @@ codeunit 1002 "Job Create-Invoice"
                     SalesHeader."Ship-to City" := Job."Ship-to City";
                     SalesHeader."Ship-to Post Code" := Job."Ship-to Post Code";
                     SalesHeader."Ship-to Country/Region Code" := Job."Ship-to Country/Region Code";
+                    SalesHeader."Ship-to Phone No." := Job."Ship-to Phone No.";
                     if FormatAddress.UseCounty(SalesHeader."Ship-to Country/Region Code") then
                         SalesHeader."Ship-to County" := Job."Ship-to County";
                 end;

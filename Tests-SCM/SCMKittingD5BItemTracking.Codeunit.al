@@ -1336,12 +1336,11 @@ codeunit 137098 "SCM Kitting-D5B-ItemTracking"
         AssemblyOrderPage.GotoRecord(AssemblyHeader);
 
         repeat
-            if (AssemblyOrderPage.Lines.Type.Value = 'Item') and (AssemblyOrderPage.Lines."No.".Value <> '') then begin
+            if (AssemblyOrderPage.Lines.Type.Value = 'Item') and (AssemblyOrderPage.Lines."No.".Value <> '') then
                 if ItemTrackingType(AssemblyOrderPage.Lines."No.".Value) <> Tracking::Untracked then begin
-                    PrepareHandleSelectEntries(RowsExpected);
-                    AssemblyOrderPage.Lines."Item Tracking Lines".Invoke();
-                end;
-            end
+                PrepareHandleSelectEntries(RowsExpected);
+                AssemblyOrderPage.Lines."Item Tracking Lines".Invoke();
+            end;
         until not AssemblyOrderPage.Lines.Next();
         AssemblyOrderPage.OK().Invoke();
     end;
@@ -1356,12 +1355,11 @@ codeunit 137098 "SCM Kitting-D5B-ItemTracking"
         AssemblyQuotePage.GotoRecord(AssemblyHeader);
 
         repeat
-            if (AssemblyQuotePage.Lines.Type.Value = 'Item') and (AssemblyQuotePage.Lines."No.".Value <> '') then begin
+            if (AssemblyQuotePage.Lines.Type.Value = 'Item') and (AssemblyQuotePage.Lines."No.".Value <> '') then
                 if ItemTrackingType(AssemblyQuotePage.Lines."No.".Value) <> Tracking::Untracked then begin
                     PrepareHandleSelectEntries(RowsExpected);
                     AssemblyQuotePage.Lines."Item Tracking Lines".Invoke();
                 end;
-            end
         until not AssemblyQuotePage.Lines.Next();
         AssemblyQuotePage.OK().Invoke();
     end;
@@ -1482,12 +1480,10 @@ codeunit 137098 "SCM Kitting-D5B-ItemTracking"
     begin
         case GLB_ITPageHandler of
             GLB_ITPageHandler::AssignITSpec:
-                begin
-                    if PAR_ITPage_AssignSerial then
-                        HNDL_ITPage_AssignSerial(ItemTrackingLinesPage)
-                    else
-                        HNDL_ITPage_AssignLot(ItemTrackingLinesPage);
-                end;
+                if PAR_ITPage_AssignSerial then
+                    HNDL_ITPage_AssignSerial(ItemTrackingLinesPage)
+                else
+                    HNDL_ITPage_AssignLot(ItemTrackingLinesPage);
             GLB_ITPageHandler::SelectITSpec:
                 HNDL_ITPage_SelectEntries(ItemTrackingLinesPage);
             GLB_ITPageHandler::AssignITSpecPartial:

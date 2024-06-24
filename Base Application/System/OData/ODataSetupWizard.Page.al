@@ -686,7 +686,7 @@ page 6711 "OData Setup Wizard"
                         FilterEDMType := ConvertFieldTypeToEdmType(FieldRef.Type);
                         FilterType := Enum::"Edit in Excel Filter Type"::Equal;
                         FilterEDMValue := ConvertToEDMValue(FilterValueEnglish, FilterEDMType);
-                        EditinExcelFilters.AddField(FieldName, FilterType, FilterEDMValue, FilterEDMType);
+                        EditinExcelFilters.AddFieldV2(FieldName, FilterType, FilterEDMValue, FilterEDMType);
                     end
         end
     end;

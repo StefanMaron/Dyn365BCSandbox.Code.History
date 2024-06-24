@@ -502,6 +502,9 @@ report 404 "Purchase - Quote"
                         column(Purchase_Header___Sell_to_Customer_No__Caption; "Purchase Header".FieldCaption("Sell-to Customer No."))
                         {
                         }
+                        column(ShipToPhoneNo; "Purchase Header"."Ship-to Phone No.")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -671,7 +674,9 @@ report 404 "Purchase - Quote"
     end;
 
     var
+#pragma warning disable AA0074
         Text002: Label 'Purchase - Quote %1', Comment = '%1 = Document No.';
+#pragma warning restore AA0074
         ShipmentMethod: Record "Shipment Method";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         TempPurchaseLine: Record "Purchase Line" temporary;

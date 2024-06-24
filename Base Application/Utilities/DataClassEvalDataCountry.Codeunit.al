@@ -18,9 +18,6 @@ using Microsoft.Purchases.Document;
 #if not CLEAN24
 using Microsoft.Inventory.Counting;
 #endif
-#if not CLEAN22
-using Microsoft;
-#endif
 
 codeunit 1752 "Data Class. Eval. Data Country"
 {
@@ -53,9 +50,6 @@ codeunit 1752 "Data Class. Eval. Data Country"
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Data Export Buffer");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Data Export Setup");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Data Exp. Primary Key Buffer");
-#if not CLEAN22
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::Certificate);
-#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Key Buffer");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Number Series Buffer");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"DACH Report Selections");

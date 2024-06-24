@@ -495,6 +495,9 @@ report 410 "Blanket Purchase Order"
                         column(Purchase_Header___Sell_to_Customer_No___Control67Caption; "Purchase Header".FieldCaption("Sell-to Customer No."))
                         {
                         }
+                        column(ShipToPhoneNo; "Purchase Header"."Ship-to Phone No.")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -673,7 +676,9 @@ report 410 "Blanket Purchase Order"
         ArchiveDocument: Boolean;
         LogInteractionEnable: Boolean;
 
+#pragma warning disable AA0074
         Text002: Label 'Blanket Purchase Order %1', Comment = '%1 = Document No.';
+#pragma warning restore AA0074
         CompanyInfo__Phone_No__CaptionLbl: Label 'Phone No.';
         CompanyInfo__Fax_No__CaptionLbl: Label 'Fax No.';
         CompanyInfo__VAT_Registration_No__CaptionLbl: Label 'VAT Reg. No.';

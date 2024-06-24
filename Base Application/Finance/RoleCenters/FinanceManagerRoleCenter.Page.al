@@ -322,18 +322,6 @@ page 8901 "Finance Manager Role Center"
                         RunObject = page "Recurring General Journal";
                         Tooltip = 'Open the Recurring General Journals page.';
                     }
-#if not CLEAN22
-                    action("Intrastat Journals")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Intrastat Journals';
-                        RunObject = page "Intrastat Journal";
-                        Tooltip = 'Open the Intrastat Journals page.';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '22.0';
-                        ObsoleteReason = 'Intrastat related functionalities are moved to Intrastat extensions.';
-                    }
-#endif
                     action("General Journals2")
                     {
                         ApplicationArea = Intercompany;
@@ -571,35 +559,6 @@ page 8901 "Finance Manager Role Center"
                     group("Group10")
                     {
                         Caption = 'Miscellaneous';
-#if not CLEAN22
-                        action("Intrastat - Checklist AT")
-                        {
-                            ApplicationArea = Basic, Suite;
-                            Caption = 'Intrastat - Checklist AT';
-                            RunObject = report "Intrastat - Checklist AT";
-                            ObsoleteState = Pending;
-                            ObsoleteTag = '22.0';
-                            ObsoleteReason = 'Intrastat related functionalities are moved to Intrastat extensions.';
-                        }
-                        action("Intrastat - Checklist AT1")
-                        {
-                            ApplicationArea = Basic, Suite;
-                            Caption = 'Intrastat - Form AT';
-                            RunObject = report "Intrastat - Form AT";
-                            ObsoleteState = Pending;
-                            ObsoleteTag = '22.0';
-                            ObsoleteReason = 'Intrastat related functionalities are moved to Intrastat extensions.';
-                        }
-                        action("Intrastat - Item List")
-                        {
-                            ApplicationArea = Basic, Suite;
-                            Caption = 'Intrastat - Item List';
-                            RunObject = report "Intrastat - Item List";
-                            ObsoleteState = Pending;
-                            ObsoleteTag = '22.0';
-                            ObsoleteReason = 'Intrastat related functionalities are moved to Intrastat extensions.';
-                        }
-#endif
                         action("Foreign Currency Balance")
                         {
                             ApplicationArea = Basic, Suite;
@@ -2516,18 +2475,6 @@ page 8901 "Finance Manager Role Center"
                 group("Group57")
                 {
                     Caption = 'Intrastat';
-#if not CLEAN22
-                    action("Intrastat Setup")
-                    {
-                        ApplicationArea = BasicEU;
-                        Caption = 'Intrastat Setup';
-                        RunObject = page "Intrastat Setup";
-                        Tooltip = 'Open the Intrastat Setup page.';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '22.0';
-                        ObsoleteReason = 'Intrastat related functionalities are moved to Intrastat extensions.';
-                    }
-#endif
                     action("Report Selection - Intrastat")
                     {
                         ApplicationArea = Basic, Suite;
@@ -2588,18 +2535,6 @@ page 8901 "Finance Manager Role Center"
                         Caption = 'Place of Receivers';
                         RunObject = page "Place of Receivers";
                     }
-#if not CLEAN22
-                    action("Intrastat Journal Templates")
-                    {
-                        ApplicationArea = BasicEU;
-                        Caption = 'Intrastat Journal Templates';
-                        RunObject = page "Intrastat Journal Templates";
-                        Tooltip = 'Open the Intrastat Journal Templates page.';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '22.0';
-                        ObsoleteReason = 'Intrastat related functionalities are moved to Intrastat extensions.';
-                    }
-#endif
                 }
                 group("Group58")
                 {

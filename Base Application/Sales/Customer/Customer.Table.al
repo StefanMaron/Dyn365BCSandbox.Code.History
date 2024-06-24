@@ -46,11 +46,6 @@ using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
-using Microsoft.Service.Contract;
-using Microsoft.Service.Document;
-using Microsoft.Service.Item;
-using Microsoft.Service.Ledger;
-using Microsoft.Service.Setup;
 using Microsoft.Utilities;
 using System;
 using System.Automation;
@@ -72,10 +67,6 @@ table 18 Customer
                   tabledata "VAT Business Posting Group" = R,
                   TableData "VAT Registration Log" = rd,
                   tabledata "Payment Terms" = R,
-                  TableData "Service Header" = r,
-                  TableData "Service Ledger Entry" = r,
-                  TableData "Service Item" = rm,
-                  TableData "Service Contract Header" = rm,
                   TableData "Price List Header" = rd,
                   TableData "Price List Line" = rd,
 #if not CLEAN23
@@ -1421,63 +1412,6 @@ table 18 Customer
                         Evaluate("Shipping Time", '<>');
             end;
         }
-        field(5900; "Service Zone Code"; Code[10])
-        {
-            Caption = 'Service Zone Code';
-            TableRelation = "Service Zone";
-        }
-        field(5902; "Contract Gain/Loss Amount"; Decimal)
-        {
-            AutoFormatType = 1;
-            CalcFormula = sum("Contract Gain/Loss Entry".Amount where("Customer No." = field("No."),
-                                                                       "Ship-to Code" = field("Ship-to Filter"),
-                                                                       "Change Date" = field("Date Filter")));
-            Caption = 'Contract Gain/Loss Amount';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(5903; "Ship-to Filter"; Code[10])
-        {
-            Caption = 'Ship-to Filter';
-            FieldClass = FlowFilter;
-            TableRelation = "Ship-to Address".Code where("Customer No." = field("No."));
-        }
-        field(5910; "Outstanding Serv. Orders (LCY)"; Decimal)
-        {
-            AutoFormatType = 1;
-            CalcFormula = sum("Service Line"."Outstanding Amount (LCY)" where("Document Type" = const(Order),
-                                                                               "Bill-to Customer No." = field("No."),
-                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
-                                                                               "Currency Code" = field("Currency Filter")));
-            Caption = 'Outstanding Serv. Orders (LCY)';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(5911; "Serv Shipped Not Invoiced(LCY)"; Decimal)
-        {
-            AutoFormatType = 1;
-            CalcFormula = sum("Service Line"."Shipped Not Invoiced (LCY)" where("Document Type" = const(Order),
-                                                                                 "Bill-to Customer No." = field("No."),
-                                                                                 "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
-                                                                                 "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
-                                                                                 "Currency Code" = field("Currency Filter")));
-            Caption = 'Serv Shipped Not Invoiced(LCY)';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(5912; "Outstanding Serv.Invoices(LCY)"; Decimal)
-        {
-            AutoFormatType = 1;
-            CalcFormula = sum("Service Line"."Outstanding Amount (LCY)" where("Document Type" = const(Invoice),
-                                                                               "Bill-to Customer No." = field("No."),
-                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
-                                                                               "Currency Code" = field("Currency Filter")));
-            Caption = 'Outstanding Serv.Invoices(LCY)';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(7000; "Price Calculation Method"; Enum "Price Calculation Method")
         {
             Caption = 'Price Calculation Method';
@@ -1832,17 +1766,8 @@ table 18 Customer
 
     trigger OnDelete()
     var
-        CampaignTargetGr: Record "Campaign Target Group";
-        ContactBusRel: Record "Contact Business Relation";
         Job: Record Job;
-        StdCustSalesCode: Record "Standard Customer Sales Code";
-        CustomReportSelection: Record "Custom Report Selection";
-        MyCustomer: Record "My Customer";
-        ServHeader: Record "Service Header";
-        ItemReference: Record "Item Reference";
-        CampaignTargetGrMgmt: Codeunit "Campaign Target Group Mgt";
         VATRegistrationLogMgt: Codeunit "VAT Registration Log Mgt.";
-        ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1852,75 +1777,16 @@ table 18 Customer
 
         ApprovalsMgmt.OnCancelCustomerApprovalRequest(Rec);
 
-        ServiceItem.SetRange("Customer No.", "No.");
-        if ServiceItem.FindFirst() then
-            if ConfirmManagement.GetResponseOrDefault(
-                 StrSubstNo(Text008, TableCaption(), "No.", ServiceItem.FieldCaption("Customer No.")), true)
-            then
-                ServiceItem.ModifyAll("Customer No.", '')
-            else
-                Error(Text009);
-
         Job.SetRange("Bill-to Customer No.", "No.");
         if not Job.IsEmpty() then
             Error(Text015, TableCaption(), "No.", Job.TableCaption());
 
         MoveEntries.MoveCustEntries(Rec);
 
-        CommentLine.SetRange("Table Name", CommentLine."Table Name"::Customer);
-        CommentLine.SetRange("No.", "No.");
-        CommentLine.DeleteAll();
-
-        CustBankAcc.SetRange("Customer No.", "No.");
-        CustBankAcc.DeleteAll();
-
-        ShipToAddr.SetRange("Customer No.", "No.");
-        ShipToAddr.DeleteAll();
-
-        SalesPrepmtPct.SetCurrentKey("Sales Type", "Sales Code");
-        SalesPrepmtPct.SetRange("Sales Type", SalesPrepmtPct."Sales Type"::Customer);
-        SalesPrepmtPct.SetRange("Sales Code", "No.");
-        SalesPrepmtPct.DeleteAll();
-
-        StdCustSalesCode.SetRange("Customer No.", "No.");
-        StdCustSalesCode.DeleteAll(true);
-
-        CheckIfSalesOrderLinesExist();
-
-        CampaignTargetGr.SetRange("No.", "No.");
-        CampaignTargetGr.SetRange(Type, CampaignTargetGr.Type::Customer);
-        if CampaignTargetGr.Find('-') then begin
-            ContactBusRel.SetRange("Link to Table", ContactBusRel."Link to Table"::Customer);
-            ContactBusRel.SetRange("No.", "No.");
-            ContactBusRel.FindFirst();
-            repeat
-                CampaignTargetGrMgmt.ConverttoContact(Rec, ContactBusRel."Contact No.");
-            until CampaignTargetGr.Next() = 0;
-        end;
-
-        ServHeader.SetCurrentKey("Customer No.", "Order Date");
-        ServHeader.SetRange("Customer No.", "No.");
-        if ServHeader.FindFirst() then
-            Error(ServiceDocumentExistErr, "No.", ServHeader."Document Type");
-
-        ServHeader.SetRange("Customer No.");
-        ServHeader.SetRange("Bill-to Customer No.", "No.");
-        if ServHeader.FindFirst() then
-            Error(ServiceDocumentExistErr, "No.", ServHeader."Document Type");
-
-        ItemReference.SetCurrentKey("Reference Type", "Reference Type No.");
-        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Customer);
-        ItemReference.SetRange("Reference Type No.", Rec."No.");
-        ItemReference.DeleteAll();
+        DeleteRelatedData();
 
         UpdateContFromCust.OnDelete(Rec);
 
-        CustomReportSelection.SetRange("Source Type", DATABASE::Customer);
-        CustomReportSelection.SetRange("Source No.", "No.");
-        CustomReportSelection.DeleteAll();
-
-        MyCustomer.SetRange("Customer No.", "No.");
-        MyCustomer.DeleteAll();
         VATRegistrationLogMgt.DeleteCustomerLog(Rec);
 
         DimMgt.DeleteDefaultDim(DATABASE::Customer, "No.");
@@ -2027,7 +1893,6 @@ table 18 Customer
         ShippingAgentService: Record "Shipping Agent Services";
         RMSetup: Record "Marketing Setup";
         SalesPrepmtPct: Record "Sales Prepayment %";
-        ServiceItem: Record "Service Item";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         CustomizedCalendarChange: Record "Customized Calendar Change";
         PaymentToleranceMgt: Codeunit "Payment Tolerance Management";
@@ -2042,19 +1907,22 @@ table 18 Customer
         LookupRequested: Boolean;
         ForceUpdateContact: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot delete %1 %2 because there is at least one outstanding Sales %3 for this customer.';
         Text002: Label 'Do you wish to create a contact for %1 %2?';
         Text003: Label 'Contact %1 %2 is not related to customer %3 %4.';
+#pragma warning restore AA0470
         Text004: Label 'post';
         Text005: Label 'create';
+#pragma warning disable AA0470
         Text006: Label 'You cannot %1 this type of document when Customer %2 is blocked with type %3';
-        Text008: Label 'Deleting the %1 %2 will cause the %3 to be deleted for the associated Service Items. Do you want to continue?';
-        Text009: Label 'Cannot delete customer.';
         Text010: Label 'The %1 %2 has been assigned to %3 %4.\The same %1 cannot be entered on more than one %3. Enter another code.';
         Text011: Label 'Reconciling IC transactions may be difficult if you change IC Partner Code because this %1 has ledger entries in a fiscal year that has not yet been closed.\ Do you still want to change the IC Partner Code?';
         Text012: Label 'You cannot change the contents of the %1 field because this %2 has one or more open ledger entries.';
-        ServiceDocumentExistErr: Label 'You cannot delete customer %1 because there is at least one outstanding Service %2 for this customer.', Comment = '%1 - customer no., %2 - service document type.';
         Text015: Label 'You cannot delete %1 %2 because there is at least one %3 associated to this customer.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         AllowPaymentToleranceQst: Label 'Do you want to allow payment tolerance for entries that are currently open?';
         RemovePaymentRoleranceQst: Label 'Do you want to remove payment tolerance from entries that are currently open?';
         CreateNewCustTxt: Label 'Create a new customer card for %1', Comment = '%1 is the name to be used to create the customer. ';
@@ -2082,6 +1950,62 @@ table 18 Customer
             OnAssistEditOnBeforeExit(Cust);
             exit(true);
         end;
+    end;
+
+    local procedure DeleteRelatedData()
+    var
+        CampaignTargetGr: Record "Campaign Target Group";
+        ContactBusRel: Record "Contact Business Relation";
+        CustomReportSelection: Record "Custom Report Selection";
+        ItemReference: Record "Item Reference";
+        MyCustomer: Record "My Customer";
+        StdCustSalesCode: Record "Standard Customer Sales Code";
+        CampaignTargetGrMgmt: Codeunit "Campaign Target Group Mgt";
+    begin
+        CommentLine.SetRange("Table Name", CommentLine."Table Name"::Customer);
+        CommentLine.SetRange("No.", "No.");
+        CommentLine.DeleteAll();
+
+        CustBankAcc.SetRange("Customer No.", "No.");
+        CustBankAcc.DeleteAll();
+
+        ShipToAddr.SetRange("Customer No.", "No.");
+        ShipToAddr.DeleteAll();
+
+        SalesPrepmtPct.SetCurrentKey("Sales Type", "Sales Code");
+        SalesPrepmtPct.SetRange("Sales Type", SalesPrepmtPct."Sales Type"::Customer);
+        SalesPrepmtPct.SetRange("Sales Code", "No.");
+        SalesPrepmtPct.DeleteAll();
+
+        StdCustSalesCode.SetRange("Customer No.", "No.");
+        StdCustSalesCode.DeleteAll(true);
+
+        CheckIfSalesOrderLinesExist();
+
+        CampaignTargetGr.SetRange("No.", "No.");
+        CampaignTargetGr.SetRange(Type, CampaignTargetGr.Type::Customer);
+        if CampaignTargetGr.Find('-') then begin
+            ContactBusRel.SetRange("Link to Table", ContactBusRel."Link to Table"::Customer);
+            ContactBusRel.SetRange("No.", "No.");
+            ContactBusRel.FindFirst();
+            repeat
+                CampaignTargetGrMgmt.ConverttoContact(Rec, ContactBusRel."Contact No.");
+            until CampaignTargetGr.Next() = 0;
+        end;
+
+        ItemReference.SetCurrentKey("Reference Type", "Reference Type No.");
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Customer);
+        ItemReference.SetRange("Reference Type No.", Rec."No.");
+        ItemReference.DeleteAll();
+
+        CustomReportSelection.SetRange("Source Type", DATABASE::Customer);
+        CustomReportSelection.SetRange("Source No.", "No.");
+        CustomReportSelection.DeleteAll();
+
+        MyCustomer.SetRange("Customer No.", "No.");
+        MyCustomer.DeleteAll();
+
+        OnAfterDeleteRelatedData(Rec);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -2319,8 +2243,8 @@ table 18 Customer
 
         xSecurityFilter := SecurityFiltering;
         SecurityFiltering(SecurityFiltering::Ignored);
-        CalcFields("Balance (LCY)", "Outstanding Orders (LCY)", "Shipped Not Invoiced (LCY)", "Outstanding Invoices (LCY)",
-          "Outstanding Serv. Orders (LCY)", "Serv Shipped Not Invoiced(LCY)", "Outstanding Serv.Invoices(LCY)");
+        CalcFields("Balance (LCY)", "Outstanding Orders (LCY)", "Shipped Not Invoiced (LCY)", "Outstanding Invoices (LCY)");
+        OnGetTotalAmountLCYOnAfterCalcFields(Rec);
         if SecurityFiltering <> xSecurityFilter then
             SecurityFiltering(xSecurityFilter);
 
@@ -2331,8 +2255,8 @@ table 18 Customer
     begin
         OnBeforeGetTotalAmountLCYUI(Rec);
 
-        SetAutoCalcFields("Balance (LCY)", "Outstanding Orders (LCY)", "Shipped Not Invoiced (LCY)", "Outstanding Invoices (LCY)",
-          "Outstanding Serv. Orders (LCY)", "Serv Shipped Not Invoiced(LCY)", "Outstanding Serv.Invoices(LCY)");
+        SetAutoCalcFields("Balance (LCY)", "Outstanding Orders (LCY)", "Shipped Not Invoiced (LCY)", "Outstanding Invoices (LCY)");
+        OnGetTotalAmountLCYUIOnAfterSetAutoCalcFields(Rec);
 
         exit(GetTotalAmountLCYCommon());
     end;
@@ -2341,14 +2265,12 @@ table 18 Customer
     var
         [SecurityFiltering(SecurityFilter::Filtered)]
         SalesLine: Record "Sales Line";
-        [SecurityFiltering(SecurityFilter::Filtered)]
-        ServiceLine: Record "Service Line";
         SalesOutstandingAmountFromShipment: Decimal;
-        ServOutstandingAmountFromShipment: Decimal;
         InvoicedPrepmtAmountLCY: Decimal;
         RetRcdNotInvAmountLCY: Decimal;
         AdditionalAmountLCY: Decimal;
         IsHandled: Boolean;
+        TotalAmountLCY: Decimal;
     begin
         IsHandled := false;
         OnBeforeGetTotalAmountLCYCommon(Rec, AdditionalAmountLCY, IsHandled);
@@ -2356,14 +2278,15 @@ table 18 Customer
             exit(AdditionalAmountLCY);
 
         SalesOutstandingAmountFromShipment := SalesLine.OutstandingInvoiceAmountFromShipment("No.");
-        ServOutstandingAmountFromShipment := ServiceLine.OutstandingInvoiceAmountFromShipment("No.");
         InvoicedPrepmtAmountLCY := GetInvoicedPrepmtAmountLCY();
         RetRcdNotInvAmountLCY := GetReturnRcdNotInvAmountLCY();
 
-        exit("Balance (LCY)" + "Outstanding Orders (LCY)" + "Shipped Not Invoiced (LCY)" + "Outstanding Invoices (LCY)" +
-          "Outstanding Serv. Orders (LCY)" + "Serv Shipped Not Invoiced(LCY)" + "Outstanding Serv.Invoices(LCY)" -
-          SalesOutstandingAmountFromShipment - ServOutstandingAmountFromShipment - InvoicedPrepmtAmountLCY - RetRcdNotInvAmountLCY +
-          AdditionalAmountLCY);
+        TotalAmountLCY :=
+            "Balance (LCY)" + "Outstanding Orders (LCY)" + "Shipped Not Invoiced (LCY)" + "Outstanding Invoices (LCY)" +
+            SalesOutstandingAmountFromShipment - InvoicedPrepmtAmountLCY - RetRcdNotInvAmountLCY + AdditionalAmountLCY;
+
+        OnAfterGetTotalAmountLCYCommon(Rec, TotalAmountLCY);
+        exit(TotalAmountLCY);
     end;
 
     procedure GetSalesLCY() SalesLCY: Decimal
@@ -3446,6 +3369,11 @@ table 18 Customer
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnAfterDeleteRelatedData(Customer: Record Customer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterGetTopCustomerHeadlineQueryDocumentTypeFilter(var DocumentTypeFilter: Text)
     begin
     end;
@@ -3719,4 +3647,21 @@ table 18 Customer
     local procedure OnGetCustNoOpenCardOnAfterMarkCustomersWithSimilarName(var Customer: Record Customer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetTotalAmountLCYOnAfterCalcFields(var Customer: Record Customer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetTotalAmountLCYUIOnAfterSetAutoCalcFields(var Customer: Record Customer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetTotalAmountLCYCommon(var Customer: Record Customer; var TotalAmountLCY: Decimal)
+    begin
+    end;
 }
+
+

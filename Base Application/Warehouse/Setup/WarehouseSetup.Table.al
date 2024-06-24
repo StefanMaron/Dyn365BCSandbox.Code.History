@@ -5,6 +5,7 @@ using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.InventoryDocument;
 using Microsoft.Warehouse.Request;
 using System.Utilities;
+using System.Environment.Configuration;
 
 table 5769 "Warehouse Setup"
 {
@@ -228,8 +229,6 @@ table 5769 "Warehouse Setup"
     end;
 
     local procedure EnsureSequenceExists()
-    var
-        DummySeq: BigInteger;
     begin
         Rec.Get();
         if Rec."Last Whse. Posting Ref. Seq." = '' then begin
@@ -245,12 +244,19 @@ table 5769 "Warehouse Setup"
             exit;
         NumberSequence.Insert(Rec."Last Whse. Posting Ref. Seq.", Rec."Last Whse. Posting Ref. No.", 1);
         // Simulate that a number was used - init issue with number sequences.
-        DummySeq := NumberSequence.next(Rec."Last Whse. Posting Ref. Seq.");
+        if NumberSequence.next(Rec."Last Whse. Posting Ref. Seq.") = 0 then;
     end;
 
     local procedure MaxInt(): Integer
     begin
         exit(2147483647);
+    end;
+
+    procedure UseLegacyPosting(): Boolean
+    var
+        FeatureKeyManagement: Codeunit "Feature Key Management";
+    begin
+        exit(not FeatureKeyManagement.IsConcurrentWarehousingPostingEnabled());
     end;
 }
 
