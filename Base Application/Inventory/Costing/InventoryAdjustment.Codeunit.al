@@ -1009,6 +1009,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
             TempInvtAdjmtBuf.CalcItemLedgEntryCost(InbndItemLedgEntry."Entry No.", false);
             ValueEntry.CalcItemLedgEntryCost(InbndItemLedgEntry."Entry No.", false);
             ValueEntry.AddCost(TempInvtAdjmtBuf);
+            OnEliminateRndgResidualOnAfterCalcInboundCost(ValueEntry, InbndItemLedgEntry."Entry No.");
 
             TempRndgResidualBuf.SetRange("Item Ledger Entry No.", InbndItemLedgEntry."Entry No.");
             TempRndgResidualBuf.SetRange("Completely Invoiced", false);
@@ -3153,7 +3154,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
     local procedure OnEliminateRndgResidualOnBeforeCheckHasNewCost(InbndItemLedgerEntry: Record "Item Ledger Entry"; ValueEntry: Record "Value Entry"; RndgCost: Decimal; RndgCostACY: Decimal; var IsHandled: Boolean)
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAdjustItem(var TheItem: Record Item)
     begin
@@ -3162,6 +3163,11 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
     [IntegrationEvent(false, false)]
     local procedure OnAfterAdjustItem(var TheItem: Record Item)
     begin
-    end;    
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnEliminateRndgResidualOnAfterCalcInboundCost(var ValueEntry: Record "Value Entry"; InbndItemLedgEntryNo: Integer)
+    begin
+    end;
 }
 
