@@ -404,8 +404,7 @@ codeunit 139051 "Add-in Hyperlink Sales"
         CreateGLAccount(GLAccount);
         Count := LibraryRandom.RandInt(8) + 2;
         for i := 1 to Count do begin
-            with SalesHeader[i] do
-                CreateSalesDocWithLine(SalesHeader[i], SalesLine, "Document Type"::Invoice, SalesLine.Type::"G/L Account", GLAccount."No.", 0D);
+            CreateSalesDocWithLine(SalesHeader[i], SalesLine, SalesHeader[i]."Document Type"::Invoice, SalesLine.Type::"G/L Account", GLAccount."No.", 0D);
             DocNos += SalesHeader[i]."No." + '|';
         end;
         DocNos := DelChr(DocNos, '>', '|');

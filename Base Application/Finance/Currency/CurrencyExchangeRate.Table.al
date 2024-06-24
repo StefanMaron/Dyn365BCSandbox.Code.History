@@ -140,7 +140,11 @@ table 330 "Currency Exchange Rate"
         CurrencyCode2: array[2] of Code[10];
         Date2: array[2] of Date;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'The currency code in the %1 field and the %2 field cannot be the same.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     procedure ExchangeAmtLCYToFCY(Date: Date; CurrencyCode: Code[10]; Amount: Decimal; Factor: Decimal): Decimal
     begin

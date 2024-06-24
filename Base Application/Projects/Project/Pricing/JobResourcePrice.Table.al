@@ -193,7 +193,11 @@ table 1012 "Job Resource Price"
         Job: Record Job;
         JT: Record "Job Task";
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 cannot be specified when %2 is %3.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     local procedure GetJob()
     begin

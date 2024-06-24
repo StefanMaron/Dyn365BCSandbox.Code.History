@@ -662,7 +662,6 @@ report 408 "Purchase - Receipt"
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
         VendAddr: array[8] of Text[100];
-        ShipToAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
         PurchaserText: Text[50];
         ReferenceText: Text[80];
@@ -706,10 +705,15 @@ report 408 "Purchase - Receipt"
         HeaderTxt: array[20] of Text;
         FooterLabel: array[20] of Text[30];
         FooterTxt: array[20] of Text;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text11500: Label 'Receipt %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     protected var
         CompanyInfo: Record "Company Information";
+        ShipToAddr: array[8] of Text[100];
 
     [Scope('OnPrem')]
     procedure PrepareHeader()

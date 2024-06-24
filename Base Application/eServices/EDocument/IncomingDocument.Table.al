@@ -525,7 +525,9 @@ table 130 "Incoming Document"
         AlreadyUsedInDocHdrErr: Label 'The incoming document has already been assigned to %1 %2 (%3).', Comment = '%1=document type, %2=document number, %3=table name, e.g. Sales Header.';
         DocPostedErr: Label 'The document related to this incoming document has been posted.';
         DocApprovedErr: Label 'This incoming document requires releasing.';
+#pragma warning disable AA0470
         DetachQst: Label 'Do you want to remove the reference from this incoming document to posted document %1, posting date %2?';
+#pragma warning restore AA0470
         NotSupportedPurchErr: Label 'Purchase documents of type %1 are not supported.', Comment = '%1 will be Sales/Purchase Header. %2 will be invoice, Credit Memo.';
         NotSupportedSalesErr: Label 'Sales documents of type %1 are not supported.', Comment = '%1 will be Sales/Purchase Header. %2 will be invoice, Credit Memo.';
         EntityNotFoundErr: Label 'Cannot create the document. Make sure the data exchange definition is correct.';

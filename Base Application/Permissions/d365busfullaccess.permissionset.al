@@ -237,18 +237,17 @@ permissionset 959 "D365 BUS FULL ACCESS"
     Permissions = system "Tools, Security, Roles" = X,
                   tabledata "Add-in" = imd,
                   tabledata "All Profile" = imd,
+                  tabledata "All Profile Extension" = imd,
+                  tabledata "All Profile Page Metadata" = imd,
                   tabledata AllObjWithCaption = R,
-                  tabledata "Designed Query Group" = IMD,
-                  tabledata "Designed Query Permission" = IMD,
                   tabledata "Object Access Intent Override" = Rimd,
                   tabledata Permission = imd,
                   tabledata "Permission Set" = imd,
                   tabledata "Profile Configuration Symbols" = imd,
                   tabledata "Published Application" = Rimd,
-#pragma warning disable AL0432
                   tabledata "Tenant Profile" = imd,
-#pragma warning restore AL0432
                   tabledata "Tenant Profile Extension" = imd,
+                  tabledata "Tenant Profile Page Metadata" = imd,
                   tabledata "Tenant Profile Setting" = imd,
                   tabledata "Tenant Web Service" = R,
                   tabledata User = D,
@@ -523,11 +522,6 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Intermediate Data Import" = IM,
                   tabledata "Internal Movement Header" = RIMD,
                   tabledata "Internal Movement Line" = RIMD,
-#if not CLEAN22
-                  tabledata "Advanced Intrastat Checklist" = RIMD,
-                  tabledata "Intrastat Jnl. Batch" = RIMD,
-                  tabledata "Intrastat Jnl. Template" = RIMD,
-#endif
                   tabledata "Invalidated Dim Correction" = R,
                   tabledata "Inventory Adjmt. Entry (Order)" = Rim,
                   tabledata "Inventory Adjustment Buffer" = Rimd,
@@ -657,9 +651,6 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Outstanding Bank Transaction" = RIMD,
                   tabledata "Over-Receipt Code" = RIMD,
                   tabledata "Overdue Approval Entry" = Rimd,
-#if not CLEAN22
-                  tabledata "Payment Buffer" = RIMD,
-#endif
                   tabledata "Vendor Payment Buffer" = RIMD,
                   tabledata "Payment Export Data" = Rimd,
                   tabledata "Payment Export Remittance Text" = RIMD,
@@ -693,9 +684,6 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Posted Docs. With No Inc. Buf." = RIMD,
                   tabledata "Posted Gen. Journal Batch" = RIMD,
                   tabledata "Posted Gen. Journal Line" = RIMD,
-#if not CLEAN22
-                  tabledata "Power BI Service Status Setup" = RIMD,
-#endif
 #if not CLEAN23
                   tabledata "Power BI User Configuration" = RIMD,
                   tabledata "Power BI Report Configuration" = RIMD,
@@ -873,12 +861,6 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Unit of Measure Translation" = RIMD,
                   tabledata "Unlinked Attachment" = RIMD,
                   tabledata "Untracked Planning Element" = RIM,
-#if not CLEAN22
-                  tabledata "User Group" = R,
-                  tabledata "User Group Access Control" = R,
-                  tabledata "User Group Permission Set" = R,
-                  tabledata "User Group Plan" = Rimd,
-#endif
                   tabledata "User Preference" = RIMD,
                   tabledata "User Security Status" = RIM,
                   tabledata "User Task" = RIMD,

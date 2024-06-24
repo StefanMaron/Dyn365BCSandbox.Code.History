@@ -1,22 +1,13 @@
 ﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Assembly.Document;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Counting.Document;
-using Microsoft.Inventory.Document;
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
-using Microsoft.Inventory.Planning;
-using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Transfer;
-using Microsoft.Manufacturing.Document;
 using Microsoft.Projects.Project.Job;
-using Microsoft.Projects.Project.Journal;
-using Microsoft.Projects.Project.Planning;
-using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.Service.Document;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Tracking;
 using Microsoft.Warehouse.Worksheet;
@@ -43,8 +34,10 @@ codeunit 99000830 "Create Reserv. Entry"
         LastProcessedSourceID: Text;
         CalledFromInvtPutawayPick: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'You cannot reserve this entry because it is not a true demand or supply.';
         Text001: Label 'Cannot match item tracking.';
+#pragma warning restore AA0074
 
     procedure CreateEntry(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; Description: Text[100]; ExpectedReceiptDate: Date; ShipmentDate: Date; TransferredFromEntryNo: Integer; Status: Enum "Reservation Status")
     var
@@ -537,65 +530,16 @@ codeunit 99000830 "Create Reserv. Entry"
     var
         Sign: Integer;
     begin
+        OnBeforeSignFactor(ReservEntry, Inbound, Sign);
+
         // Demand is regarded as negative, supply is regarded as positive.
         case ReservEntry."Source Type" of
-            Database::"Sales Line":
-                if ReservEntry."Source Subtype" in [3, 5] then // Credit memo, Return Order = supply
-                    Sign := 1
-                else
-                    Sign := -1;
-            Database::"Requisition Line":
-                if ReservEntry."Source Subtype" = 1 then
-                    Sign := -1
-                else
-                    Sign := 1;
-            Database::"Purchase Line":
-                if ReservEntry."Source Subtype" in [3, 5] then // Credit memo, Return Order = demand
-                    Sign := -1
-                else
-                    Sign := 1;
-            Database::"Item Journal Line":
-                if (ReservEntry."Source Subtype" = 4) and Inbound then
-                    Sign := 1
-                else
-                    if ReservEntry."Source Subtype" in [1, 3, 4, 5] then // Sale, Negative Adjmt., Transfer, Consumption
-                        Sign := -1
-                    else
-                        Sign := 1;
-            Database::"Job Journal Line":
-                Sign := -1;
             Database::"Item Ledger Entry":
                 Sign := 1;
-            Database::"Prod. Order Line":
-                Sign := 1;
-            Database::"Prod. Order Component":
-                Sign := -1;
-            Database::"Assembly Header":
-                Sign := 1;
-            Database::"Assembly Line":
-                Sign := -1;
-            Database::"Planning Component":
-                Sign := -1;
-            Database::"Transfer Line":
-                if ReservEntry."Source Subtype" = 0 then // Outbound
-                    Sign := -1
-                else
-                    Sign := 1;
-            Database::"Service Line":
-                if ReservEntry."Source Subtype" in [3] then // Credit memo
-                    Sign := 1
-                else
-                    Sign := -1;
-            Database::"Job Planning Line",
             Database::Job:
                 Sign := -1;
             Database::"Phys. Invt. Order Line":
                 if ReservEntry.Positive then
-                    Sign := 1
-                else
-                    Sign := -1;
-            Database::"Invt. Document Line":
-                if ReservEntry."Source Subtype" = 0 then // Receipt
                     Sign := 1
                 else
                     Sign := -1;
@@ -626,27 +570,12 @@ codeunit 99000830 "Create Reserv. Entry"
 
     local procedure CheckSourceTypeSubtype(var ReservEntry: Record "Reservation Entry") IsError: Boolean
     begin
-        case ReservEntry."Source Type" of
-            Database::"Sales Line":
-                IsError := not (ReservEntry."Source Subtype" in [1, 5]);
-            Database::"Purchase Line":
-                IsError := not (ReservEntry."Source Subtype" in [1, 5]);
-            Database::"Prod. Order Line", Database::"Prod. Order Component":
-                IsError := (ReservEntry."Source Subtype" = 4) or ((ReservEntry."Source Subtype" = 1) and (ReservEntry.Binding = ReservEntry.Binding::" "));
-            Database::"Assembly Header", Database::"Assembly Line":
-                IsError := not (ReservEntry."Source Subtype" = 1); // Only Assembly Order supported
-            Database::"Requisition Line", Database::"Planning Component":
-                IsError := ReservEntry.Binding = ReservEntry.Binding::" ";
-            Database::"Item Journal Line":
-                // Item Journal Lines with Entry Type Transfer can carry reservations during posting:
-                IsError := (ReservEntry."Source Subtype" <> 4) and (ReservEntry."Source Ref. No." <> 0);
-            Database::"Job Journal Line":
-                IsError := ReservEntry.Binding = ReservEntry.Binding::"Order-to-Order";
-            Database::"Job Planning Line":
-                IsError := ReservEntry."Source Subtype" <> 2;
-            else
-                OnAfterCheckValidity(ReservEntry, IsError);
-        end;
+        OnCheckSourceTypeSubtype(ReservEntry, IsError);
+        if IsError then
+            exit(true);
+
+        OnAfterCheckValidity(ReservEntry, IsError);
+
         OnAfterCheckSourceTypeSubtype(ReservEntry, IsError);
     end;
 
@@ -1088,6 +1017,11 @@ codeunit 99000830 "Create Reserv. Entry"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeSignFactor(var ReservationEntry: Record "Reservation Entry"; Inbound: Boolean; var Sign: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterSignFactor(ReservationEntry: Record "Reservation Entry"; var Sign: Integer)
     begin
     end;
@@ -1294,6 +1228,11 @@ codeunit 99000830 "Create Reserv. Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferReservEntryOnAfterTransferFields(var NewReservationEntry: Record "Reservation Entry"; var OldReservationEntry: Record "Reservation Entry"; var UseQtyToHandle: Boolean; var UseQtyToInvoice: Boolean; var CurrSignFactor: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckSourceTypeSubtype(var ReservationEntry: Record "Reservation Entry"; var IsError: Boolean)
     begin
     end;
 }

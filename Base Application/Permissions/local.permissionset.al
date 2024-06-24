@@ -1,9 +1,6 @@
 namespace System.Security.AccessControl;
 
 using Microsoft.Bank.Payment;
-#if not CLEAN22
-using Microsoft;
-#endif
 using Microsoft.Foundation.Reporting;
 using Microsoft.Finance.AuditFileExport;
 using Microsoft.Purchases.Document;
@@ -22,9 +19,6 @@ permissionset 1001 "LOCAL"
     Caption = 'Country/region-specific func.';
 
     Permissions = tabledata "Bank Directory" = RIMD,
-#if not CLEAN22
-                  tabledata Certificate = RIMD,
-#endif
                   tabledata "DACH Report Selections" = RIMD,
                   tabledata "Data Exp. Primary Key Buffer" = RIMD,
                   tabledata "Data Export" = RIMD,

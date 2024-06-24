@@ -115,7 +115,9 @@ table 50 "Accounting Period"
         AccountingPeriod2: Record "Accounting Period";
         InvtSetup: Record "Inventory Setup";
 
+#pragma warning disable AA0074
         Text000: Label '<Month Text,10>', Locked = true;
+#pragma warning restore AA0074
         MonthTxt: Label '<Month Text>', Locked = true;
 
     procedure UpdateAvgItems()

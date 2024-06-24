@@ -157,7 +157,11 @@ report 718 "Inventory - Sales Back Orders"
         ItemFilter: Text;
         SalesLineFilter: Text;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Sales Order Line: %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         InvSalesBackOrdersCaptionLbl: Label 'Inventory - Sales Back Orders';
         CurrReportPageNoCaptionLbl: Label 'Page';
         CustNameCaptionLbl: Label 'Customer';

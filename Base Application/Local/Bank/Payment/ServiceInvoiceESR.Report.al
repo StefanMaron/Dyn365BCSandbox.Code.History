@@ -713,8 +713,8 @@ report 3010534 "Service - Invoice ESR"
 
             trigger OnAfterGetRecord()
             begin
-                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
-                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
+                CurrReport.Language := GlobalLanguage.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := GlobalLanguage.GetFormatRegionOrDefault("Format Region");
 
                 FormatAddressFields("Service Invoice Header");
                 FormatDocumentFields("Service Invoice Header");
@@ -819,7 +819,7 @@ report 3010534 "Service - Invoice ESR"
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         EsrSetup: Record "ESR Setup";
-        Language: Codeunit Language;
+        GlobalLanguage: Codeunit Language;
         CHMgt: Codeunit CHMgt;
         ServiceInvPrinted: Codeunit "Service Inv.-Printed";
         FormatAddr: Codeunit "Format Address";
@@ -1040,10 +1040,12 @@ report 3010534 "Service - Invoice ESR"
     end;
 
     local procedure FormatAddressFields(var ServiceInvoiceHeader: Record "Service Invoice Header")
+    var
+        ServiceFormatAddress: Codeunit "Service Format Address";
     begin
         FormatAddr.GetCompanyAddr(ServiceInvoiceHeader."Responsibility Center", RespCenter, CompanyInfo, CompanyAddr);
-        FormatAddr.ServiceInvBillTo(CustAddr, ServiceInvoiceHeader);
-        ShowShippingAddr := FormatAddr.ServiceInvShipTo(ShipToAddr, CustAddr, ServiceInvoiceHeader);
+        ServiceFormatAddress.ServiceInvBillTo(CustAddr, ServiceInvoiceHeader);
+        ShowShippingAddr := ServiceFormatAddress.ServiceInvShipTo(ShipToAddr, CustAddr, ServiceInvoiceHeader);
     end;
 
     local procedure FormatDocumentFields(ServiceInvoiceHeader: Record "Service Invoice Header")

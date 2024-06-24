@@ -2,13 +2,17 @@ namespace Microsoft.Finance.FinancialReports;
 
 page 104 "Account Schedule"
 {
+    AboutTitle = 'About (Financial Report) Row Definition';
+    AboutText = 'A row definition in financial reports provide a place for calculations that can''t be made directly in the chart of accounts. For example, you can create subtotals for groups of accounts and then include that total in other totals. You can also calculate intermediate steps that aren''t shown in the final report.';
     AutoSplitKey = true;
-    Caption = 'Row Definition';
+    AnalysisModeEnabled = false;
+    Caption = '(Financial Report) Row Definition';
     DataCaptionFields = "Schedule Name";
     MultipleNewLines = true;
     PageType = Worksheet;
     SourceTable = "Acc. Schedule Line";
     RefreshOnActivate = true;
+    UsageCategory = None;
 
     layout
     {
@@ -19,8 +23,6 @@ page 104 "Account Schedule"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Name';
                 Lookup = true;
-                ToolTip = 'Specifies the name of the row definition.';
-
                 trigger OnLookup(var Text: Text): Boolean
                 begin
                     exit(AccSchedManagement.LookupName(CurrentSchedName, Text));
@@ -194,31 +196,6 @@ page 104 "Account Schedule"
 
     actions
     {
-#if not CLEAN22
-        area(navigation)
-        {
-            action(Overview)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'View Report';
-                Ellipsis = true;
-                Image = ViewDetails;
-                ToolTip = 'View an overview of the current account schedule.';
-                Visible = false;
-                ObsoleteReason = 'This page is now opened from Financial Reports Page instead (Overview action).';
-                ObsoleteState = Pending;
-                ObsoleteTag = '22.0';
-
-                trigger OnAction()
-                var
-                    AccSchedOverview: Page "Acc. Schedule Overview";
-                begin
-                    AccSchedOverview.SetAccSchedName(CurrentSchedName);
-                    AccSchedOverview.Run();
-                end;
-            }
-        }
-#endif
         area(processing)
         {
             action(Indent)
@@ -318,83 +295,20 @@ page 104 "Account Schedule"
                         AccSchedManagement.InsertCostTypes(AccSchedLine);
                     end;
                 }
-#if not CLEAN22
-                action(EditColumnLayoutSetup)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Edit Column Layout Setup';
-                    Ellipsis = true;
-                    Image = SetupColumns;
-                    RunObject = Page "Column Layout";
-                    ToolTip = 'Create or change the column layout for the current account schedule name.';
-                    Visible = false;
-                    ObsoleteReason = 'Relation to columns on a financial report are now stored on "Financial Report". This control is now replaced by the one on page Financial Reports, action EditColumnGroup.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '22.0';
-                }
-#endif
             }
         }
-#if not CLEAN22
-        area(reporting)
-        {
-            action(Print)
-            {
-                ObsoleteReason = 'AccScheduleName is no longer printable directly as they are only row definitions, print instead related Financial Report by calling directly the Account Schedule Report with SetFinancialReportName or SetFinancialReportNameNonEditable.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '22.0';
-                ApplicationArea = Basic, Suite;
-                Caption = '&Print';
-                Ellipsis = true;
-                Image = Print;
-                ToolTip = 'Prepare to print the document. A report request window for the document opens where you can specify what to include on the print-out.';
-                Visible = false;
-                trigger OnAction()
-                var
-                    AccScheduleName: Record "Acc. Schedule Name";
-                begin
-                    AccScheduleName.Get(Rec."Schedule Name");
-                    AccScheduleName.Print();
-                end;
-            }
-        }
-#endif
         area(Promoted)
         {
             group(Category_Process)
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
-#if not CLEAN22
-                actionref(Overview_Promoted; Overview)
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'This page is now opened from Financial Reports Page instead (Overview action).';
-                    ObsoleteTag = '22.0';
-                }
-#endif
-#if not CLEAN22
-                actionref(Print_Promoted; Print)
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'AccScheduleName is no longer printable directly as they are only row definitions, print instead related Financial Report by calling directly the Account Schedule Report with SetFinancialReportName or SetFinancialReportNameNonEditable.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 actionref(Outdent_Promoted; Outdent)
                 {
                 }
                 actionref(Indent_Promoted; Indent)
                 {
                 }
-#if not CLEAN22
-                actionref(EditColumnLayoutSetup_Promoted; EditColumnLayoutSetup)
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Relation to columns on a financial report are now stored on "Financial Report". This control is now replaced by the one on page Financial Reports, action EditColumnGroup.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
             }
             group(Category_Category4)
             {

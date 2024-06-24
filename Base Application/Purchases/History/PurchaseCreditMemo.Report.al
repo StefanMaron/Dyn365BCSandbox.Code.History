@@ -797,6 +797,9 @@ report 407 "Purchase - Credit Memo"
                         column(ShipToAddressCaption; ShipToAddressCaptionLbl)
                         {
                         }
+                        column(ShipToPhoneNo; "Purch. Cr. Memo Hdr."."Ship-to Phone No.")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -945,6 +948,8 @@ report 407 "Purchase - Credit Memo"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text003: Label '(Applies to %1 %2)';
         GLSetup: Record "General Ledger Setup";
         SalesPurchPerson: Record "Salesperson/Purchaser";
@@ -960,7 +965,6 @@ report 407 "Purchase - Credit Memo"
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
         VendAddr: array[8] of Text[100];
-        ShipToAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
         ReturnOrderNoText: Text[80];
         PurchaserText: Text[50];
@@ -987,13 +991,19 @@ report 407 "Purchase - Credit Memo"
         VALVATAmountLCY: Decimal;
         VALSpecLCYHeader: Text[80];
         VALExchRate: Text[50];
+#pragma warning disable AA0074
         Text008: Label 'VAT Amount Specification in ';
         Text009: Label 'Local Currency';
+#pragma warning disable AA0470
         Text010: Label 'Exchange rate: %1/%2';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CalculatedExchRate: Decimal;
         Text012: Label '%1% VAT';
+#pragma warning restore AA0470
         Text013: Label 'VAT Amount';
         RegNoText: Text[20];
+#pragma warning restore AA0074
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1047,6 +1057,7 @@ report 407 "Purchase - Credit Memo"
 
     protected var
         CompanyInfo: Record "Company Information";
+        ShipToAddr: array[8] of Text[100];
 
     procedure InitLogInteraction()
     begin
@@ -1116,12 +1127,12 @@ report 407 "Purchase - Credit Memo"
         CHReportManagement.PrepareFooter(RecRef, REPORT::"Purchase - Credit Memo", FooterLabel, FooterTxt);
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterInitReport()
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterPostDataItem(var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.")
     begin
     end;

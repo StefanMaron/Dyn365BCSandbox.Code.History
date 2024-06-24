@@ -36,7 +36,7 @@ table 26100 "DACH Report Selections"
         }
         field(4; "Report Name"; Text[80])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
                                                                            "Object ID" = field("Report ID")));
             Caption = 'Report Name';
             Editable = false;

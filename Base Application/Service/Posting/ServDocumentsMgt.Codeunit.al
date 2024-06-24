@@ -85,6 +85,7 @@ codeunit 5988 "Serv-Documents Mgt."
         ServOrderMgt: Codeunit ServOrderManagement;
         ServLogMgt: Codeunit ServLogManagement;
         DimMgt: Codeunit DimensionManagement;
+        ServDimMgt: Codeunit "Serv. Dimension Management";
         ServAllocMgt: Codeunit ServAllocationManagement;
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
@@ -101,24 +102,36 @@ codeunit 5988 "Serv-Documents Mgt."
         Ship: Boolean;
         Consume: Boolean;
         Invoice: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text007: Label '%1 %2 -> Invoice %3';
         Text008: Label '%1 %2 -> Credit Memo %3';
+#pragma warning restore AA0470
         Text011: Label 'must have the same sign as the shipment.';
         Text013: Label 'The shipment lines have been deleted.';
+#pragma warning disable AA0470
         Text014: Label 'You cannot invoice more than you have shipped for order %1.';
         Text015: Label 'The %1 you are going to invoice has a %2 entered.\You may need to run price adjustment. Do you want to continue posting? ';
+#pragma warning restore AA0470
         Text023: Label 'This order must be a complete Shipment.';
+#pragma warning disable AA0470
         Text026: Label 'Line %1 of the shipment %2, which you are attempting to invoice, has already been invoiced.';
         Text027: Label 'The quantity you are attempting to invoice is greater than the quantity in shipment %1.';
         Text028: Label 'The combination of dimensions used in %1 %2 is blocked. %3';
         Text029: Label 'The combination of dimensions used in %1 %2, line no. %3 is blocked. %4';
         Text030: Label 'The dimensions used in %1 %2 are invalid. %3';
         Text031: Label 'The dimensions used in %1 %2, line no. %3 are invalid. %4';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CloseCondition: Boolean;
         ServLinesPassed: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text035: Label 'The %1 %2 relates to the same %3 as %1 %4.';
         Text039: Label '%1 %2 on %3 %4 relates to a %5 that has already been invoiced.';
         Text041: Label 'Old %1 service ledger entries have been found for service contract %2.\You must close them by posting the old service invoices.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         TrackingSpecificationExists: Boolean;
         ServLineInvoicedConsumedQty: Decimal;
         ServLedgEntryNo: Integer;
@@ -1203,6 +1216,7 @@ codeunit 5988 "Serv-Documents Mgt."
             if ServShptItemLine.Find('-') then
                 repeat
                     ServiceShipmentItemLine2.Init();
+                    OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(ServShptItemLine);
                     ServiceShipmentItemLine2.Copy(ServShptItemLine);
                     ServiceShipmentItemLine2.Insert();
                 until ServShptItemLine.Next() = 0;
@@ -1497,7 +1511,7 @@ codeunit 5988 "Serv-Documents Mgt."
                   Text030,
                   ServHeader."Document Type", ServHeader."No.", DimMgt.GetDimValuePostingErr());
         end else begin
-            TableIDArr[1] := DimMgt.TypeToTableID5(ServiceLine2.Type.AsInteger());
+            TableIDArr[1] := ServDimMgt.ServiceLineTypeToTableID(ServiceLine2.Type);
             NumberArr[1] := ServiceLine2."No.";
             TableIDArr[2] := Database::Job;
             NumberArr[2] := ServiceLine2."Job No.";
@@ -2082,13 +2096,12 @@ codeunit 5988 "Serv-Documents Mgt."
         OnGetShippingAdviceOnAfterServLine2SetFilters(ServLine2);
         if ServLine2.FindSet() then
             repeat
-                if ServLine2.IsShipment() then begin
+                if ServLine2.IsShipment() then
                     if ServLine2."Document Type" <> ServLine2."Document Type"::"Credit Memo" then
                         if ServLine2."Quantity (Base)" <>
                            ServLine2."Qty. to Ship (Base)" + ServLine2."Qty. Shipped (Base)"
                         then
                             exit(false);
-                end;
             until ServLine2.Next() = 0;
         exit(true);
     end;
@@ -2323,7 +2336,7 @@ codeunit 5988 "Serv-Documents Mgt."
             if VATPostingSetup.Get(ServShptHeader."VAT Bus. Posting Group", ServShptLine."VAT Prod. Posting Group") and
                VATPostingSetup."Certificate of Supply Required"
             then begin
-                CertificateOfSupply.InitFromService(ServShptHeader);
+                ServShptHeader.InitCertificateOfSupply(CertificateOfSupply);
                 CertificateOfSupply.SetRequired(ServShptHeader."No.");
                 OnAfterCheckCertificateOfSupplyStatus(ServShptHeader, ServShptLine);
             end;
@@ -2932,6 +2945,11 @@ codeunit 5988 "Serv-Documents Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnFinalizeShipmentDocumentOnAfterInserServiceShipmentLine(var ServiceShipmentLine2: Record "Service Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(var ServiceShipmentItemLine: Record "Service Shipment Item Line")
     begin
     end;
 }

@@ -344,7 +344,6 @@ page 240 "Business Unit List"
                     Image = JobJournal;
                     ToolTip = 'Shows the consolidation runs.';
                     RunObject = Page "Consolidations in Progress";
-                    Visible = IsSaaS;
                 }
                 action(Setup)
                 {
@@ -413,9 +412,11 @@ page 240 "Business Unit List"
         IsSaaS: Boolean;
         CreateBusinessUnitFirstErr: Label 'You need to create a Business Unit first to configure its exchange rates.';
 #if not CLEAN24
+#pragma warning disable AA0074
         Text000: Label 'Average Rate (Manual)';
         Text001: Label 'Closing Rate';
         Text002: Label 'Last Closing Rate';
+#pragma warning restore AA0074
 #endif
 
     trigger OnOpenPage()

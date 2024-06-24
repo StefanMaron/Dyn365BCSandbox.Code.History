@@ -585,6 +585,9 @@ report 404 "Purchase - Quote"
                         column(ShiptoAddressCaption; ShiptoAddressCaptionLbl)
                         {
                         }
+                        column(ShipToPhoneNo; "Purchase Header"."Ship-to Phone No.")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -757,7 +760,9 @@ report 404 "Purchase - Quote"
     end;
 
     var
+#pragma warning disable AA0074
         Text003: Label 'Page %1';
+#pragma warning restore AA0074
         ShipmentMethod: Record "Shipment Method";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         TempPurchaseLine: Record "Purchase Line" temporary;
@@ -887,12 +892,12 @@ report 404 "Purchase - Quote"
         CHReportManagement.PrepareFooter(RecRef, REPORT::"Purchase - Quote", FooterLabel, FooterTxt);
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterInitReport()
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterPostDataItem(var PurchaseHeader: Record "Purchase Header")
     begin
     end;

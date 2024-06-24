@@ -375,11 +375,6 @@ table 242 "Source Code Setup"
             Caption = 'Phys. Invt. Orders';
             TableRelation = "Source Code";
         }
-        field(5900; "Service Management"; Code[10])
-        {
-            Caption = 'Service Management';
-            TableRelation = "Source Code";
-        }
         field(7139; "Compress Item Budget"; Code[10])
         {
             Caption = 'Compress Item Budget';

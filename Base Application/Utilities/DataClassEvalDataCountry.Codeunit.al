@@ -21,9 +21,6 @@ using Microsoft.Inventory.Counting;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Bank.Payment;
 using Microsoft.Purchases.Payables;
-#if not CLEAN22
-using Microsoft;
-#endif
 
 codeunit 1752 "Data Class. Eval. Data Country"
 {
@@ -56,9 +53,6 @@ codeunit 1752 "Data Class. Eval. Data Country"
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Data Export Buffer");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Data Export Setup");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Data Exp. Primary Key Buffer");
-#if not CLEAN22
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::Certificate);
-#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Key Buffer");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Number Series Buffer");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"DACH Report Selections");
@@ -95,9 +89,6 @@ codeunit 1752 "Data Class. Eval. Data Country"
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"LSV Journal");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"LSV Journal Line");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Sales Header Archive");
-#if not CLEAN22
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Payment Buffer");
-#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Vendor Payment Buffer");
         OnAfterClassifyCountrySpecificTables();
     end;
