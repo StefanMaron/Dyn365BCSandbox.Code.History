@@ -191,12 +191,11 @@ codeunit 12104 LocalApplicationManagement
         if Step5CodeVar <> RemainingVarTxt then begin
             SetValue := SetValue::B;
             ErrorMessage(SetValue, 0, 0, CheckDigitVar);
-        end else begin
+        end else
             if CheckDigitVar <> SelectStr(Pos, Str3) then begin
                 SetValue := SetValue::B;
                 ErrorMessage(SetValue, 0, 0, CheckDigitVar);
             end;
-        end;
     end;
 
     [Scope('OnPrem')]

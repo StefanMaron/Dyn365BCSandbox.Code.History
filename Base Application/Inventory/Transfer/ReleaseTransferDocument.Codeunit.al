@@ -1,5 +1,6 @@
 namespace Microsoft.Inventory.Transfer;
 
+using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Setup;
 
 codeunit 5708 "Release Transfer Document"
@@ -72,8 +73,14 @@ codeunit 5708 "Release Transfer Document"
         TransferHeader: Record "Transfer Header";
         InvtSetup: Record "Inventory Setup";
         WhseTransferRelease: Codeunit "Whse.-Transfer Release";
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'The transfer order %1 cannot be released because %2 and %3 are the same.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+#pragma warning disable AA0470
         NothingToReleaseErr: Label 'There is nothing to release for transfer order %1.';
+#pragma warning restore AA0470
 
     procedure Reopen(var TransHeader: Record "Transfer Header")
     begin
@@ -100,6 +107,7 @@ codeunit 5708 "Release Transfer Document"
 
     local procedure CheckTransLines(var TransLine: Record "Transfer Line"; TransHeader: Record "Transfer Header")
     var
+        Item: Record Item;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -107,6 +115,7 @@ codeunit 5708 "Release Transfer Document"
         if IsHandled then
             exit;
 
+        TransLine.SetLoadFields("Document No.", Quantity, "WIP Quantity", "Item No.");
         TransLine.SetRange("Document No.", TransHeader."No.");
         TransLine.SetFilter(Quantity, '<>0');
         TransHeader.CalcFields("Subcontracting Order");
@@ -119,9 +128,18 @@ codeunit 5708 "Release Transfer Document"
                         Error(NothingToReleaseErr, TransHeader."No.");
                 end;
             false:
-                if TransLine.IsEmpty() then
-                    Error(NothingToReleaseErr, TransHeader."No.");
+        if TransLine.IsEmpty() then
+            Error(NothingToReleaseErr, TransHeader."No.");
         end;
+
+        TransLine.SetFilter("Item No.", '<>%1', '');
+        if TransLine.FindSet() then
+            repeat
+                Item.Get(TransLine."Item No.");
+                if Item.IsInventoriableType() then
+                    TransLine.TestField("Unit of Measure Code");
+            until TransLine.Next() = 0;
+        TransLine.SetFilter("Item No.", '');
     end;
 
     [IntegrationEvent(false, false)]

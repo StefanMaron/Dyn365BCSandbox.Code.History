@@ -546,6 +546,11 @@ table 110 "Sales Shipment Header"
             Caption = 'Work Description';
             DataClassification = CustomerContent;
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';

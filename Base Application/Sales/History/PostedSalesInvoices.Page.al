@@ -318,10 +318,22 @@ page 143 "Posted Sales Invoices"
         }
         area(factboxes)
         {
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Sales Invoice Header"),
+                              "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Sales Invoice Header"),
                               "No." = field("No.");
             }
@@ -787,7 +799,13 @@ page 143 "Posted Sales Invoices"
     trigger OnAfterGetCurrRecord()
     var
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnAfterGetCurrRecord(Rec, IsHandled, HasPostedSalesInvoices, CRMIsCoupledToRecord, CRMIntegrationEnabled);
+        if IsHandled then
+            exit;
+
         HasPostedSalesInvoices := true;
         if not GuiAllowed() then
             exit;
@@ -847,6 +865,11 @@ page 143 "Posted Sales Invoices"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateCreditMemoOnAction(var SalesInvoiceHeader: Record "Sales Invoice Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnAfterGetCurrRecord(var SalesInvoiceHeader: Record "Sales Invoice Header"; var IsHandled: Boolean; var HasPostedSalesInvoices: Boolean; var CRMIsCoupledToRecord: Boolean; var CRMIntegrationEnabled: Boolean)
     begin
     end;
 }

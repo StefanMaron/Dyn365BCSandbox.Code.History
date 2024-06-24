@@ -93,7 +93,6 @@ codeunit 144081 "SCM Subcontracting"
         ProdOrderErr: Label 'You cannot update the order line because the order line is associated with production order';
         RefOrderTypeTxt: Label 'Purchase';
         ReturnTrasferOrderErr: Label 'Components to send to subcontractor do not exist.';
-        SubconOrderErr: Label 'Subcontracting Location Code must have a value in Vendor: No.=%1. It cannot be zero or empty.';
         UnexpectedErr: Label 'More than 1 Subcontracting Invoices are not exist.';
         VendorErr: Label 'Vendor %1 on Work Center %2 does not exist.';
         RowInNotInTheTestPageErr: Label 'The row does not exist on the TestPage.';
@@ -307,6 +306,7 @@ codeunit 144081 "SCM Subcontracting"
     var
         Item: Record Item;
         RoutingLink: Record "Routing Link";
+        Vendor: Record Vendor;
         VendorNo: Code[20];
     begin
         // Verify error when Subcontracting Location is blank on Vendor.
@@ -321,7 +321,7 @@ codeunit 144081 "SCM Subcontracting"
         asserterror CreateReleasedProductionOrder(Item."No.", '');  // Using blank for Location.
 
         // Verify: Verify actual error Subcontracting Location Code must have a value in Vendor: No. It cannot be zero or empty.
-        Assert.ExpectedError(StrSubstNo(SubconOrderErr, VendorNo));
+        Assert.ExpectedTestFieldError(Vendor.FieldCaption("Subcontracting Location Code"), '');
     end;
 
     [Test]
@@ -1400,13 +1400,11 @@ codeunit 144081 "SCM Subcontracting"
     begin
         LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
         LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, '', '');
-        with TransportReasonCode do begin
-            Init();
-            Validate(Code, LibraryUtility.GenerateRandomCode(FieldNo(Code), DATABASE::"Transport Reason Code"));
-            Validate("Posted Shpt. Nos.", NoSeries.Code);
-            Insert(true);
-            exit(Code)
-        end;
+        TransportReasonCode.Init();
+        TransportReasonCode.Validate(Code, LibraryUtility.GenerateRandomCode(TransportReasonCode.FieldNo(Code), DATABASE::"Transport Reason Code"));
+        TransportReasonCode.Validate("Posted Shpt. Nos.", NoSeries.Code);
+        TransportReasonCode.Insert(true);
+        exit(TransportReasonCode.Code)
     end;
 
     local procedure CreateTransportReasonCodeWithPostedRcptNos(var NoSeriesLine: Record "No. Series Line"): Code[20]
@@ -1416,24 +1414,20 @@ codeunit 144081 "SCM Subcontracting"
     begin
         LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
         LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, '', '');
-        with TransportReasonCode do begin
-            Init();
-            Validate(Code, LibraryUtility.GenerateRandomCode(FieldNo(Code), DATABASE::"Transport Reason Code"));
-            Validate("Posted Rcpt. Nos.", NoSeries.Code);
-            Insert(true);
-            exit(Code)
-        end;
+        TransportReasonCode.Init();
+        TransportReasonCode.Validate(Code, LibraryUtility.GenerateRandomCode(TransportReasonCode.FieldNo(Code), DATABASE::"Transport Reason Code"));
+        TransportReasonCode.Validate("Posted Rcpt. Nos.", NoSeries.Code);
+        TransportReasonCode.Insert(true);
+        exit(TransportReasonCode.Code)
     end;
 
     local procedure FindItemLedgerEntry(var ItemLedgerEntry: Record "Item Ledger Entry"; EntryType: Enum "Item Ledger Entry Type"; ItemNo: Code[20]; LocationCode: Code[10]; IsPositive: Boolean)
     begin
-        with ItemLedgerEntry do begin
-            SetRange("Entry Type", EntryType);
-            SetRange("Item No.", ItemNo);
-            SetRange("Location Code", LocationCode);
-            SetRange(Positive, IsPositive);
-            FindFirst();
-        end;
+        ItemLedgerEntry.SetRange("Entry Type", EntryType);
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        ItemLedgerEntry.SetRange("Location Code", LocationCode);
+        ItemLedgerEntry.SetRange(Positive, IsPositive);
+        ItemLedgerEntry.FindFirst();
     end;
 
     local procedure FindPurchaseHeader(var PurchaseHeader: Record "Purchase Header"; BuyFromVendorNo: Code[20]; SubcontractingOrder: Boolean)
@@ -1609,11 +1603,9 @@ codeunit 144081 "SCM Subcontracting"
 
     local procedure UpdateSubcontractingHeader(var PurchaseHeader: Record "Purchase Header"; VendorNo: Code[20]; VendorInvoiceNo: Code[20])
     begin
-        with PurchaseHeader do begin
-            Get("Document Type"::Order, GetSubcontractingOrderNo(VendorNo));
-            Validate("Vendor Invoice No.", VendorInvoiceNo);
-            Modify(true);
-        end;
+        PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, GetSubcontractingOrderNo(VendorNo));
+        PurchaseHeader.Validate("Vendor Invoice No.", VendorInvoiceNo);
+        PurchaseHeader.Modify(true);
     end;
 
     local procedure UpdateSubcontractingOrder(VendorNo: Code[20]; ResponsibilityCenterCode: Code[10]; CurrencyCode: Code[10]; BuyFromVendorNo: Code[20])
@@ -1653,13 +1645,11 @@ codeunit 144081 "SCM Subcontracting"
 
     local procedure UpdateTransportReasonCodeInSubcontractingTransferHeader(var SubcontractingTransferHeader: Record "Transfer Header"; TransferFromCode: Code[20]; TransferToCode: Code[20]; TransportReasonCode: Code[20])
     begin
-        with SubcontractingTransferHeader do begin
-            SetRange("Transfer-from Code", TransferFromCode);
-            SetRange("Transfer-to Code", TransferToCode);
-            FindFirst();
-            Validate("Transport Reason Code", TransportReasonCode);
-            Modify(true);
-        end;
+        SubcontractingTransferHeader.SetRange("Transfer-from Code", TransferFromCode);
+        SubcontractingTransferHeader.SetRange("Transfer-to Code", TransferToCode);
+        SubcontractingTransferHeader.FindFirst();
+        SubcontractingTransferHeader.Validate("Transport Reason Code", TransportReasonCode);
+        SubcontractingTransferHeader.Modify(true);
     end;
 
     local procedure VerifyItemLedgerEntry(ItemNo: Code[20]; LocationCode: Code[10])
@@ -1678,24 +1668,20 @@ codeunit 144081 "SCM Subcontracting"
     var
         TransferShipmentHeader: Record "Transfer Shipment Header";
     begin
-        with TransferShipmentHeader do begin
-            SetRange("Transfer Order No.", TransferOrderNo);
-            FindFirst();
-            TestField("No.", TransferShipmentHeaderNo);
-            TestField("No. Series", TransferShipmentHeaderNoSeries);
-        end;
+        TransferShipmentHeader.SetRange("Transfer Order No.", TransferOrderNo);
+        TransferShipmentHeader.FindFirst();
+        TransferShipmentHeader.TestField("No.", TransferShipmentHeaderNo);
+        TransferShipmentHeader.TestField("No. Series", TransferShipmentHeaderNoSeries);
     end;
 
     local procedure VerifyNoOnTransferReceiptHeader(TransferOrderNo: Code[20]; TransferReceiptHeaderNo: Code[20]; TransferReceiptHeaderNoSeries: Code[20])
     var
         TransferReceiptHeader: Record "Transfer Receipt Header";
     begin
-        with TransferReceiptHeader do begin
-            SetRange("Transfer Order No.", TransferOrderNo);
-            FindFirst();
-            TestField("No.", TransferReceiptHeaderNo);
-            TestField("No. Series", TransferReceiptHeaderNoSeries);
-        end;
+        TransferReceiptHeader.SetRange("Transfer Order No.", TransferOrderNo);
+        TransferReceiptHeader.FindFirst();
+        TransferReceiptHeader.TestField("No.", TransferReceiptHeaderNo);
+        TransferReceiptHeader.TestField("No. Series", TransferReceiptHeaderNoSeries);
     end;
 
     local procedure VerifyWarehouseInventory(Item: Record Item; LocationCode: Code[10]; Qty: Decimal)

@@ -833,25 +833,21 @@ codeunit 12184 "Fattura Doc. Helper"
     begin
         case AppliedCustLedgerEntry."Document Type" of
             AppliedCustLedgerEntry."Document Type"::Invoice:
-                begin
-                    if SalesInvoiceHeader.Get(AppliedCustLedgerEntry."Document No.") then
-                        DocRecRef.GetTable(SalesInvoiceHeader)
+                if SalesInvoiceHeader.Get(AppliedCustLedgerEntry."Document No.") then
+                    DocRecRef.GetTable(SalesInvoiceHeader)
+                else
+                    if ServiceInvoiceHeader.Get(AppliedCustLedgerEntry."Document No.") then
+                        DocRecRef.GetTable(ServiceInvoiceHeader)
                     else
-                        if ServiceInvoiceHeader.Get(AppliedCustLedgerEntry."Document No.") then
-                            DocRecRef.GetTable(ServiceInvoiceHeader)
-                        else
-                            exit(false);
-                end;
+                        exit(false);
             AppliedCustLedgerEntry."Document Type"::"Credit Memo":
-                begin
-                    if SalesCrMemoHeader.Get(AppliedCustLedgerEntry."Document No.") then
-                        DocRecRef.GetTable(SalesCrMemoHeader)
+                if SalesCrMemoHeader.Get(AppliedCustLedgerEntry."Document No.") then
+                    DocRecRef.GetTable(SalesCrMemoHeader)
+                else
+                    if ServiceCrMemoHeader.Get(AppliedCustLedgerEntry."Document No.") then
+                        DocRecRef.GetTable(ServiceCrMemoHeader)
                     else
-                        if ServiceCrMemoHeader.Get(AppliedCustLedgerEntry."Document No.") then
-                            DocRecRef.GetTable(ServiceCrMemoHeader)
-                        else
-                            exit(false);
-                end;
+                        exit(false);
             else
                 exit(false);
         end;

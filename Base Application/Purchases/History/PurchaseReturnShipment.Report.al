@@ -616,8 +616,12 @@ report 6636 "Purchase - Return Shipment"
     end;
 
     var
+#pragma warning disable AA0074
         Text002: Label 'Purchase - Return Shipment %1', Comment = '%1 = Document No.';
+#pragma warning disable AA0470
         Text003: Label 'Page %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         SalesPurchPerson: Record "Salesperson/Purchaser";
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
@@ -627,7 +631,6 @@ report 6636 "Purchase - Return Shipment"
         FormatAddr: Codeunit "Format Address";
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
-        ShptShipToAddr: array[8] of Text[100];
         ShptBuyFromAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
         PurchaserText: Text[50];
@@ -682,6 +685,7 @@ report 6636 "Purchase - Return Shipment"
 
     protected var
         CompanyInfo: Record "Company Information";
+        ShptShipToAddr: array[8] of Text[100];
 
     procedure InitializeRequest(NewNoOfCopies: Decimal; NewShowInternalInfo: Boolean; NewShowCorrectionLines: Boolean; NewLogInteraction: Boolean)
     begin

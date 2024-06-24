@@ -41,8 +41,12 @@ codeunit 5986 "Serv-Amounts Mgt."
         FALineNo: Integer;
 #endif
         RoundingLineNo: Integer;
+#pragma warning disable AA0074
         Text016: Label 'VAT Amount';
+#pragma warning disable AA0470
         Text017: Label '%1% VAT';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         RoundingLineIsInserted: Boolean;
         IsInitialized: Boolean;
         SuppressCommit: Boolean;
@@ -602,7 +606,7 @@ codeunit 5986 "Serv-Amounts Mgt."
         TempVATAmountLineRemainder: Record "VAT Amount Line" temporary;
         GLSetup: Record "General Ledger Setup";
         Currency: Record Currency;
-        CostCalcMgt: Codeunit "Cost Calculation Management";
+        ServCostCalculationMgt: Codeunit "Serv. Cost Calculation Mgt.";
         ServLineQty: Decimal;
         LastLineRetrieved: Boolean;
         AdjCostLCY: Decimal;
@@ -683,7 +687,7 @@ codeunit 5986 "Serv-Amounts Mgt."
                     if not (QtyType in [QtyType::Shipping]) and
                        not InsertServLine and CalcAdCostLCY
                     then begin
-                        AdjCostLCY := CostCalcMgt.CalcServLineCostLCY(ServLine, QtyType);
+                        AdjCostLCY := ServCostCalculationMgt.CalcServLineCostLCY(ServLine, QtyType);
                         TotalAdjCostLCY := TotalAdjCostLCY + GetServLineAdjCostLCY(ServLine, QtyType, AdjCostLCY);
                     end;
 

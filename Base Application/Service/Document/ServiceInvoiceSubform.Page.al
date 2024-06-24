@@ -28,7 +28,7 @@ page 5934 "Service Invoice Subform"
         {
             repeater(Control1)
             {
-                Editable = Rec."Automatically Generated" = FALSE;
+                Editable = Rec."Automatically Generated" = false;
                 ShowCaption = false;
                 field(Type; Rec.Type)
                 {
@@ -535,7 +535,7 @@ page 5934 "Service Invoice Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromServLine(Rec, ItemAvailFormsMgt.ByEvent());
+                            ServAvailabilityMgt.ShowItemAvailabilityFromServLine(Rec, "Item Availability Type"::"Event");
                         end;
                     }
                     action(Period)
@@ -547,7 +547,7 @@ page 5934 "Service Invoice Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromServLine(Rec, ItemAvailFormsMgt.ByPeriod());
+                            ServAvailabilityMgt.ShowItemAvailabilityFromServLine(Rec, "Item Availability Type"::Period);
                         end;
                     }
                     action(Variant)
@@ -559,7 +559,7 @@ page 5934 "Service Invoice Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromServLine(Rec, ItemAvailFormsMgt.ByVariant());
+                            ServAvailabilityMgt.ShowItemAvailabilityFromServLine(Rec, "Item Availability Type"::Variant);
                         end;
                     }
                     action(Location)
@@ -572,7 +572,7 @@ page 5934 "Service Invoice Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromServLine(Rec, ItemAvailFormsMgt.ByLocation());
+                            ServAvailabilityMgt.ShowItemAvailabilityFromServLine(Rec, "Item Availability Type"::Location);
                         end;
                     }
                     action(Lot)
@@ -595,7 +595,7 @@ page 5934 "Service Invoice Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromServLine(Rec, ItemAvailFormsMgt.ByBOM());
+                            ServAvailabilityMgt.ShowItemAvailabilityFromServLine(Rec, "Item Availability Type"::BOM);
                         end;
                     }
                 }
@@ -728,8 +728,7 @@ page 5934 "Service Invoice Subform"
 
     var
         ServHeader: Record "Service Header";
-        TransferExtendedText: Codeunit "Transfer Extended Text";
-        ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
+        ServAvailabilityMgt: Codeunit "Serv. Availability Mgt.";
         ExtendedPriceEnabled: Boolean;
         BackgroundErrorCheck: Boolean;
         ItemReferenceVisible: Boolean;
@@ -764,13 +763,15 @@ page 5934 "Service Invoice Subform"
     end;
 
     procedure InsertExtendedText(Unconditionally: Boolean)
+    var
+        ServiceTransferExtText: Codeunit "Service Transfer Ext. Text";
     begin
         OnBeforeInsertExtendedText(Rec);
-        if TransferExtendedText.ServCheckIfAnyExtText(Rec, Unconditionally) then begin
+        if ServiceTransferExtText.ServCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord();
-            TransferExtendedText.InsertServExtText(Rec);
+            ServiceTransferExtText.InsertServExtText(Rec);
         end;
-        if TransferExtendedText.MakeUpdate() then
+        if ServiceTransferExtText.MakeUpdate() then
             UpdateForm(true);
     end;
 

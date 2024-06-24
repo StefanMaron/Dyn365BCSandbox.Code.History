@@ -2,6 +2,7 @@ namespace Microsoft.Purchases.Document;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.AllocationAccount;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -51,6 +52,8 @@ table 174 "Standard Purchase Line"
             if (Type = const("Fixed Asset")) "Fixed Asset"
             else
             if (Type = const("Charge (Item)")) "Item Charge"
+            else
+            if (Type = const("Allocation Account")) "Allocation Account"
             else
             if (Type = const(Resource)) Resource;
 
@@ -258,8 +261,12 @@ table 174 "Standard Purchase Line"
     var
         StdPurchCode: Record "Standard Purchase Code";
         DimMgt: Codeunit DimensionManagement;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot rename a %1.';
         Text002: Label '%1 must not be %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CommentLbl: Label 'Comment';
 
     procedure EmptyLine(): Boolean

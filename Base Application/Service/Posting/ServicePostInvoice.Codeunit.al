@@ -275,7 +275,7 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
             InvoicePostingParameters."Document Type", InvoicePostingParameters."Document No.",
             InvoicePostingParameters."External Document No.", InvoicePostingParameters."Source Code", '');
 
-        GenJnlLine.CopyFromServiceHeader(ServiceHeader);
+        ServiceHeader.CopyToGenJournalLine(GenJnlLine);
         GenJnlLine."Individual Person" := ServiceHeader."Individual Person";
         GenJnlLine.Resident := ServiceHeader.Resident;
         GenJnlLine."First Name" := ServiceHeader."First Name";
@@ -326,12 +326,12 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
 
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::Customer;
         GenJnlLine."Account No." := ServiceHeader."Bill-to Customer No.";
-        GenJnlLine.CopyFromServiceHeader(ServiceHeader);
+        ServiceHeader.CopyToGenJournalLine(GenJnlLine);
         GenJnlLine.SetCurrencyFactor(ServiceHeader."Currency Code", ServiceHeader."Currency Factor");
 
-        GenJnlLine.CopyFromServiceHeaderApplyTo(ServiceHeader);
+        ServiceHeader.CopyToGenJournalLineApplyTo(GenJnlLine);
         GenJnlLine."Applies-to Occurrence No." := ServiceHeader."Applies-to Occurrence No.";
-        GenJnlLine.CopyFromServiceHeaderPayment(ServiceHeader);
+        ServiceHeader.CopyToGenJournalLinePayment(GenJnlLine);
 
         GenJnlLine.Amount := -TotalServiceLine."Amount Including VAT";
         GenJnlLine."Source Currency Amount" := -TotalServiceLine."Amount Including VAT";
@@ -391,7 +391,7 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
 
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::Customer;
         GenJnlLine."Account No." := ServiceHeader."Bill-to Customer No.";
-        GenJnlLine.CopyFromServiceHeader(ServiceHeader);
+        ServiceHeader.CopyToGenJournalLine(GenJnlLine);
         GenJnlLine.SetCurrencyFactor(ServiceHeader."Currency Code", ServiceHeader."Currency Factor");
 
         SetApplyToDocNo(ServiceHeader, GenJnlLine);

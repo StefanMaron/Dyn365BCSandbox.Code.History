@@ -405,33 +405,31 @@ report 20 "Calc. and Post VAT Settlement"
                                         VATAmountAddCurr := VATAmountAddCurr + VATEntry."Additional-Currency Amount";
                                     end;
                                 "VAT Posting Setup"."VAT Calculation Type"::"Reverse Charge VAT":
-                                    begin
-                                        case VATType of
-                                            VATEntry.Type::Purchase:
-                                                begin
-                                                    TotalPurchaseAmount := -VATEntry.Amount + TotalPurchaseAmount;
-                                                    GenJnlLine."Account No." := "VAT Posting Setup".GetPurchAccount(false);
-                                                    GenJnlLine.Validate(Amount, -VATEntry.Amount);
-                                                    CopyAmounts(GenJnlLine, VATEntry);
-                                                    if (PostSettlement) and (GenJnlLine."VAT Amount" <> 0) then
-                                                        GenJnlPostLine.Run(GenJnlLine);
-                                                    VATAmount := VATAmount + VATEntry.Amount;
-                                                    VATAmountAddCurr := VATAmountAddCurr + VATEntry."Additional-Currency Amount";
-                                                end;
-                                            VATEntry.Type::Sale:
-                                                begin
-                                                    TotalSaleAmount := -VATEntry.Amount + TotalSaleAmount;
-                                                    GenJnlLine."Account No." := "VAT Posting Setup".GetRevChargeAccount(false);
-                                                    GenJnlLine.Validate(Amount, -VATEntry.Amount);
-                                                    GenJnlLine."Deductible %" := 100;
-                                                    CopyAmounts(GenJnlLine, VATEntry);
-                                                    GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::Settlement;
-                                                    if (PostSettlement) and (GenJnlLine."VAT Amount" <> 0) then
-                                                        GenJnlPostLine.Run(GenJnlLine);
-                                                    VATAmount := VATAmount + VATEntry.Amount;
-                                                    VATAmountAddCurr := VATAmountAddCurr + VATEntry."Additional-Currency Amount";
-                                                end;
-                                        end;
+                                    case VATType of
+                                        VATEntry.Type::Purchase:
+                                            begin
+                                                TotalPurchaseAmount := -VATEntry.Amount + TotalPurchaseAmount;
+                                                GenJnlLine."Account No." := "VAT Posting Setup".GetPurchAccount(false);
+                                                GenJnlLine.Validate(Amount, -VATEntry.Amount);
+                                                CopyAmounts(GenJnlLine, VATEntry);
+                                                if (PostSettlement) and (GenJnlLine."VAT Amount" <> 0) then
+                                                    GenJnlPostLine.Run(GenJnlLine);
+                                                VATAmount := VATAmount + VATEntry.Amount;
+                                                VATAmountAddCurr := VATAmountAddCurr + VATEntry."Additional-Currency Amount";
+                                            end;
+                                        VATEntry.Type::Sale:
+                                            begin
+                                                TotalSaleAmount := -VATEntry.Amount + TotalSaleAmount;
+                                                GenJnlLine."Account No." := "VAT Posting Setup".GetRevChargeAccount(false);
+                                                GenJnlLine.Validate(Amount, -VATEntry.Amount);
+                                                GenJnlLine."Deductible %" := 100;
+                                                CopyAmounts(GenJnlLine, VATEntry);
+                                                GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::Settlement;
+                                                if (PostSettlement) and (GenJnlLine."VAT Amount" <> 0) then
+                                                    GenJnlPostLine.Run(GenJnlLine);
+                                                VATAmount := VATAmount + VATEntry.Amount;
+                                                VATAmountAddCurr := VATAmountAddCurr + VATEntry."Additional-Currency Amount";
+                                            end;
                                     end;
                                 "VAT Posting Setup"."VAT Calculation Type"::"Sales Tax":
                                     begin
@@ -591,10 +589,9 @@ report 20 "Calc. and Post VAT Settlement"
                         then begin
                             if (TotalSaleRounded - TotalPurchRounded) < 0 then
                                 CreditNextPeriod := -(TotalSaleRounded - TotalPurchRounded);
-                            if (TotalSaleRounded - TotalPurchRounded) > 0 then begin
+                            if (TotalSaleRounded - TotalPurchRounded) > 0 then
                                 if (TotalSaleRounded - TotalPurchRounded) <= GLSetup."Minimum VAT Payable" then
                                     DebitNextPeriod := TotalSaleRounded - TotalPurchRounded;
-                            end;
                         end;
                     end;
                 }
@@ -1028,15 +1025,23 @@ report 20 "Calc. and Post VAT Settlement"
         TotalRemainUnrealAmt: Decimal;
         PeriodInputVATYearInputVAT: Decimal;
         PeriodOutputVATYearOutputVATAdvAmt: Decimal;
+#pragma warning disable AA0074
         Text000: Label 'Enter the posting date.';
         Text001: Label 'Enter the document no.';
         Text002: Label 'Enter the settlement account.';
         Text003: Label 'Do you want to calculate and post the VAT Settlement?';
         Text004: Label 'VAT Settlement';
+#pragma warning disable AA0470
         Text005: Label 'Period: %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         AllAmountsAreInTxt: Label 'All amounts are in %1.', Comment = '%1 = Currency Code';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text007: Label 'Purchase VAT settlement: #1######## #2########';
         Text008: Label 'Sales VAT settlement  : #1######## #2########';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         TestReportnotpostedCaptionLbl: Label 'Test Report (Not Posted)';
         CalcandPostVATSettlementCaptionLbl: Label 'Calc. and Post VAT Settlement';
         DocNoCaptionLbl: Label 'Document No.';
@@ -1225,12 +1230,11 @@ report 20 "Calc. and Post VAT Settlement"
         PriorPeriodVATEntry2.Insert();
 
         IsNewYear := Date2DMY(CalcDate(DateFormula, EndDateReq), 3) <> Date2DMY(EndDateReq, 3);
-        if (TotalSaleAmount = 0) and (TotalPurchaseAmount = 0) then begin
+        if (TotalSaleAmount = 0) and (TotalPurchaseAmount = 0) then
             if (PriorPeriodVATEntry."Prior Period Input VAT" <> 0) or (PriorPeriodVATEntry."Prior Year Input VAT" <> 0) then
                 CreditNextPeriod := PriorPeriodVATEntry."Prior Period Input VAT" + PriorPeriodVATEntry."Prior Year Input VAT"
             else
                 DebitNextPeriod := PriorPeriodVATEntry."Prior Period Output VAT" + PriorPeriodVATEntry."Prior Year Output VAT";
-        end;
 
         if CreditNextPeriod <> 0 then
             if IsNewYear then

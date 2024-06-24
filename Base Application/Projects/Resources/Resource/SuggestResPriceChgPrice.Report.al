@@ -211,9 +211,13 @@ report 1192 "Suggest Res. Price Chg.(Price)"
         PriceLowerLimit: Decimal;
         PriceAlreadyExists: Boolean;
 
+#pragma warning disable AA0074
         Text001: Label 'Processing resources...\\';
+#pragma warning disable AA0470
         Text002: Label 'Type         #1##########\';
         Text003: Label 'Code         #2##########\';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     procedure InitializeCopyToResPrice(CurrencyCode: Code[10]; WorkTypeCode: Code[10])
     begin

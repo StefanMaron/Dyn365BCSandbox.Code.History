@@ -133,13 +133,10 @@ codeunit 137410 "Extended Text Documents"
 
         // [WHEN] Make a Sales Order from the Blanket Order.
         CODEUNIT.Run(CODEUNIT::"Blnkt Sales Ord. to Ord. (Y/N)", SalesHeader);
-
         // [THEN] Extended Text "ET1" is not present in the Sales Order.
-        with SalesLine do begin
-            SetRange("Document Type", "Document Type"::Order);
-            SetRange(Description, ExtText);
-            Assert.RecordIsEmpty(SalesLine);
-        end;
+        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+        SalesLine.SetRange(Description, ExtText);
+        Assert.RecordIsEmpty(SalesLine);
     end;
 
     [Test]
@@ -222,13 +219,10 @@ codeunit 137410 "Extended Text Documents"
 
         // [WHEN] Make a Purchase Order from the Blanket Order.
         CODEUNIT.Run(CODEUNIT::"Blnkt Purch Ord. to Ord. (Y/N)", PurchHeader);
-
         // [THEN] Extended Text "ET1" is not present in the Purchase Order.
-        with PurchLine do begin
-            SetRange("Document Type", "Document Type"::Order);
-            SetRange(Description, ExtText);
-            Assert.RecordIsEmpty(PurchLine);
-        end;
+        PurchLine.SetRange("Document Type", PurchLine."Document Type"::Order);
+        PurchLine.SetRange(Description, ExtText);
+        Assert.RecordIsEmpty(PurchLine);
     end;
 
     [Test]
@@ -382,7 +376,7 @@ codeunit 137410 "Extended Text Documents"
         ServiceHeader: Record "Service Header";
         ServiceLine: Record "Service Line";
         ExtendedTextHeader: Record "Extended Text Header";
-        TransferExtendedText: Codeunit "Transfer Extended Text";
+        ServiceTransferExtText: Codeunit "Service Transfer Ext. Text";
         InsertedCode: Code[10];
     begin
         // [FEATURE] [Service]
@@ -401,10 +395,10 @@ codeunit 137410 "Extended Text Documents"
         // [GIVEN] Table "Area" is updated - a record "R" is inserted
         InsertedCode := CommitAndStartNewTransaction();
 
-        TransferExtendedText.ServCheckIfAnyExtText(ServiceLine, true);
+        ServiceTransferExtText.ServCheckIfAnyExtText(ServiceLine, true);
 
         // [WHEN] Insert extended text in "S" through codeunit "Transfer Extended Text" and  rollback transaction with ERROR function
-        TransferExtendedText.InsertServExtText(ServiceLine);
+        ServiceTransferExtText.InsertServExtText(ServiceLine);
 
         // [THEN] Table "Area" does not contain "R"
         RollbackTransactionThroughErrorAndVerify(InsertedCode);

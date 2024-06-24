@@ -793,15 +793,12 @@ codeunit 144068 "UT REP Posting Routine"
         // [SCENARIO] Report "Vendor Sheet - Print" should print starting and ending balance when net change is zero
 
         Initialize();
-
         // [GIVEN] Vendor "V" with net change on WorkDate() - 1
-        with DetailedVendorLedgEntry do begin
-            "Entry No." := LibraryUtility.GetNewRecNo(DetailedVendorLedgEntry, FieldNo("Entry No."));
-            "Vendor No." := LibraryPurchase.CreateVendorNo();
-            "Posting Date" := CalcDate('<-1D>', WorkDate());
-            "Amount (LCY)" := LibraryRandom.RandDec(1000, 2);
-            Insert();
-        end;
+        DetailedVendorLedgEntry."Entry No." := LibraryUtility.GetNewRecNo(DetailedVendorLedgEntry, DetailedVendorLedgEntry.FieldNo("Entry No."));
+        DetailedVendorLedgEntry."Vendor No." := LibraryPurchase.CreateVendorNo();
+        DetailedVendorLedgEntry."Posting Date" := CalcDate('<-1D>', WorkDate());
+        DetailedVendorLedgEntry."Amount (LCY)" := LibraryRandom.RandDec(1000, 2);
+        DetailedVendorLedgEntry.Insert();
 
         LibraryVariableStorage.Enqueue(DetailedVendorLedgEntry."Vendor No.");
 
@@ -824,15 +821,12 @@ codeunit 144068 "UT REP Posting Routine"
         // [SCENARIO] Report "Customer Sheet - Print" should print starting and ending balance when net change is zero
 
         Initialize();
-
         // [GIVEN] Customer "C" with net change on WorkDate() - 1
-        with DetailedCustLedgEntry do begin
-            "Entry No." := LibraryUtility.GetNewRecNo(DetailedCustLedgEntry, FieldNo("Entry No."));
-            "Customer No." := LibrarySales.CreateCustomerNo();
-            "Posting Date" := CalcDate('<-1D>', WorkDate());
-            "Amount (LCY)" := LibraryRandom.RandDec(1000, 2);
-            Insert();
-        end;
+        DetailedCustLedgEntry."Entry No." := LibraryUtility.GetNewRecNo(DetailedCustLedgEntry, DetailedCustLedgEntry.FieldNo("Entry No."));
+        DetailedCustLedgEntry."Customer No." := LibrarySales.CreateCustomerNo();
+        DetailedCustLedgEntry."Posting Date" := CalcDate('<-1D>', WorkDate());
+        DetailedCustLedgEntry."Amount (LCY)" := LibraryRandom.RandDec(1000, 2);
+        DetailedCustLedgEntry.Insert();
 
         LibraryVariableStorage.Enqueue(DetailedCustLedgEntry."Customer No.");
 
@@ -1298,12 +1292,10 @@ codeunit 144068 "UT REP Posting Routine"
     var
         PurchInvHeader: Record "Purch. Inv. Header";
     begin
-        with PurchInvHeader do begin
-            "No." := LibraryUTUtility.GetNewCode();
-            "Pay-to Name" := BuyFromVendorNo;
-            Insert();
-            exit("No.");
-        end;
+        PurchInvHeader."No." := LibraryUTUtility.GetNewCode();
+        PurchInvHeader."Pay-to Name" := BuyFromVendorNo;
+        PurchInvHeader.Insert();
+        exit(PurchInvHeader."No.");
     end;
 
     local procedure CreateReprintInfoFiscalReports()
@@ -1342,12 +1334,10 @@ codeunit 144068 "UT REP Posting Routine"
     var
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        with SalesInvHeader do begin
-            "No." := LibraryUTUtility.GetNewCode();
-            "Bill-to Name" := SellToCustomerNo;
-            Insert();
-            exit("No.");
-        end;
+        SalesInvHeader."No." := LibraryUTUtility.GetNewCode();
+        SalesInvHeader."Bill-to Name" := SellToCustomerNo;
+        SalesInvHeader.Insert();
+        exit(SalesInvHeader."No.");
     end;
 
     local procedure CreateVATBookEntry(var VATBookEntry: Record "VAT Book Entry"; Type: Enum "General Posting Type"; NoSeries: Code[20]; ReverseVATEntry: Boolean; SellToBuyFromNo: Code[20])

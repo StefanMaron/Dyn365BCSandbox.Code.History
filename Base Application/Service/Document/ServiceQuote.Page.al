@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Document;
 
 using Microsoft.Finance.Currency;
@@ -598,10 +602,23 @@ page 5964 "Service Quote"
         }
         area(factboxes)
         {
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Service Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = Service;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Service Header"),
                               "No." = field("No."),
                               "Document Type" = field("Document Type");
@@ -793,10 +810,10 @@ page 5964 "Service Quote"
 
                 trigger OnAction()
                 var
-                    DocumentPrint: Codeunit "Document-Print";
+                    ServDocumentPrint: Codeunit "Serv. Document Print";
                 begin
                     CurrPage.Update(true);
-                    DocumentPrint.PrintServiceHeader(Rec);
+                    ServDocumentPrint.PrintServiceHeader(Rec);
                 end;
             }
             action(AttachAsPDF)
@@ -810,11 +827,11 @@ page 5964 "Service Quote"
                 trigger OnAction()
                 var
                     ServiceHeader: Record "Service Header";
-                    DocumentPrint: Codeunit "Document-Print";
+                    ServDocumentPrint: Codeunit "Serv. Document Print";
                 begin
                     ServiceHeader := Rec;
                     ServiceHeader.SetRecFilter();
-                    DocumentPrint.PrintServiceHeaderToDocumentAttachment(ServiceHeader);
+                    ServDocumentPrint.PrintServiceHeaderToDocumentAttachment(ServiceHeader);
                 end;
             }
         }
@@ -925,10 +942,10 @@ page 5964 "Service Quote"
 
     local procedure SetDocNoVisible()
     var
-        DocumentNoVisibility: Codeunit DocumentNoVisibility;
+        ServDocumentNoVisibility: Codeunit "Serv. Document No. Visibility";
         DocType: Option Quote,"Order",Invoice,"Credit Memo",Contract;
     begin
-        DocNoVisible := DocumentNoVisibility.ServiceDocumentNoIsVisible(DocType::Quote, Rec."No.");
+        DocNoVisible := ServDocumentNoVisibility.ServiceDocumentNoIsVisible(DocType::Quote, Rec."No.");
     end;
 
     local procedure CustomerNoOnAfterValidate()

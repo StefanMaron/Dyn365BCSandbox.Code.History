@@ -9,6 +9,7 @@ using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Family;
@@ -296,7 +297,8 @@ table 5405 "Production Order"
                         else begin
                             if ProdOrderLine.Find('-') then
                                 "Ending Date" :=
-                                    LeadTimeMgt.PlannedEndingDate(ProdOrderLine."Item No.", "Location Code", '', "Due Date", '', 2)
+                                    LeadTimeMgt.GetPlannedEndingDate(
+                                        ProdOrderLine."Item No.", "Location Code", '', "Due Date", '', "Requisition Ref. Order Type"::"Prod. Order")
                             else
                                 "Ending Date" := "Due Date";
                             "Ending Date-Time" := CreateDateTime("Ending Date", "Ending Time");
@@ -310,7 +312,7 @@ table 5405 "Production Order"
                         else begin
                             if "Source Type" = "Source Type"::Item then
                                 "Ending Date" :=
-                                    LeadTimeMgt.PlannedEndingDate("Source No.", "Location Code", '', "Due Date", '', 2)
+                                    LeadTimeMgt.GetPlannedEndingDate("Source No.", "Location Code", '', "Due Date", '', "Requisition Ref. Order Type"::"Prod. Order")
                             else
                                 "Ending Date" := "Due Date";
                             "Starting Date" := "Ending Date";
@@ -760,9 +762,13 @@ table 5405 "Production Order"
     end;
 
     var
+#pragma warning disable AA0074
         Text000: Label 'You cannot delete %1 %2 %3 because there is at least one %4 associated with it.', Comment = '%1 = Document status; %2 = Table caption; %3 = Field value; %4 = Table Caption';
+#pragma warning disable AA0470
         Text001: Label 'You cannot rename a %1.';
+#pragma warning restore AA0470
         Text002: Label 'You cannot change %1 on %2 %3 %4 because there is at least one %5 associated with it.', Comment = '%1 = Field caption; %2 = Document status; %3 = Table caption; %4 = Field value; %5 = Table Caption';
+#pragma warning restore AA0074
         MultiLevelMsg: Label 'The production order contains lines connected in a multi-level structure and the production order lines have not been automatically rescheduled.\Use Refresh if you want to reschedule the lines.';
         MfgSetup: Record "Manufacturing Setup";
         ProdOrder: Record "Production Order";
@@ -771,13 +777,21 @@ table 5405 "Production Order"
         CalcProdOrder: Codeunit "Calculate Prod. Order";
         LeadTimeMgt: Codeunit "Lead-Time Management";
         DimMgt: Codeunit DimensionManagement;
+#pragma warning disable AA0074
         Text006: Label 'A Finished Production Order cannot be modified.';
+#pragma warning disable AA0470
         Text007: Label '%1 %2 %3 cannot be created, because a %4 %2 %3 already exists.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ItemTrackingMgt: Codeunit "Item Tracking Management";
+#pragma warning disable AA0074
         Text008: Label 'Nothing to handle. The production components are completely picked or not eligible for picking.';
+#pragma warning restore AA0074
         UpdateEndDate: Boolean;
+#pragma warning disable AA0074
         Text010: Label 'You may have changed a dimension.\\Do you want to update the lines?';
         Text011: Label 'You cannot change Finished Production Order dimensions.';
+#pragma warning restore AA0074
         ConfirmDeleteQst: Label 'The items have been picked. If you delete the Production Order, then the items will remain in the operation area until you put them away.\Related item tracking information that is defined during the pick will be deleted.\Are you sure that you want to delete the Production Order?';
 
     protected var
@@ -791,8 +805,8 @@ table 5405 "Production Order"
             Validate("Due Date", WorkDate());
         if ("Source Type" = "Source Type"::Item) and ("Source No." <> '') then
             "Ending Date" :=
-              LeadTimeMgt.PlannedEndingDate(
-                "Source No.", "Location Code", "Variant Code", "Due Date", '', 2)
+              LeadTimeMgt.GetPlannedEndingDate(
+                "Source No.", "Location Code", "Variant Code", "Due Date", '', "Requisition Ref. Order Type"::"Prod. Order")
         else
             "Ending Date" := "Due Date";
         "Starting Date" := "Ending Date";
@@ -1069,6 +1083,7 @@ table 5405 "Production Order"
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
         if OldDimSetID <> "Dimension Set ID" then begin
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if Status = Status::Finished then
                 Error(Text011);
             Modify();
@@ -1276,9 +1291,9 @@ table 5405 "Production Order"
                         ProdOrderLine."Due Date" := ProdOrderLine."Ending Date"
                     else
                         ProdOrderLine."Due Date" :=
-                          LeadTimeMgt.PlannedDueDate(
+                          LeadTimeMgt.GetPlannedDueDate(
                             ProdOrderLine."Item No.", ProdOrderLine."Location Code", ProdOrderLine."Variant Code",
-                            ProdOrderLine."Ending Date", '', 2);
+                            ProdOrderLine."Ending Date", '', "Requisition Ref. Order Type"::"Prod. Order");
                 if "Due Date" = 0D then
                     "Due Date" := ProdOrderLine."Due Date";
                 case Direction of
@@ -1324,13 +1339,9 @@ table 5405 "Production Order"
                 ProdOrderLine.Modify();
                 CalcProdOrder.SetParameter(true);
                 ProdOrderLine."Ending Date" :=
-                  LeadTimeMgt.PlannedEndingDate(
-                    ProdOrderLine."Item No.",
-                    ProdOrderLine."Location Code",
-                    ProdOrderLine."Variant Code",
-                    ProdOrderLine."Due Date",
-                    '',
-                    2);
+                    LeadTimeMgt.GetPlannedEndingDate(
+                        ProdOrderLine."Item No.", ProdOrderLine."Location Code", ProdOrderLine."Variant Code",
+                        ProdOrderLine."Due Date", '', "Requisition Ref. Order Type"::"Prod. Order");
                 OnUpdateEndingDateOnBeforeCalcProdOrderRecalculate(ProdOrderLine);
                 CalcProdOrder.Recalculate(ProdOrderLine, 1, true);
                 "Starting Date-Time" := CreateDateTime("Starting Date", "Starting Time");
@@ -1351,6 +1362,9 @@ table 5405 "Production Order"
           DimMgt.EditDimensionSet(
             Rec, "Dimension Set ID", StrSubstNo('%1 %2', TableCaption(), "No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+
+        OnShowDocDimOnAfterSetDimensionSetID(Rec, xRec);
+
         if OldDimSetID <> "Dimension Set ID" then begin
             if Status = Status::Finished then
                 Error(Text011);
@@ -1658,6 +1672,16 @@ table 5405 "Production Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeConfirmUpdateAllLineDim(var ProductionOrder: Record "Production Order"; var xProductionOrder: Record "Production Order"; NewParentDimSetID: Integer; OldParentDimSetID: Integer; var Confirmed: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var ProductionOrder: Record "Production Order"; var xProductionOrder: Record "Production Order")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowDocDimOnAfterSetDimensionSetID(var ProductionOrder: Record "Production Order"; xProductionOrder: Record "Production Order")
     begin
     end;
 }

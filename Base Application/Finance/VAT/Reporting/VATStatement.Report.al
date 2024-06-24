@@ -248,10 +248,13 @@ report 12 "VAT Statement"
         Heading2: Text[50];
         PeriodicSettlVATEntry: Record "Periodic Settlement VAT Entry";
         VATPeriod: Code[10];
-
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'VAT entries before and within the period';
         Text004: Label 'VAT entries within the period';
         Text005: Label 'Period: %1..%2';
+#pragma warning restore AA0470
+#pragma warning restore AA0074        
         AllAmountsAreInLbl: Label 'All amounts are in';
         VATStatementCaptionLbl: Label 'VAT Statement';
         TotalAmountCaptionLbl: Label 'Amount';

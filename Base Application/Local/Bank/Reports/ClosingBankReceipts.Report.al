@@ -20,13 +20,13 @@ report 12171 "Closing Bank Receipts"
     {
         dataitem(CustEntry1; "Cust. Ledger Entry")
         {
-            DataItemTableView = sorting("Due Date", "Customer No.", "Bank Receipt", "Bank Receipt Temp. No.", "Customer Bill No.") ORDER(Ascending) where("Document Type" = const(Payment), Open = const(true), "Bank Receipt" = const(true));
+            DataItemTableView = sorting("Due Date", "Customer No.", "Bank Receipt", "Bank Receipt Temp. No.", "Customer Bill No.") order(ascending) where("Document Type" = const(Payment), Open = const(true), "Bank Receipt" = const(true));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Customer No.", "Due Date";
             dataitem(CustEntry2; "Cust. Ledger Entry")
             {
                 DataItemLink = "Document Type" = field("Document Type to Close"), "Document No." = field("Document No. to Close"), "Document Occurrence" = field("Document Occurrence to Close"), "Customer No." = field("Customer No.");
-                DataItemTableView = sorting("Document Type", "Document No.", "Document Occurrence", "Customer No.") ORDER(Ascending) where(Open = const(true), "Bank Receipt Issued" = const(true), "Customer Bill No." = filter(<> ''));
+                DataItemTableView = sorting("Document Type", "Document No.", "Document Occurrence", "Customer No.") order(ascending) where(Open = const(true), "Bank Receipt Issued" = const(true), "Customer Bill No." = filter(<> ''));
 
                 trigger OnAfterGetRecord()
                 var

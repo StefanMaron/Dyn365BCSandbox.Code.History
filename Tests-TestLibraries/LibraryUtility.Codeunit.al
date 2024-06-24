@@ -844,30 +844,27 @@ codeunit 131000 "Library - Utility"
         ZeroPadding: Text;
         NewStr: Text;
     begin
-
         StartIndex := 1;
+        EndIndex := 0;
 
         // Find integer suffix.
-        for Index := StrLen(str) downto 1 do begin
+        for Index := StrLen(str) downto 1 do
             if Evaluate(Number, str.Substring(Index, 1)) then begin
                 Digits := str.Substring(Index, 1) + Digits;
                 if EndIndex = 0 then
                     EndIndex := Index;
-            end else begin
+            end else
                 if StrLen(Digits) > 0 then begin
                     StartIndex := Index + 1;
                     break;
                 end;
-            end;
-        end;
 
         // Get zero padding in the digits.
-        for Index := 1 to StrLen(Digits) do begin
+        for Index := 1 to StrLen(Digits) do
             if Digits.Substring(Index, 1) = '0' then
                 ZeroPadding := ZeroPadding + '0'
             else
                 break;
-        end;
 
         Evaluate(Number, Digits);
         Number := Number - 1;

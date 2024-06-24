@@ -116,7 +116,7 @@ report 12120 "VAT Register - Print"
         }
         dataitem("VAT Register"; "VAT Register")
         {
-            DataItemTableView = sorting(Code) order(Ascending);
+            DataItemTableView = sorting(Code) order(ascending);
             PrintOnlyIfDetail = true;
             column(VAT_Register_Code; Code)
             {
@@ -218,7 +218,7 @@ report 12120 "VAT Register - Print"
             {
                 DataItemLink = "VAT Register" = field(Code);
                 DataItemLinkReference = "VAT Register";
-                DataItemTableView = sorting("VAT Reg. Print Priority") order(Ascending);
+                DataItemTableView = sorting("VAT Reg. Print Priority") order(ascending);
                 PrintOnlyIfDetail = true;
                 column(No__Series_Code; Code)
                 {
@@ -231,7 +231,7 @@ report 12120 "VAT Register - Print"
                     CalcFields = "Document Type", Base, Amount, "VAT Calculation Type", "Sell-to/Buy-from No.", "External Document No.", "No. Series", "Nondeductible Amount", "Document Date", "VAT Difference", "Nondeductible Base", "Unrealized Base", "Unrealized Amount";
                     DataItemLink = "No. Series" = field(Code);
                     DataItemLinkReference = "No. Series";
-                    DataItemTableView = sorting("Document No.", "Posting Date") ORDER(Ascending) where(Type = filter(<> Settlement), "Unrealized VAT" = filter(false));
+                    DataItemTableView = sorting("Document No.", "Posting Date") order(ascending) where(Type = filter(<> Settlement), "Unrealized VAT" = filter(false));
                     column(IntraC; IntraC)
                     {
                     }
@@ -522,7 +522,7 @@ report 12120 "VAT Register - Print"
                     CalcFields = "Document Type", Base, Amount, "VAT Calculation Type", "Sell-to/Buy-from No.", "External Document No.", "No. Series", "Nondeductible Amount", "Document Date", "VAT Difference", "Nondeductible Base", "Unrealized Base", "Unrealized Amount";
                     DataItemLink = "No. Series" = field(Code);
                     DataItemLinkReference = "No. Series";
-                    DataItemTableView = sorting("Document No.", "Posting Date") ORDER(Ascending) where(Type = filter(<> Settlement), "Unrealized VAT" = filter(true));
+                    DataItemTableView = sorting("Document No.", "Posting Date") order(ascending) where(Type = filter(<> Settlement), "Unrealized VAT" = filter(true));
                     column(UnrealizedVAT_PageNo_Prefix; StrSubstNo(Text1038, Format(Date2DMY(StartingDate, 3))))
                     {
                     }
@@ -814,7 +814,7 @@ report 12120 "VAT Register - Print"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = sorting(Number) order(Ascending);
+            DataItemTableView = sorting(Number) order(ascending);
             column(Integer_PageNo_Prefix; StrSubstNo(Text1038, Format(Date2DMY(StartingDate, 3))))
             {
             }

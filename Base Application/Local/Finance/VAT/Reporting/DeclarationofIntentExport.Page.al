@@ -178,7 +178,7 @@ page 12161 "Declaration of Intent Export"
         ExportFlags[6] := false;
     end;
 
-    var
+    protected var
         VATExemption: Record "VAT Exemption";
         AmountToDeclare: Decimal;
         CeilingType: Option "Fixed",Mobile;
@@ -192,6 +192,7 @@ page 12161 "Declaration of Intent Export"
     procedure Initialize(var VATExemption2: Record "VAT Exemption")
     begin
         VATExemption := VATExemption2;
+        AmountToDeclare := VATExemption.GetSuggestedAmountToDeclare();
     end;
 }
 

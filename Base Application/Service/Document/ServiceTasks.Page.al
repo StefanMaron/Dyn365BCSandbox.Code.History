@@ -484,7 +484,11 @@ page 5915 "Service Tasks"
         AllocationStatus: Option " ",Nonactive,Active,Finished,Canceled,"Reallocation Needed";
         DocFilter: Option "Order",Quote,All;
         TempTextFilter: Text;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'There is no %1 within the filter.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         TempAllocationStatus: Option " ",Nonactive,Active,Finished,Canceled,"Reallocation Needed";
 
     protected var

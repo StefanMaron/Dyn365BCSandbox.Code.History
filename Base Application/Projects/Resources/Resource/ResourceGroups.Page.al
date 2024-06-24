@@ -9,7 +9,6 @@ using Microsoft.Projects.Resources.Analysis;
 #if not CLEAN23
 using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.Service.Analysis;
 
 page 72 "Resource Groups"
 {
@@ -207,15 +206,6 @@ page 72 "Resource Groups"
                     RunObject = Page "Res. Gr. Allocated per Job";
                     RunPageLink = "Resource Gr. Filter" = field("No.");
                     ToolTip = 'View the project allocations of the resource group.';
-                }
-                action("Res. Group Allocated per Service &Order")
-                {
-                    ApplicationArea = Jobs;
-                    Caption = 'Res. Group Allocated per Service &Order';
-                    Image = ViewServiceOrder;
-                    RunObject = Page "Res. Gr. Alloc. per Serv Order";
-                    RunPageLink = "Resource Group Filter" = field("No.");
-                    ToolTip = 'View the service order allocations of the resource group.';
                 }
                 action("Res. Group Availa&bility")
                 {

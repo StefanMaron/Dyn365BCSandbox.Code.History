@@ -15,7 +15,6 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
-using Microsoft.Service.Document;
 
 table 846 "Cash Flow Worksheet Line"
 {
@@ -164,8 +163,6 @@ table 846 "Cash Flow Worksheet Line"
             if ("Source Type" = const("Sales Orders")) "Sales Header"."No." where("Document Type" = const(Order))
             else
             if ("Source Type" = const("Purchase Orders")) "Purchase Header"."No." where("Document Type" = const(Order))
-            else
-            if ("Source Type" = const("Service Orders")) "Service Header"."No." where("Document Type" = const(Order))
             else
             if ("Source Type" = const("Cash Flow Manual Expense")) "Cash Flow Manual Expense"
             else
@@ -480,9 +477,9 @@ table 846 "Cash Flow Worksheet Line"
         GLSetup.Get();
 
         repeat
-            if InsertLine then begin
-                "Line No." := "Line No." + 1;
-            end else
+            if InsertLine then
+                "Line No." := "Line No." + 1
+            else
                 InsertLine := true;
 
             if CountForPaymentLines = 1 then begin
