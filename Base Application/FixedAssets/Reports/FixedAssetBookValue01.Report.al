@@ -351,10 +351,9 @@ report 5605 "Fixed Asset - Book Value 01"
                     end;
                     if GetPeriodDisposal() then
                         DisposalAmounts[i] := -(StartAmounts[i] + NetChangeAmounts[i])
-                    else begin
+                    else
                         if i <> 7 then
                             DisposalAmounts[i] := 0;
-                    end;
                     if (i >= 3) and (i <> 7) then
                         AddPostingType(i - 3);
                 end;
@@ -362,12 +361,11 @@ report 5605 "Fixed Asset - Book Value 01"
                     TotalEndingAmounts[j] := StartAmounts[j] + NetChangeAmounts[j] + DisposalAmounts[j];
                 BookValueAtEndingDate := 0;
                 BookValueAtStartingDate := 0;
-                for j := 1 to NumberOfTypes do begin
+                for j := 1 to NumberOfTypes do
                     if not ((j = 7) and HasDerogatorySetup) then begin
                         BookValueAtEndingDate := BookValueAtEndingDate + TotalEndingAmounts[j];
                         BookValueAtStartingDate := BookValueAtStartingDate + StartAmounts[j];
                     end;
-                end;
 
                 MakeGroupHeadLine();
                 UpdateTotals();
@@ -567,6 +565,7 @@ report 5605 "Fixed Asset - Book Value 01"
         PrintFASetup: Boolean;
         HasDerogatorySetup: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'Fixed Asset - Book Value 01';
         Text001: Label '(Budget Report)';
         Text002: Label 'Group Total';
@@ -574,9 +573,12 @@ report 5605 "Fixed Asset - Book Value 01"
         Text004: Label 'in Period';
         Text005: Label 'Disposal';
         Text006: Label 'Addition';
+#pragma warning disable AA0470
         Text007: Label '%1 has been modified in fixed asset %2.';
         Text10800: Label 'Increased in Period';
         Text10801: Label 'Decreased in Period';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         PageCaptionLbl: Label 'Page';
         TotalCaptionLbl: Label 'Total';
         GroupTotalsTxt: Label ' ,FA Class,FA Subclass,FA Location,Main Asset,Global Dimension 1,Global Dimension 2,FA Posting Group';
@@ -740,12 +742,11 @@ report 5605 "Fixed Asset - Book Value 01"
               GroupStartAmounts[j] + GroupNetChangeAmounts[j] + GroupDisposalAmounts[j];
         BookValueAtEndingDate := 0;
         BookValueAtStartingDate := 0;
-        for j := 1 to NumberOfTypes do begin
+        for j := 1 to NumberOfTypes do
             if not ((j = 7) and HasDerogatorySetup) then begin
                 BookValueAtEndingDate := BookValueAtEndingDate + TotalEndingAmounts[j];
                 BookValueAtStartingDate := BookValueAtStartingDate + GroupStartAmounts[j];
             end;
-        end;
     end;
 
     local procedure CreateTotals()

@@ -404,8 +404,7 @@ codeunit 137055 "SCM Warehouse Pick"
         CreateReleaseAndReserveSalesOrder(SalesHeader, Bin."Location Code", Item."No.", Qty, false);
         CreateWhseShipmentAndPick(SalesHeader);
 
-        with WarehouseActivityLine do
-            FindWhseActivityLine(WarehouseActivityLine, "Activity Type"::Pick, "Action Type"::Take, LocationWhite.Code, SalesHeader."No.");
+        FindWhseActivityLine(WarehouseActivityLine, WarehouseActivityLine."Activity Type"::Pick, WarehouseActivityLine."Action Type"::Take, LocationWhite.Code, SalesHeader."No.");
 
         // [WHEN] Run "Change Unit Of Measure" on the pick document
         LibraryWarehouse.ChangeUnitOfMeasure(WarehouseActivityLine);
@@ -2064,12 +2063,10 @@ codeunit 137055 "SCM Warehouse Pick"
         RecRef: RecordRef;
     begin
         RecRef.GetTable(TransferLine);
-        with TransferLine do begin
-            Validate("Document No.", TransferHeader."No.");
-            Validate("Line No.", LibraryUtility.GetNewLineNo(RecRef, FieldNo("Line No.")));
-            Validate(Description, LibraryUtility.GenerateGUID());
-            Insert(true);
-        end;
+        TransferLine.Validate("Document No.", TransferHeader."No.");
+        TransferLine.Validate("Line No.", LibraryUtility.GetNewLineNo(RecRef, TransferLine.FieldNo("Line No.")));
+        TransferLine.Validate(Description, LibraryUtility.GenerateGUID());
+        TransferLine.Insert(true);
     end;
 
     local procedure CreatePurchaseOrder(var PurchaseHeader: Record "Purchase Header"; LocationCode: Code[10]; ItemNo: Code[20]; Quantity: Decimal)
@@ -2561,12 +2558,10 @@ codeunit 137055 "SCM Warehouse Pick"
     var
         TransferLine: Record "Transfer Line";
     begin
-        with TransferLine do begin
-            SetRange("Document No.", TransferOrderNo);
-            SetRange("Item No.", ItemNo);
-            FindFirst();
-            Assert.AreEqual(ExpectedQuantity, "Quantity Shipped", TransferMustBeShippedErr);
-        end;
+        TransferLine.SetRange("Document No.", TransferOrderNo);
+        TransferLine.SetRange("Item No.", ItemNo);
+        TransferLine.FindFirst();
+        Assert.AreEqual(ExpectedQuantity, TransferLine."Quantity Shipped", TransferMustBeShippedErr);
     end;
 
     local procedure CreateRouting(): Code[20]

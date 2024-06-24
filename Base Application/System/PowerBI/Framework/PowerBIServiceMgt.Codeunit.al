@@ -39,9 +39,6 @@ codeunit 6301 "Power BI Service Mgt."
         ErrorWebResponseTelemetryMsg: Label 'GetData failed with an error. The status code is: %1.', Locked = true;
         DataNotFoundErr: Label 'The report(s) you are trying to load do not exist.';
 #endif
-#if not CLEAN22
-        RetryAfterNotSatisfiedTelemetryMsg: Label 'PowerBI service not ready. Will retry after: %1.', Locked = true;
-#endif
         EmptyAccessTokenTelemetryMsg: Label 'Encountered an empty access token.', Locked = true;
         ScheduleSyncTelemetryMsg: Label 'Scheduling sync for UTC datetime: %1.', Locked = true;
 
@@ -136,24 +133,7 @@ codeunit 6301 "Power BI Service Mgt."
         exit(PowerBIMyOrgUrlTxt);
     end;
 
-#if not CLEAN22
-    [Scope('OnPrem')]
-    [Obsolete('This function requires now a context parameter.', '23.0')]
-    procedure SynchronizeReportsInBackground()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        PowerBIServiceStatusSetup: Record "Power BI Service Status Setup";
-        ScheduledDateTime: DateTime;
-    begin
-        if PowerBIServiceStatusSetup.FindFirst() and (PowerBIServiceStatusSetup."Retry After" > CurrentDateTime()) then
-            ScheduledDateTime := PowerBIServiceStatusSetup."Retry After"
-        else
-            ScheduledDateTime := CurrentDateTime();
-
-        Session.LogMessage('0000FB2', StrSubstNo(ScheduleSyncTelemetryMsg, Format(ScheduledDateTime, 50, 9)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
-        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"Power BI Report Synchronizer", ScheduledDateTime, GetJobQueueCategoryCode(), '')
-    end;
-#elif not CLEAN23
+#if not CLEAN23
     [Scope('OnPrem')]
     [Obsolete('This function requires now a context parameter.', '23.0')]
     procedure SynchronizeReportsInBackground()
@@ -229,26 +209,6 @@ codeunit 6301 "Power BI Service Mgt."
     local procedure SendPowerBiOngoingDeploymentsTelemetry(FieldChanged: Text; NewValue: Boolean)
     begin
         Session.LogMessage('0000AYR', StrSubstNo(OngoingDeploymentTelemetryMsg, FieldChanged, NewValue), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
-    end;
-#endif
-
-#if not CLEAN22
-    [Scope('OnPrem')]
-    [Obsolete('Power BI service status is no longer cached.', '22.0')]
-    procedure IsPBIServiceAvailable(): Boolean
-    var
-        PowerBIServiceStatusSetup: Record "Power BI Service Status Setup";
-    begin
-        // Checks whether the Power BI service is available for deploying default reports, based on
-        // whether previous deployments have failed with a retry date/time that we haven't reached yet.
-        PowerBIServiceStatusSetup.Reset();
-        if PowerBIServiceStatusSetup.FindFirst() then
-            if PowerBIServiceStatusSetup."Retry After" > CurrentDateTime then begin
-                Session.LogMessage('0000B64', StrSubstNo(RetryAfterNotSatisfiedTelemetryMsg, PowerBIServiceStatusSetup."Retry After"), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
-                exit(false);
-            end;
-
-        exit(true);
     end;
 #endif
 
@@ -463,6 +423,8 @@ codeunit 6301 "Power BI Service Mgt."
         PowerBIBlob: Record "Power BI Blob";
         PowerBIDefaultSelection: Record "Power BI Default Selection";
         PowerBIContextSettings: Record "Power BI Context Settings";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        PowerBIContextSettings2: Record "Power BI Context Settings";
         PowerBICustomerReports: Record "Power BI Customer Reports";
         PowerBIDisplayedElement: Record "Power BI Displayed Element";
     begin
@@ -474,7 +436,7 @@ codeunit 6301 "Power BI Service Mgt."
         exit(PowerBIBlob.ReadPermission()
             and PowerBIDefaultSelection.ReadPermission()
             and PowerBICustomerReports.ReadPermission()
-            and PowerBIContextSettings.WritePermission() and PowerBIContextSettings.ReadPermission()
+            and PowerBIContextSettings2.WritePermission() and PowerBIContextSettings.ReadPermission()
             and PowerBIDisplayedElement.ReadPermission());
     end;
 

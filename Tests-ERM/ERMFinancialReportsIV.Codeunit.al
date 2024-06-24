@@ -690,13 +690,11 @@ codeunit 134992 "ERM Financial Reports IV"
     var
         VATEntry: Record "VAT Entry";
     begin
-        with VATEntry do begin
-            SetRange("VAT Calculation Type", "VAT Calculation Type"::"Normal VAT");
-            SetRange(Type, EntryType);
-            SetRange(Closed, Closed);
-            FindFirst();
-            VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-        end;
+        VATEntry.SetRange("VAT Calculation Type", VATEntry."VAT Calculation Type"::"Normal VAT");
+        VATEntry.SetRange(Type, EntryType);
+        VATEntry.SetRange(Closed, VATEntry.Closed);
+        VATEntry.FindFirst();
+        VATPostingSetup.Get(VATEntry."VAT Bus. Posting Group", VATEntry."VAT Prod. Posting Group");
     end;
 
     local procedure CalcAndPostVATSettlementWithPostingOption(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
@@ -899,11 +897,9 @@ codeunit 134992 "ERM Financial Reports IV"
         Customer: Record Customer;
     begin
         LibrarySales.CreateCustomer(Customer);
-        with Customer do begin
-            Validate("VAT Bus. Posting Group", VATBusPostingGroupCode);
-            Modify(true);
-            exit("No.");
-        end;
+        Customer.Validate("VAT Bus. Posting Group", VATBusPostingGroupCode);
+        Customer.Modify(true);
+        exit(Customer."No.");
     end;
 
     local procedure CreateVendor(VATBusPostingGroupCode: Code[20]): Code[20]
@@ -911,11 +907,9 @@ codeunit 134992 "ERM Financial Reports IV"
         Vendor: Record Vendor;
     begin
         LibraryPurchase.CreateVendor(Vendor);
-        with Vendor do begin
-            Validate("VAT Bus. Posting Group", VATBusPostingGroupCode);
-            Modify(true);
-            exit("No.");
-        end;
+        Vendor.Validate("VAT Bus. Posting Group", VATBusPostingGroupCode);
+        Vendor.Modify(true);
+        exit(Vendor."No.");
     end;
 
     local procedure FindVATEntry(var VATEntry: Record "VAT Entry"; BilltoPaytoNo: Code[20])

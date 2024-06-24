@@ -57,19 +57,25 @@ codeunit 11 "Gen. Jnl.-Check Line"
         LogErrorMode: Boolean;
         IsBatchMode: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'can only be a closing date for G/L entries';
         Text001: Label 'is not within your range of allowed posting dates';
+#pragma warning disable AA0470
         Text002: Label '%1 or %2 must be G/L Account or Bank Account.';
         Text003: Label 'must have the same sign as %1';
         Text004: Label 'You must not specify %1 when %2 is %3.';
         Text005: Label '%1 + %2 must be %3.';
         Text006: Label '%1 + %2 must be -%3.';
+#pragma warning restore AA0470
         Text007: Label 'must be positive';
         Text008: Label 'must be negative';
+#pragma warning disable AA0470
         Text009: Label 'must have a different sign than %1';
         Text010: Label '%1 %2 and %3 %4 is not allowed.';
         Text011: Label 'The combination of dimensions used in %1 %2, %3, %4 is blocked. %5';
         Text012: Label 'A dimension used in %1 %2, %3, %4 has caused an error. %5';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         DuplicateRecordErr: Label 'Document No. %1 already exists. It is not possible to calculate new deferrals for a Document No. that already exists.', Comment = '%1=Document No.';
         SpecifyGenPostingTypeErr: Label 'Posting to Account %1 must either be of type Purchase or Sale (see %2), because there are specified values in one of the following fields: %3, %4 , %5, or %6', comment = '%1 an G/L Account number;%2 = Gen. Posting Type; %3 = Gen. Bus. Posting Group; %4 = Gen. Prod. Posting Group; %5 = VAT Bus. Posting Group, %6 = VAT Prod. Posting Group';
         SalesDocAlreadyExistsErr: Label 'Sales %1 %2 already exists.', Comment = '%1 = Document Type; %2 = Document No.';
@@ -86,8 +92,12 @@ codeunit 11 "Gen. Jnl.-Check Line"
         ICBankAccount: Record "IC Bank Account";
         ErrorMessageHandler: Codeunit "Error Message Handler";
         ErrorContextElement: Codeunit "Error Context Element";
+        IsHandled: Boolean;
     begin
-        OnBeforeRunCheck(GenJnlLine);
+        IsHandled := false;
+        OnBeforeRunCheck(GenJnlLine, OverrideDimErr, IsHandled);
+        if IsHandled then
+            exit;
 
         if LogErrorMode then begin
             ErrorMessageMgt.Activate(ErrorMessageHandler);
@@ -109,25 +119,7 @@ codeunit 11 "Gen. Jnl.-Check Line"
         GenJnlLine.TestField("Source Code", ErrorInfo.Create());
         TestDocumentNo(GenJnlLine);
 
-        if (GenJnlLine."Account Type" in
-            [GenJnlLine."Account Type"::Customer,
-             GenJnlLine."Account Type"::Vendor,
-             GenJnlLine."Account Type"::"Fixed Asset",
-             GenJnlLine."Account Type"::"IC Partner"]) and
-           (GenJnlLine."Bal. Account Type" in
-            [GenJnlLine."Bal. Account Type"::Customer,
-             GenJnlLine."Bal. Account Type"::Vendor,
-             GenJnlLine."Bal. Account Type"::"Fixed Asset",
-             GenJnlLine."Bal. Account Type"::"IC Partner"])
-        then
-            Error(
-                ErrorInfo.Create(
-                    StrSubstNo(
-                    Text002,
-                    GenJnlLine.FieldCaption("Account Type"), GenJnlLine.FieldCaption("Bal. Account Type")),
-                true,
-                GenJnlLine,
-                GenJnlLine.FieldNo("Account Type")));
+        TestAccountAndBalAccountType(GenJnlLine);
 
         if GenJnlLine."Bal. Account No." = '' then
             GenJnlLine.TestField("Account No.", ErrorInfo.Create());
@@ -161,12 +153,6 @@ codeunit 11 "Gen. Jnl.-Check Line"
 
         if GenJnlLine."Bal. Account No." <> '' then
             CheckBalAccountNo(GenJnlLine);
-#if not CLEAN22
-        if (GenJnlLine."IC Partner G/L Acc. No." <> '') and (GenJnlLine."IC Account No." = '') then begin
-            GenJnlLine."IC Account Type" := GenJnlLine."IC Account Type"::"G/L Account";
-            GenJnlLine."IC Account No." := GenJnlLine."IC Partner G/L Acc. No.";
-        end;
-#endif
         if GenJnlLine."IC Account No." <> '' then begin
             if GenJnlLine."IC Account Type" = GenJnlLine."IC Account Type"::"G/L Account" then
                 if ICGLAcount.Get(GenJnlLine."IC Account No.") then
@@ -187,8 +173,7 @@ codeunit 11 "Gen. Jnl.-Check Line"
             GenJnlLine.TestField("Payment Discount %", 0, ErrorInfo.Create());
         end;
 
-        if GenJnlLine."Applies-to Doc. No." <> '' then
-            GenJnlLine.TestField("Applies-to ID", '', ErrorInfo.Create());
+        TestAppliesToID(GenJnlLine);
 
         if (GenJnlLine."Account Type" <> GenJnlLine."Account Type"::"Bank Account") and
            (GenJnlLine."Bal. Account Type" <> GenJnlLine."Bal. Account Type"::"Bank Account")
@@ -237,6 +222,49 @@ codeunit 11 "Gen. Jnl.-Check Line"
             exit;
 
         GenJournalLine.TestField("Document No.", ErrorInfo.Create());
+    end;
+
+    local procedure TestAccountAndBalAccountType(var GenJnlLine: Record "Gen. Journal Line")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTestAccountAndBalAccountType(GenJnlLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        if (GenJnlLine."Account Type" in
+                 [GenJnlLine."Account Type"::Customer,
+                  GenJnlLine."Account Type"::Vendor,
+                  GenJnlLine."Account Type"::"Fixed Asset",
+                  GenJnlLine."Account Type"::"IC Partner"]) and
+                (GenJnlLine."Bal. Account Type" in
+                 [GenJnlLine."Bal. Account Type"::Customer,
+                  GenJnlLine."Bal. Account Type"::Vendor,
+                  GenJnlLine."Bal. Account Type"::"Fixed Asset",
+                  GenJnlLine."Bal. Account Type"::"IC Partner"])
+             then
+            Error(
+                ErrorInfo.Create(
+                    StrSubstNo(
+                    Text002,
+                    GenJnlLine.FieldCaption("Account Type"), GenJnlLine.FieldCaption("Bal. Account Type")),
+                true,
+                GenJnlLine,
+                GenJnlLine.FieldNo("Account Type")));
+    end;
+
+    local procedure TestAppliesToID(var GenJnlLine: Record "Gen. Journal Line")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTestAppliesToID(GenJnlLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        if GenJnlLine."Applies-to Doc. No." <> '' then
+            GenJnlLine.TestField("Applies-to ID", '', ErrorInfo.Create());
     end;
 
     procedure GetErrors(var NewTempErrorMessage: Record "Error Message" temporary)
@@ -1219,12 +1247,22 @@ codeunit 11 "Gen. Jnl.-Check Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeRunCheck(var GenJournalLine: Record "Gen. Journal Line")
+    local procedure OnBeforeRunCheck(var GenJournalLine: Record "Gen. Journal Line"; OverrideDimErr: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestDocumentNo(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestAccountAndBalAccountType(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestAppliesToID(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 

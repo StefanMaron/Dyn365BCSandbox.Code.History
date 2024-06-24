@@ -19,6 +19,9 @@ report 5852 "Suggest Capacity Standard Cost"
 
             trigger OnAfterGetRecord()
             begin
+                if not (WorkSheetSource in [WorkSheetSource::"Work Center", WorkSheetSource::All]) then
+                    CurrReport.Skip();
+
                 InsertStdCostWksh(1, "No.");
                 if CurrentDateTime - WindowUpdateDateTime >= 750 then begin
                     Window.Update(1, "No.");
@@ -43,6 +46,9 @@ report 5852 "Suggest Capacity Standard Cost"
 
             trigger OnAfterGetRecord()
             begin
+                if not (WorkSheetSource in [WorkSheetSource::"Machine Center", WorkSheetSource::All]) then
+                    CurrReport.Skip();
+
                 InsertStdCostWksh(2, "No.");
                 if CurrentDateTime - WindowUpdateDateTime >= 750 then begin
                     Window.Update(1, "No.");
@@ -66,6 +72,9 @@ report 5852 "Suggest Capacity Standard Cost"
 
             trigger OnAfterGetRecord()
             begin
+                if not (WorkSheetSource in [WorkSheetSource::Resource, WorkSheetSource::All]) then
+                    CurrReport.Skip();
+
                 InsertStdCostWksh(3, "No.");
                 if CurrentDateTime - WindowUpdateDateTime >= 750 then begin
                     Window.Update(1, "No.");
@@ -160,6 +169,13 @@ report 5852 "Suggest Capacity Standard Cost"
                             TableRelation = "Rounding Method";
                             ToolTip = 'Specifies a code for the rounding method that you want to apply to costs that you adjust.';
                         }
+                        field(Source; WorkSheetSource)
+                        {
+                            Caption = 'Source';
+                            ApplicationArea = All;
+                            ToolTip = 'Specifies the Type of Standard Cost Worksheet.';
+                            OptionCaption = 'All,Work Center,Machine Center,Resource';
+                        }
                     }
                 }
             }
@@ -201,12 +217,17 @@ report 5852 "Suggest Capacity Standard Cost"
         RoundingMethod: array[3] of Code[10];
         AmtAdjustFactor: array[3] of Decimal;
         WindowUpdateDateTime: DateTime;
+        WorkSheetSource: Option All,"Work Center","Machine Center",Resource;
 
+#pragma warning disable AA0074
         Text004: Label 'You must specify a worksheet name to copy to.';
         Text007: Label 'Copying worksheet...\\';
+#pragma warning disable AA0470
         Text008: Label 'Work Center No. #1####################\';
         Text009: Label 'Machine Center No. #1####################\';
         Text010: Label 'Resource No. #1####################\';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     local procedure InsertStdCostWksh(Type2: Option; No2: Code[20])
     begin

@@ -1148,6 +1148,7 @@ report 5606 "Fixed Asset - Book Value 02"
         DerogDeprBookInfo5: Decimal;
         DeprBookInfo5: Decimal;
 
+#pragma warning disable AA0074
         Text000: Label 'Fixed Asset - Book Value 02';
         Text001: Label '(Budget Report)';
         Text002: Label 'Group Totals';
@@ -1155,9 +1156,12 @@ report 5606 "Fixed Asset - Book Value 02"
         Text004: Label 'Addition in Period';
         Text005: Label 'Disposal in Period';
         Text006: Label 'Group Total';
+#pragma warning disable AA0470
         Text007: Label '%1 has been modified in fixed asset %2.';
         Text10800: Label 'Increased in Period';
         Text10801: Label 'Decreased in Period';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         PageCaptionLbl: Label 'Page';
         TotalCaptionLbl: Label 'Total';
 

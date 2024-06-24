@@ -205,7 +205,7 @@ codeunit 136318 "Whse. Pick On Job Planning"
         asserterror OpenJobAndCreateWarehousePick(Job);
 
         // [THEN] Error is thrown validating the Job.Status
-        Assert.ExpectedError(StrSubstNo('Status must be equal to ''%1''', Job.Status::Open));
+        Assert.ExpectedTestFieldError(Job.FieldCaption(Status), Format(Job.Status::Open));
     end;
 
     [Test]
@@ -598,9 +598,8 @@ codeunit 136318 "Whse. Pick On Job Planning"
         Assert.RecordCount(JobPlanningLine, 4);
         JobPlanningLine.FindSet();
         repeat
-            if (JobPlanningLine.Type = JobPlanningLine.Type::Item) and ((JobPlanningLine."Line Type" = JobPlanningLine."Line Type"::Budget) or (JobPlanningLine."Line Type" = JobPlanningLine."Line Type"::"Both Budget and Billable")) then begin
+            if (JobPlanningLine.Type = JobPlanningLine.Type::Item) and ((JobPlanningLine."Line Type" = JobPlanningLine."Line Type"::Budget) or (JobPlanningLine."Line Type" = JobPlanningLine."Line Type"::"Both Budget and Billable")) then
                 VerifyJobPlanningLineQuantities(JobPlanningLine, 0, 0, JobPlanningLine.Quantity, JobPlanningLine.Quantity, 0, true)
-            end
             else begin
                 JobPlanningLine.TestField("Qty. Picked", 0);
                 JobPlanningLine.TestField("Qty. Picked (Base)", 0);
@@ -2536,7 +2535,7 @@ codeunit 136318 "Whse. Pick On Job Planning"
             Counter += 1;
             WarehouseActivityLinePick.Validate("Serial No.", ItemTrackingEntries."Serial No.");
             WarehouseActivityLinePick.Modify(true);
-            if (JobPlanningLine."Bin Code" = '') or (Counter MOD 2 = 0) then
+            if (JobPlanningLine."Bin Code" = '') or (Counter mod 2 = 0) then
                 ItemTrackingEntries.Next(); //Use the same serial number of take and place activity type or use new serial number when BinCode = ''.
         until (WarehouseActivityLinePick.Next() = 0);
     end;

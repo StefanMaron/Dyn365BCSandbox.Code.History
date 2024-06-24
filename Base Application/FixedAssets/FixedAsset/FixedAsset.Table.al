@@ -467,8 +467,12 @@ table 5600 "Fixed Asset"
         NoSeries: Codeunit "No. Series";
         DimMgt: Codeunit DimensionManagement;
 
+#pragma warning disable AA0074
         Text000: Label 'A main asset cannot be deleted.';
+#pragma warning disable AA0470
         Text001: Label 'You cannot delete %1 %2 because it has associated depreciation books.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         UnexpctedSubclassErr: Label 'This fixed asset subclass belongs to a different fixed asset class.';
         DontAskAgainActionTxt: Label 'Don''t ask again';
         NotificationNameTxt: Label 'Fixed Asset Acquisition Wizard';

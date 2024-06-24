@@ -28,7 +28,9 @@ codeunit 5335 "Integration Table Synch."
         MappingDoesNotAllowDirectionErr: Label 'The %1 %2 is not configured for %3 synchronization.', Comment = '%1 = Integration Table Mapping caption, %2 Integration Table Mapping Name, %3 = the calculated synch. direction (FromIntegrationTable|ToIntegrationTable)';
         InvalidStateErr: Label 'The synchronization process is in a state that is not valid.';
         DirectionChangeIsNotSupportedErr: Label 'You cannot change the synchronization direction after a job has started.';
+#pragma warning disable AA0470
         TablesDoNotMatchMappingErr: Label 'Source table %1 and destination table %2 do not match integration table mapping %3.', Comment = '%1,%2 - tables Ids; %2 - name of the mapping.';
+#pragma warning restore AA0470
 
     procedure BeginIntegrationSynchJob(ConnectionType: TableConnectionType; var IntegrationTableMapping: Record "Integration Table Mapping"; SourceTableID: Integer) JobID: Guid
     begin

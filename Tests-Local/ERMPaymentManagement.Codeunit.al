@@ -1357,14 +1357,11 @@ codeunit 144049 "ERM Payment Management"
         // [GIVEN] Customers "C1", "C2".
         LibrarySales.CreateCustomer(Customer[1]);
         LibrarySales.CreateCustomer(Customer[2]);
-
         // [GIVEN] Gen. Jnl. Lines "G1", "G2" and associated Customer Ledger Entries "CLE1", "CLE2".
-        with GenJournalLine do begin
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Customer, Customer[1]."No.", "Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Customer, Customer[2]."No.", "Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
-        end;
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Customer, Customer[1]."No.", GenJournalLine."Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Customer, Customer[2]."No.", GenJournalLine."Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
 
         // [GIVEN] Payment class with No. Series.
         PaymentClass.Get(CreatePaymentClass(PaymentClass.Suggestions::Customer));
@@ -1419,14 +1416,11 @@ codeunit 144049 "ERM Payment Management"
         // [GIVEN] Customers "C1", "C2".
         LibrarySales.CreateCustomer(Customer[1]);
         LibrarySales.CreateCustomer(Customer[2]);
-
         // [GIVEN] Gen. Jnl. Lines "G1", "G2" and associated Customer Ledger Entries "CLE1", "CLE2".
-        with GenJournalLine do begin
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Customer, Customer[1]."No.", "Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Customer, Customer[2]."No.", "Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
-        end;
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Customer, Customer[1]."No.", GenJournalLine."Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Customer, Customer[2]."No.", GenJournalLine."Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
 
         // [GIVEN] Payment class with No. Series.
         PaymentClass.Get(CreatePaymentClass(PaymentClass.Suggestions::Customer));
@@ -1481,14 +1475,11 @@ codeunit 144049 "ERM Payment Management"
         // [GIVEN] Customers "C1", "C2".
         LibrarySales.CreateCustomer(Customer[1]);
         LibrarySales.CreateCustomer(Customer[2]);
-
         // [GIVEN] Gen. Jnl. Lines "G1", "G2" and associated Customer Ledger Entries "CLE1", "CLE2".
-        with GenJournalLine do begin
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Customer, Customer[1]."No.", "Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Customer, Customer[2]."No.", "Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
-        end;
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Customer, Customer[1]."No.", GenJournalLine."Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Customer, Customer[2]."No.", GenJournalLine."Document Type"::Invoice, LibraryRandom.RandDec(10, 2), WorkDate());
 
         // [GIVEN] Payment class with No. Series.
         PaymentClass.Get(CreatePaymentClass(PaymentClass.Suggestions::Customer));
@@ -1543,14 +1534,11 @@ codeunit 144049 "ERM Payment Management"
         // [GIVEN] Vendors "C1", "C2".
         LibraryPurchase.CreateVendor(Vendor[1]);
         LibraryPurchase.CreateVendor(Vendor[2]);
-
         // [GIVEN] Gen. Jnl. Lines "G1", "G2" and associated Vendor Ledger Entries "VLE1", "VLE2".
-        with GenJournalLine do begin
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Vendor, Vendor[1]."No.", "Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Vendor, Vendor[2]."No.", "Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-        end;
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[1]."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[2]."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
 
         // [GIVEN] Payment class with No. Series.
         PaymentClass.Get(CreatePaymentClass(PaymentClass.Suggestions::Vendor));
@@ -1605,14 +1593,11 @@ codeunit 144049 "ERM Payment Management"
         // [GIVEN] Vendors "C1", "C2".
         LibraryPurchase.CreateVendor(Vendor[1]);
         LibraryPurchase.CreateVendor(Vendor[2]);
-
         // [GIVEN] Gen. Jnl. Lines "G1", "G2" and associated Vendor Ledger Entries "VLE1", "VLE2".
-        with GenJournalLine do begin
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Vendor, Vendor[1]."No.", "Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Vendor, Vendor[2]."No.", "Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-        end;
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[1]."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[2]."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
 
         // [GIVEN] Payment class with No. Series.
         PaymentClass.Get(CreatePaymentClass(PaymentClass.Suggestions::Vendor));
@@ -1667,14 +1652,11 @@ codeunit 144049 "ERM Payment Management"
         // [GIVEN] Vendors "C1", "C2".
         LibraryPurchase.CreateVendor(Vendor[1]);
         LibraryPurchase.CreateVendor(Vendor[2]);
-
         // [GIVEN] Gen. Jnl. Lines "G1", "G2".
-        with GenJournalLine do begin
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Vendor, Vendor[1]."No.", "Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-            CreateAndPostGeneralJournal(
-              GenJournalLine, "Account Type"::Vendor, Vendor[2]."No.", "Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-        end;
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[1]."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
+        CreateAndPostGeneralJournal(
+          GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[2]."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
 
         // [GIVEN] Payment class with No. Series.
         PaymentClass.Get(CreatePaymentClass(PaymentClass.Suggestions::Vendor));
@@ -2756,10 +2738,8 @@ codeunit 144049 "ERM Payment Management"
     var
         PaymentStepLedger: Record "Payment Step Ledger";
     begin
-        with PaymentStepLedger do begin
-            SetRange("Payment Class", PaymentClassCode);
-            ModifyAll("Memorize Entry", MemorizeEntry);
-        end;
+        PaymentStepLedger.SetRange("Payment Class", PaymentClassCode);
+        PaymentStepLedger.ModifyAll("Memorize Entry", MemorizeEntry);
     end;
 
     local procedure VerifyBankAccountLedgerEntry(PaymentHeader: Record "Payment Header"; NoOfRecord: Integer)
@@ -2850,12 +2830,10 @@ codeunit 144049 "ERM Payment Management"
     var
         PaymentHeader: Record "Payment Header";
     begin
-        with PaymentHeader do begin
-            SetRange("Payment Class", PaymentClassCode);
-            FindFirst();
-            Validate("Account No.", LibraryERM.CreateBankAccountNo());
-            Modify();
-        end;
+        PaymentHeader.SetRange("Payment Class", PaymentClassCode);
+        PaymentHeader.FindFirst();
+        PaymentHeader.Validate("Account No.", LibraryERM.CreateBankAccountNo());
+        PaymentHeader.Modify();
     end;
 
     local procedure SetupPaymentSlip(PaymentClassCode: Text[30]; AccountType: Enum "Gen. Journal Account Type"; CustomerVendorNo: Code[20])
@@ -2885,12 +2863,10 @@ codeunit 144049 "ERM Payment Management"
 
     local procedure FindPaymentLine(var PaymentLine: Record "Payment Line"; PaymentClass: Text[30]; LineNo: Integer)
     begin
-        with PaymentLine do begin
-            SetRange("Payment Class", PaymentClass);
-            if LineNo <> 0 then
-                SetRange("Status No.", LineNo);
-            FindFirst();
-        end;
+        PaymentLine.SetRange("Payment Class", PaymentClass);
+        if LineNo <> 0 then
+            PaymentLine.SetRange("Status No.", LineNo);
+        PaymentLine.FindFirst();
     end;
 
     local procedure FindVATEntry(var VATEntry: Record "VAT Entry"; DocumentNo: Code[20])
@@ -2903,24 +2879,20 @@ codeunit 144049 "ERM Payment Management"
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            SetRange("Document No.", PaymentHeaderNo);
-            SetRange("Credit Amount", 0);
-            FindLast();
-            exit("Entry No.");
-        end;
+        GLEntry.SetRange("Document No.", PaymentHeaderNo);
+        GLEntry.SetRange("Credit Amount", 0);
+        GLEntry.FindLast();
+        exit(GLEntry."Entry No.");
     end;
 
     local procedure GetLastCreditGLEntryNo(PaymentHeaderNo: Code[20]): Integer
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            SetRange("Document No.", PaymentHeaderNo);
-            SetRange("Debit Amount", 0);
-            FindLast();
-            exit("Entry No.");
-        end;
+        GLEntry.SetRange("Document No.", PaymentHeaderNo);
+        GLEntry.SetRange("Debit Amount", 0);
+        GLEntry.FindLast();
+        exit(GLEntry."Entry No.");
     end;
 
     local procedure VerifyCopyLinkInPaymentLine(PaymentClass: Text[30]; LineNo: Integer)
@@ -2930,20 +2902,18 @@ codeunit 144049 "ERM Payment Management"
     begin
         FindPaymentLine(SourcePaymentLine, PaymentClass, LineNo);
 
-        with SourcePaymentLine do begin
-            Assert.IsTrue(
-              PaymentLine.Get("Copied To No.", "Copied To Line"),
-              StrSubstNo(PaymentLineIsNotCopiedErr, "No."));
-            Assert.IsTrue(
-              PaymentLine.IsCopy,
-              StrSubstNo(ValueIsIncorrectErr, PaymentLine.IsCopy, FieldCaption(IsCopy)));
-            Assert.AreEqual(
-              "Account Type", PaymentLine."Account Type",
-              StrSubstNo(ValueIsIncorrectErr, PaymentLine."Account Type", FieldCaption("Account Type")));
-            Assert.AreEqual(
-              "Account No.", PaymentLine."Account No.",
-              StrSubstNo(ValueIsIncorrectErr, PaymentLine."Account No.", FieldCaption("Account No.")));
-        end;
+        Assert.IsTrue(
+          PaymentLine.Get(SourcePaymentLine."Copied To No.", SourcePaymentLine."Copied To Line"),
+          StrSubstNo(PaymentLineIsNotCopiedErr, SourcePaymentLine."No."));
+        Assert.IsTrue(
+          PaymentLine.IsCopy,
+          StrSubstNo(ValueIsIncorrectErr, PaymentLine.IsCopy, SourcePaymentLine.FieldCaption(IsCopy)));
+        Assert.AreEqual(
+          SourcePaymentLine."Account Type", PaymentLine."Account Type",
+          StrSubstNo(ValueIsIncorrectErr, PaymentLine."Account Type", SourcePaymentLine.FieldCaption("Account Type")));
+        Assert.AreEqual(
+          SourcePaymentLine."Account No.", PaymentLine."Account No.",
+          StrSubstNo(ValueIsIncorrectErr, PaymentLine."Account No.", SourcePaymentLine.FieldCaption("Account No.")));
     end;
 
     local procedure VerifyPostingError(PaymentClassCode: Text[30])
@@ -2952,16 +2922,12 @@ codeunit 144049 "ERM Payment Management"
         PaymentStep: Record "Payment Step";
         PaymentManagement: Codeunit "Payment Management";
     begin
-        with PaymentStep do begin
-            SetRange("Payment Class", PaymentClassCode);
-            FindLast();
-            SetRecFilter();
-        end;
+        PaymentStep.SetRange("Payment Class", PaymentClassCode);
+        PaymentStep.FindLast();
+        PaymentStep.SetRecFilter();
 
-        with PaymentHeader do begin
-            SetRange("Payment Class", PaymentClassCode);
-            FindFirst();
-        end;
+        PaymentHeader.SetRange("Payment Class", PaymentClassCode);
+        PaymentHeader.FindFirst();
 
         asserterror PaymentManagement.ProcessPaymentSteps(PaymentHeader, PaymentStep);
         Assert.ExpectedError(StepLedgerGetErr);
@@ -2980,12 +2946,10 @@ codeunit 144049 "ERM Payment Management"
         LastDebitGLEntryNo := GetLastDebitGLEntryNo(PaymentHeaderNo);
         LastCreditGLEntryNo := GetLastCreditGLEntryNo(PaymentHeaderNo);
         FindPaymentLine(PaymentLine, PaymentClassCode, 0);
-        with PaymentLine do begin
-            Assert.AreEqual(LastDebitGLEntryNo, "Entry No. Debit", FieldCaption("Entry No. Debit"));
-            Assert.AreEqual(LastDebitGLEntryNo, "Entry No. Debit Memo", FieldCaption("Entry No. Debit Memo"));
-            Assert.AreEqual(LastCreditGLEntryNo, "Entry No. Credit", FieldCaption("Entry No. Credit"));
-            Assert.AreEqual(LastCreditGLEntryNo, "Entry No. Credit Memo", FieldCaption("Entry No. Credit Memo"));
-        end;
+        Assert.AreEqual(LastDebitGLEntryNo, PaymentLine."Entry No. Debit", PaymentLine.FieldCaption("Entry No. Debit"));
+        Assert.AreEqual(LastDebitGLEntryNo, PaymentLine."Entry No. Debit Memo", PaymentLine.FieldCaption("Entry No. Debit Memo"));
+        Assert.AreEqual(LastCreditGLEntryNo, PaymentLine."Entry No. Credit", PaymentLine.FieldCaption("Entry No. Credit"));
+        Assert.AreEqual(LastCreditGLEntryNo, PaymentLine."Entry No. Credit Memo", PaymentLine.FieldCaption("Entry No. Credit Memo"));
     end;
 
     local procedure VerifyPaymentLineDimSetID(DimSetID: Integer; AppliestoDocNo: Code[20])

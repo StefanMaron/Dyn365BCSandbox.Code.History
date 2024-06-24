@@ -19,12 +19,14 @@ codeunit 1020 JobJnlManagement
         LastJobJnlLine: Record "Job Journal Line";
         OpenFromBatch: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'PROJECT';
         Text001: Label 'Project Journal';
         Text002: Label 'RECURRING';
         Text003: Label 'Recurring Project Journal';
         Text004: Label 'DEFAULT';
         Text005: Label 'Default Journal';
+#pragma warning restore AA0074
 
     procedure TemplateSelection(PageID: Integer; RecurringJnl: Boolean; var JobJnlLine: Record "Job Journal Line"; var JnlSelected: Boolean)
     var
