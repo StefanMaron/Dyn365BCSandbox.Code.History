@@ -25,7 +25,6 @@ codeunit 134990 "ERM Fixed Assets Reports - III"
         Amounts3Caption: Label 'Amounts3';
         DateErr: Label 'You must specify the Starting Date and the Ending Date.';
         DateErr2: Label 'You must specify the starting date and the ending date';
-        DepreciationBookErr: Label 'The Depreciation Book does not exist. Identification fields and values: Code=''''';
         EndingDateErr: Label 'You must specify an Ending Date.';
         FaDeprBookAcquDateCaption: Label 'FaDeprBookAcquDate';
         FANoCaption: Label 'FANo';
@@ -344,7 +343,7 @@ codeunit 134990 "ERM Fixed Assets Reports - III"
         asserterror REPORT.Run(REPORT::"Fixed Asset - List");
 
         // Verify: Verify error on Fixed Asset List report for blank Depreciation Book Code.
-        Assert.ExpectedError(DepreciationBookErr);
+        Assert.ExpectedErrorCannotFind(Database::"Depreciation Book");
     end;
 
     [Test]
@@ -422,7 +421,7 @@ codeunit 134990 "ERM Fixed Assets Reports - III"
         asserterror REPORT.Run(REPORT::"Maintenance - Analysis");
 
         // Verify: Verify error on Maintenance Analysis report for blank Depreciation Book Code.
-        Assert.ExpectedError(DepreciationBookErr);
+        Assert.ExpectedErrorCannotFind(Database::"Depreciation Book");
     end;
 
     [Test]

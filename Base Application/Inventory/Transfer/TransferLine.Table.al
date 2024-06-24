@@ -1094,17 +1094,27 @@ table 5741 "Transfer Line"
         UOMMgt: Codeunit "Unit of Measure Management";
         Reservation: Page Reservation;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'You cannot rename a %1.';
         Text002: Label 'must not be less than %1';
         Text003: Label 'Warehouse %1 is required for %2 = %3.';
+#pragma warning restore AA0470
         Text004: Label '\The entered information may be disregarded by warehouse operations.';
+#pragma warning disable AA0470
         Text005: Label 'You cannot ship more than %1 units.';
+#pragma warning restore AA0470
         Text006: Label 'All items have been shipped.';
+#pragma warning disable AA0470
         Text008: Label 'You cannot receive more than %1 units.';
+#pragma warning restore AA0470
         Text009: Label 'No items are currently in transit.';
         Text011: Label 'Outbound,Inbound';
+#pragma warning disable AA0470
         Text012: Label 'You have changed one or more dimensions on the %1, which is already shipped. When you post the line with the changed dimension to General Ledger, amounts on the Inventory Interim account will be out of balance when reported per dimension.\\Do you want to keep the changed dimension?';
+#pragma warning restore AA0470
         Text013: Label 'Cancelled.';
+#pragma warning restore AA0074
         CannotAutoReserveErr: Label 'Quantity %1 in line %2 cannot be reserved automatically.', Comment = '%1 - quantity, %2 - line number';
         MustUseTrackingErr: Label 'You must use the %1 page to specify the %2, if you use item tracking.', Comment = '%1 = Form Name, %2 = Value to Enter';
         LedgEntryWillBeOpenedMsg: Label 'When posting the Applied to Ledger Entry %1 will be opened first.', Comment = '%1 = Entry No.';

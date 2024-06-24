@@ -395,9 +395,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Cost Share Buffer" = RIMD,
                   tabledata "Country/Region" = RIMD,
                   tabledata "Country/Region Translation" = RIMD,
-#if not CLEAN22
-                  tabledata "Coupling Field Buffer" = RIMD,
-#endif
                   tabledata "Coupling Record Buffer" = RIMD,
                   tabledata "Credit Trans Re-export History" = RIMD,
                   tabledata "Credit Transfer Entry" = RIMD,
@@ -632,12 +629,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Interaction Template Setup" = i,
                   tabledata "Interaction Tmpl. Language" = RIMD,
                   tabledata "Intermediate Data Import" = RIMD,
-#if not CLEAN22
-                  tabledata "Intrastat Jnl. Batch" = RIMD,
-                  tabledata "Intrastat Jnl. Line" = RIMD,
-                  tabledata "Intrastat Jnl. Template" = RIMD,
-                  tabledata "Intrastat Setup" = RIMD,
-#endif
                   tabledata "Inventory Adjmt. Entry (Order)" = Rimd,
                   tabledata "Inventory Adjustment Buffer" = Rimd,
                   tabledata "Inventory Buffer" = RIMD,
@@ -805,9 +796,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Payable Employee Ledger Entry" = RIMD,
                   tabledata "Payable Vendor Ledger Entry" = RIMD,
                   tabledata "Payment Application Proposal" = RIMD,
-#if not CLEAN22
-                  tabledata "Payment Buffer" = RIMD,
-#endif
                   tabledata "Vendor Payment Buffer" = RIMD,
                   tabledata "Payment Export Data" = Rimd,
                   tabledata "Payment Export Remittance Text" = RIMD,
@@ -840,9 +828,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Posted Docs. With No Inc. Buf." = RIMD,
                   tabledata "Posted Payment Recon. Hdr" = RIMD,
                   tabledata "Posted Payment Recon. Line" = RIMD,
-#if not CLEAN22
-                  tabledata "Power BI Service Status Setup" = RIMD,
-#endif
 #if not CLEAN23
                   tabledata "Power BI User Configuration" = RIMD,
                   tabledata "Power BI Report Configuration" = RIMD,
@@ -899,6 +884,7 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Referenced XML Schema" = RIMD,
                   tabledata "Relationship Mgmt. Cue" = RIMD,
                   tabledata "Reminder Attachment Text" = RIMD,
+                  tabledata "Reminder Attachment Text Line" = RIMD,
                   tabledata "Reminder Comment Line" = RIMD,
                   tabledata "Reminder Email Text" = RIMD,
                   tabledata "Reminder Header" = RIMD,
@@ -1086,13 +1072,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Unlinked Attachment" = RIMD,
                   tabledata "Unplanned Demand" = RIMD,
                   tabledata "Untracked Planning Element" = RIMD,
-#if not CLEAN22
-                  tabledata "User Group" = R,
-                  tabledata "User Group Access Control" = R,
-                  tabledata "User Group Member" = Rimd,
-                  tabledata "User Group Permission Set" = R,
-                  tabledata "User Group Plan" = Rimd,
-#endif
                   tabledata "User Preference" = RIMD,
                   tabledata "User Security Status" = RIMD,
                   tabledata "User Setup" = RIMD,

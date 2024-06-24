@@ -62,7 +62,7 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T001_SalesPriceListsShowsAllCustomers()
     var
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         SalesPriceLists: TestPage "Sales Price Lists";
     begin
         // [SCENARIO] Sales Price lists page shows prices for "All Customers" if open not from a customer.
@@ -94,8 +94,8 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T002_SalesPriceListsPricesFromCustomersCard()
     var
-        Customer: Array[2] of Record Customer;
-        PriceListHeader: Array[4] of Record "Price List Header";
+        Customer: array[2] of Record Customer;
+        PriceListHeader: array[4] of Record "Price List Header";
         CustomerCard: TestPage "Customer Card";
         SalesPriceLists: TestPage "Sales Price Lists";
     begin
@@ -145,8 +145,8 @@ codeunit 134117 "Price Lists UI"
     [Obsolete('Not Used.', '23.0')]
     procedure T003_SalesPriceListsDiscountsFromCustomersList()
     var
-        Customer: Array[2] of Record Customer;
-        PriceListHeader: Array[4] of Record "Price List Header";
+        Customer: array[2] of Record Customer;
+        PriceListHeader: array[4] of Record "Price List Header";
         CustomerList: TestPage "Customer List";
         SalesPriceLists: TestPage "Sales Price Lists";
     begin
@@ -195,8 +195,8 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T004_SalesPriceLinesFromCustomersCard()
     var
-        Customer: Array[2] of Record Customer;
-        PriceListLine: Array[4] of Record "Price List Line";
+        Customer: array[2] of Record Customer;
+        PriceListLine: array[4] of Record "Price List Line";
         CustomerCard: TestPage "Customer Card";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -230,8 +230,8 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T005_SalesDiscountLinesFromCustomersList()
     var
-        Customer: Array[2] of Record Customer;
-        PriceListLine: Array[4] of Record "Price List Line";
+        Customer: array[2] of Record Customer;
+        PriceListLine: array[4] of Record "Price List Line";
         CustomerList: TestPage "Customer List";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -265,10 +265,10 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T006_SalesPriceListsPricesForPriceGroupFromCustomersCard()
     var
-        Customer: Array[2] of Record Customer;
+        Customer: array[2] of Record Customer;
         CustomerDiscountGroup: Record "Customer Discount Group";
         CustomerPriceGroup: Record "Customer Price Group";
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         CustomerCard: TestPage "Customer Card";
         SalesPriceLists: TestPage "Sales Price Lists";
     begin
@@ -329,10 +329,10 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T007_SalesPriceLinesForPriceGroupFromCustomersCard()
     var
-        Customer: Array[2] of Record Customer;
+        Customer: array[2] of Record Customer;
         CustomerDiscountGroup: Record "Customer Discount Group";
         CustomerPriceGroup: Record "Customer Price Group";
-        PriceListLine: Array[5] of Record "Price List Line";
+        PriceListLine: array[5] of Record "Price List Line";
         CustomerPriceGroups: TestPage "Customer Price Groups";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -392,10 +392,10 @@ codeunit 134117 "Price Lists UI"
     [Obsolete('Not Used.', '23.0')]
     procedure T008_SalesPriceListsDiscForDiscGroupFromCustomersCard()
     var
-        Customer: Array[2] of Record Customer;
+        Customer: array[2] of Record Customer;
         CustomerDiscountGroup: Record "Customer Discount Group";
         CustomerPriceGroup: Record "Customer Price Group";
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         CustomerCard: TestPage "Customer Card";
         SalesPriceLists: TestPage "Sales Price Lists";
     begin
@@ -456,10 +456,10 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T009_SalesDisounctLinesForDiscGroupFromCustomerDiscountGroups()
     var
-        Customer: Array[2] of Record Customer;
+        Customer: array[2] of Record Customer;
         CustomerDiscountGroup: Record "Customer Discount Group";
         CustomerPriceGroup: Record "Customer Price Group";
-        PriceListLine: Array[5] of Record "Price List Line";
+        PriceListLine: array[5] of Record "Price List Line";
         CustomerDiscGroups: TestPage "Customer Disc. Groups";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -1817,7 +1817,7 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T051_PurchasePriceListsShowsAllVendors()
     var
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         PurchasePriceLists: TestPage "Purchase Price Lists";
     begin
         // [SCENARIO] Purchase Price lists page shows prices for "All Vendors" if open not from a Vendor.
@@ -1849,8 +1849,8 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T052_PurchasePriceListsPricesFromVendorsCard()
     var
-        Vendor: Array[2] of Record Vendor;
-        PriceListHeader: Array[4] of Record "Price List Header";
+        Vendor: array[2] of Record Vendor;
+        PriceListHeader: array[4] of Record "Price List Header";
         VendorCard: TestPage "Vendor Card";
         PurchasePriceLists: TestPage "Purchase Price Lists";
     begin
@@ -1900,8 +1900,8 @@ codeunit 134117 "Price Lists UI"
     [Obsolete('Not Used.', '23.0')]
     procedure T053_PurchasePriceListsDiscountsFromVendorsList()
     var
-        Vendor: Array[2] of Record Vendor;
-        PriceListHeader: Array[4] of Record "Price List Header";
+        Vendor: array[2] of Record Vendor;
+        PriceListHeader: array[4] of Record "Price List Header";
         VendorList: TestPage "Vendor List";
         PurchasePriceLists: TestPage "Purchase Price Lists";
     begin
@@ -1950,8 +1950,8 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T054_PurchasePriceLinesFromVendorsCard()
     var
-        Vendor: Array[2] of Record Vendor;
-        PriceListLine: Array[4] of Record "Price List Line";
+        Vendor: array[2] of Record Vendor;
+        PriceListLine: array[4] of Record "Price List Line";
         VendorCard: TestPage "Vendor Card";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -1991,8 +1991,8 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T055_PurchaseDiscountLinesFromVendorsList()
     var
-        Vendor: Array[2] of Record Vendor;
-        PriceListLine: Array[4] of Record "Price List Line";
+        Vendor: array[2] of Record Vendor;
+        PriceListLine: array[4] of Record "Price List Line";
         VendorList: TestPage "Vendor List";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -2623,7 +2623,7 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T101_SalesJobPriceListsShowsAllJobs()
     var
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         SalesJobPriceLists: TestPage "Sales Job Price Lists";
     begin
         // [SCENARIO] Sales Job Price lists page shows prices for "All Jobs" if open not from a Job.
@@ -2657,9 +2657,9 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T102_SalesJobPriceListsPricesFromJobsCard()
     var
-        Job: Array[2] of Record Job;
+        Job: array[2] of Record Job;
         JobTask: Record "Job Task";
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         JobCard: TestPage "Job Card";
         SalesJobPriceLists: TestPage "Sales Job Price Lists";
     begin
@@ -2718,8 +2718,8 @@ codeunit 134117 "Price Lists UI"
     [Obsolete('Not Used.', '23.0')]
     procedure T103_SalesJobPriceListsDiscountsFromJobsList()
     var
-        Job: Array[2] of Record Job;
-        PriceListHeader: Array[4] of Record "Price List Header";
+        Job: array[2] of Record Job;
+        PriceListHeader: array[4] of Record "Price List Header";
         JobList: TestPage "Job List";
         SalesJobPriceLists: TestPage "Sales Job Price Lists";
     begin
@@ -2768,9 +2768,9 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T104_SalesJobPricesFromJobsCard()
     var
-        Job: Array[2] of Record Job;
+        Job: array[2] of Record Job;
         JobTask: Record "Job Task";
-        PriceListLine: Array[5] of Record "Price List Line";
+        PriceListLine: array[5] of Record "Price List Line";
         JobCard: TestPage "Job Card";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -2807,9 +2807,9 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T105_SalesJobDiscountsFromJobsList()
     var
-        Job: Array[2] of Record Job;
+        Job: array[2] of Record Job;
         JobTask: Record "Job Task";
-        PriceListLine: Array[5] of Record "Price List Line";
+        PriceListLine: array[5] of Record "Price List Line";
         JobList: TestPage "Job List";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -3126,7 +3126,7 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T151_PurchaseJobPriceListsShowsAllJobs()
     var
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         PurchaseJobPriceLists: TestPage "Purchase Job Price Lists";
     begin
         // [SCENARIO] Purchase Job Price lists page shows prices for "All Jobs" if open not from a Job.
@@ -3160,9 +3160,9 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T152_PurchaseJobPriceListsPricesFromJobCard()
     var
-        Job: Array[2] of Record Job;
+        Job: array[2] of Record Job;
         JobTask: Record "Job Task";
-        PriceListHeader: Array[5] of Record "Price List Header";
+        PriceListHeader: array[5] of Record "Price List Header";
         JobCard: TestPage "Job Card";
         PurchaseJobPriceLists: TestPage "Purchase Job Price Lists";
     begin
@@ -3221,8 +3221,8 @@ codeunit 134117 "Price Lists UI"
     [Obsolete('Not Used.', '23.0')]
     procedure T153_PurchaseJobPriceListsDiscountsFromJobList()
     var
-        Job: Array[2] of Record Job;
-        PriceListHeader: Array[4] of Record "Price List Header";
+        Job: array[2] of Record Job;
+        PriceListHeader: array[4] of Record "Price List Header";
         JobList: TestPage "Job List";
         PurchaseJobPriceLists: TestPage "Purchase Job Price Lists";
     begin
@@ -3271,9 +3271,9 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T154_PurchaseJobPricesFromJobsCard()
     var
-        Job: Array[2] of Record Job;
+        Job: array[2] of Record Job;
         JobTask: Record "Job Task";
-        PriceListLine: Array[5] of Record "Price List Line";
+        PriceListLine: array[5] of Record "Price List Line";
         JobCard: TestPage "Job Card";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -3310,9 +3310,9 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure T155_PurchaseJobDiscountsFromJobsList()
     var
-        Job: Array[2] of Record Job;
+        Job: array[2] of Record Job;
         JobTask: Record "Job Task";
-        PriceListLine: Array[5] of Record "Price List Line";
+        PriceListLine: array[5] of Record "Price List Line";
         JobList: TestPage "Job List";
         PriceListLineReview: TestPage "Price List Line Review";
     begin
@@ -4156,7 +4156,7 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure PriceListCustomerShowForBillToCustomerNo()
     var
-        Customer: Array[2] of Record Customer;
+        Customer: array[2] of Record Customer;
         PriceUXManagement: Codeunit "Price UX Management";
         PriceListsUI: Codeunit "Price Lists UI";
         SalesPriceLists: TestPage "Sales Price Lists";
@@ -4187,7 +4187,7 @@ codeunit 134117 "Price Lists UI"
     [Test]
     procedure PriceListVendorShowForPayToVendorNo()
     var
-        Vendor: Array[2] of Record Vendor;
+        Vendor: array[2] of Record Vendor;
         PriceUXManagement: Codeunit "Price UX Management";
         PriceListsUI: Codeunit "Price Lists UI";
         PurchPriceLists: TestPage "Purchase Price Lists";
@@ -4472,7 +4472,7 @@ codeunit 134117 "Price Lists UI"
         end;
     end;
 
-    local procedure CreateSalesPriceLinesForCustomers(Customer: Array[2] of Record Customer; var PriceListLine: Array[4] of Record "Price List Line")
+    local procedure CreateSalesPriceLinesForCustomers(Customer: array[2] of Record Customer; var PriceListLine: array[4] of Record "Price List Line")
     var
         PriceListHeader: Record "Price List Header";
     begin
@@ -4501,7 +4501,7 @@ codeunit 134117 "Price Lists UI"
             "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
     end;
 
-    local procedure CreatePurchPriceLinesForVendors(Vendor: Array[2] of Record Vendor; var PriceListLine: Array[4] of Record "Price List Line")
+    local procedure CreatePurchPriceLinesForVendors(Vendor: array[2] of Record Vendor; var PriceListLine: array[4] of Record "Price List Line")
     begin
         LibraryPriceCalculation.CreatePurchPriceLine(
             PriceListLine[1], '001', "Price Source Type"::"All Vendors", '',
@@ -4522,7 +4522,7 @@ codeunit 134117 "Price Lists UI"
             "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
     end;
 
-    local procedure CreatePurchPriceLinesForJobs(Job: Array[2] of Record Job; JobTask: Record "Job Task"; var PriceListLine: Array[5] of Record "Price List Line"; FifthPriceAmountType: Enum "Price Amount Type")
+    local procedure CreatePurchPriceLinesForJobs(Job: array[2] of Record Job; JobTask: Record "Job Task"; var PriceListLine: array[5] of Record "Price List Line"; FifthPriceAmountType: Enum "Price Amount Type")
     begin
         LibraryPriceCalculation.CreatePurchPriceLine(
             PriceListLine[1], '001', "Price Source Type"::"All Jobs", '',
@@ -4549,7 +4549,7 @@ codeunit 134117 "Price Lists UI"
             FifthPriceAmountType, "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
     end;
 
-    local procedure CreateSalesPriceLinesForJobs(Job: Array[2] of Record Job; JobTask: Record "Job Task"; var PriceListLine: Array[5] of Record "Price List Line"; FifthPriceAmountType: Enum "Price Amount Type")
+    local procedure CreateSalesPriceLinesForJobs(Job: array[2] of Record Job; JobTask: Record "Job Task"; var PriceListLine: array[5] of Record "Price List Line"; FifthPriceAmountType: Enum "Price Amount Type")
     begin
         LibraryPriceCalculation.CreateSalesPriceLine(
             PriceListLine[1], '001', "Price Source Type"::"All Jobs", '',

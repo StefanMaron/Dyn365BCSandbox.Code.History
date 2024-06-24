@@ -1890,19 +1890,17 @@
 
     local procedure CreateItemLedgerEntry(var ItemLedgerEntry: Record "Item Ledger Entry"; ItemNo: Code[20])
     begin
-        with ItemLedgerEntry do begin
-            if FindLast() then;
+        if ItemLedgerEntry.FindLast() then;
 
-            Init();
-            "Entry No." += 1;
-            "Item No." := ItemNo;
-            Quantity := LibraryRandom.RandDec(100, 2);
-            "Location Code" := LibraryUtility.GenerateGUID();
-            "Variant Code" := LibraryUtility.GenerateGUID();
-            "Global Dimension 1 Code" := LibraryUtility.GenerateGUID();
-            "Global Dimension 2 Code" := LibraryUtility.GenerateGUID();
-            Insert();
-        end;
+        ItemLedgerEntry.Init();
+        ItemLedgerEntry."Entry No." += 1;
+        ItemLedgerEntry."Item No." := ItemNo;
+        ItemLedgerEntry.Quantity := LibraryRandom.RandDec(100, 2);
+        ItemLedgerEntry."Location Code" := LibraryUtility.GenerateGUID();
+        ItemLedgerEntry."Variant Code" := LibraryUtility.GenerateGUID();
+        ItemLedgerEntry."Global Dimension 1 Code" := LibraryUtility.GenerateGUID();
+        ItemLedgerEntry."Global Dimension 2 Code" := LibraryUtility.GenerateGUID();
+        ItemLedgerEntry.Insert();
     end;
 
 #if not CLEAN23
@@ -2169,13 +2167,11 @@
         ReqWkshTemplate.FindFirst();
         LibraryPlanning.CreateRequisitionWkshName(RequisitionWkshName, ReqWkshTemplate.Name);
         LibraryPlanning.CreateRequisitionLine(RequisitionLine, RequisitionWkshName."Worksheet Template Name", RequisitionWkshName.Name);
-        with RequisitionLine do begin
-            Validate(Type, Type::Item);
-            Validate("No.", ItemNo);
-            Validate(Quantity, Qty);
-            Validate("Due Date", WorkDate());
-            Modify(true);
-        end;
+        RequisitionLine.Validate(Type, RequisitionLine.Type::Item);
+        RequisitionLine.Validate("No.", ItemNo);
+        RequisitionLine.Validate(Quantity, Qty);
+        RequisitionLine.Validate("Due Date", WorkDate());
+        RequisitionLine.Modify(true);
     end;
 
     local procedure GenerateBOMCostTree(var Item: Record Item; var TempBOMBuffer: Record "BOM Buffer" temporary)
@@ -2910,12 +2906,10 @@
 
     local procedure SetLimitsTotalsFilterOnItem(var Item: Record Item; ItemLedgerEntry: Record "Item Ledger Entry")
     begin
-        with Item do begin
-            SetRange("Location Filter", ItemLedgerEntry."Location Code");
-            SetRange("Variant Filter", ItemLedgerEntry."Variant Code");
-            SetRange("Global Dimension 1 Filter", ItemLedgerEntry."Global Dimension 1 Code");
-            SetRange("Global Dimension 2 Filter", ItemLedgerEntry."Global Dimension 2 Code");
-        end;
+        Item.SetRange("Location Filter", ItemLedgerEntry."Location Code");
+        Item.SetRange("Variant Filter", ItemLedgerEntry."Variant Code");
+        Item.SetRange("Global Dimension 1 Filter", ItemLedgerEntry."Global Dimension 1 Code");
+        Item.SetRange("Global Dimension 2 Filter", ItemLedgerEntry."Global Dimension 2 Code");
     end;
 
     [MessageHandler]

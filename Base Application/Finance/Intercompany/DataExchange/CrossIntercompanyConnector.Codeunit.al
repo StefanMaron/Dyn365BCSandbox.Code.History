@@ -223,7 +223,6 @@ codeunit 560 "CrossIntercompany Connector"
         HandleHttpResponse(HttpResponseMessage);
     end;
 
-    [NonDebuggable]
     local procedure PrepareHeaders(HttpRequestMessage: HttpRequestMessage; var ICPartner: Record "IC Partner")
     var
         HttpRequestHeaders: HttpHeaders;
@@ -232,7 +231,7 @@ codeunit 560 "CrossIntercompany Connector"
 
         HttpRequestHeaders.Add('Accept', 'application/json');
         HttpRequestHeaders.Add('Accept-Language', 'en-US');
-        HttpRequestHeaders.Add('Authorization', 'Bearer ' + GetBearerAccessToken(ICPartner));
+        HttpRequestHeaders.Add('Authorization', SecretStrSubstNo('Bearer %1', GetBearerAccessToken(ICPartner)));
     end;
 
     [NonDebuggable]
@@ -290,10 +289,9 @@ codeunit 560 "CrossIntercompany Connector"
         Error(FriendlyErrorMsg);
     end;
 
-    [NonDebuggable]
-    internal procedure GetBearerAccessToken(var ICPartner: Record "IC Partner"): Text
+    internal procedure GetBearerAccessToken(var ICPartner: Record "IC Partner"): SecretText
     var
-        Token: Text;
+        Token: SecretText;
     begin
         if (ICPartner."Token Expiration Time" <= CurrentDateTime) then begin
             Token := AcquireBearerAccessToken(ICPartner);
@@ -309,21 +307,22 @@ codeunit 560 "CrossIntercompany Connector"
     end;
 
     [NonDebuggable]
-    internal procedure AcquireBearerAccessToken(var ICPartner: Record "IC Partner"): Text
+    internal procedure AcquireBearerAccessToken(var ICPartner: Record "IC Partner"): SecretText
     var
         EnvironmentInformation: Codeunit "Environment Information";
         OAuth2: Codeunit OAuth2;
         Scopes: List of [Text];
-        ClientId, ClientSecret, TokenEndpoint, RedirectURL : Text;
-        BearerAccessToken: Text;
+        ClientId, TokenEndpoint, RedirectURL : Text;
+        ClientSecret: SecretText;
+        BearerAccessToken: SecretText;
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
             Error(NonSaaSEnvironmentErr);
 
-        ClientId := ICPartner.GetSecret(ICPartner."Client Id Key");
+        ClientId := ICPartner.GetSecret(ICPartner."Client Id Key").Unwrap();
         ClientSecret := ICPartner.GetSecret(ICPartner."Client Secret Key");
-        TokenEndpoint := ICPartner.GetSecret(ICPartner."Token Endpoint Key");
-        RedirectURL := ICPartner.GetSecret(ICPartner."Redirect URL Key");
+        TokenEndpoint := ICPartner.GetSecret(ICPartner."Token Endpoint Key").Unwrap();
+        RedirectURL := ICPartner.GetSecret(ICPartner."Redirect URL Key").Unwrap();
         Scopes.Add(BCResourceURLScopeTok);
 
         OAuth2.AcquireTokenWithClientCredentials(ClientId, ClientSecret, TokenEndpoint, RedirectURL, Scopes, BearerAccessToken);
@@ -396,7 +395,7 @@ codeunit 560 "CrossIntercompany Connector"
     var
         Result: Text;
     begin
-        Result := ICPartner.GetSecret(ICPartner."Connection Url Key") + StrSubstNo(APIPath, APIVersion) + '(' + RemoveCurlyBracketsAndUpperCases(ICPartner.GetSecret(ICPartner."Company Id Key")) + ')/' + EntityName;
+        Result := ICPartner.GetSecret(ICPartner."Connection Url Key").Unwrap() + StrSubstNo(APIPath, APIVersion) + '(' + RemoveCurlyBracketsAndUpperCases(ICPartner.GetSecret(ICPartner."Company Id Key").Unwrap()) + ')/' + EntityName;
         if EntityID <> EmptyGuid then
             Result += '(' + RemoveCurlyBracketsAndUpperCases(EntityID) + ')' + OperationTxt;
         exit(Result);

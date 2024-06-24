@@ -26,6 +26,8 @@ using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
+using Microsoft.Inventory.Journal;
+using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
@@ -229,7 +231,7 @@ table 5900 "Service Header"
 
             trigger OnValidate()
             var
-                CustCheckCrLimit: Codeunit "Cust-Check Cr. Limit";
+                ServCheckCreditLimit: Codeunit "Serv. Check Credit Limit";
                 ConfirmManagement: Codeunit "Confirm Management";
                 IsHandled: Boolean;
             begin
@@ -279,7 +281,7 @@ table 5900 "Service Header"
                     if GuiAllowed and not HideValidationDialog and
                        ("Document Type" in ["Document Type"::Quote, "Document Type"::Order, "Document Type"::Invoice])
                     then
-                        CustCheckCrLimit.ServiceHeaderCheck(Rec);
+                        ServCheckCreditLimit.ServiceHeaderCheck(Rec);
 
                 CopyBillToCustomerFields(Cust);
 
@@ -1554,13 +1556,11 @@ table 5900 "Service Header"
 
                 case Status of
                     Status::"In Process":
-                        begin
-                            if not LinesExist then begin
-                                "Starting Date" := WorkDate();
-                                Validate("Starting Time", Time);
-                            end else
-                                UpdateStartingDateTime();
-                        end;
+                        if not LinesExist then begin
+                            "Starting Date" := WorkDate();
+                            Validate("Starting Time", Time);
+                        end else
+                            UpdateStartingDateTime();
                     Status::Finished:
                         begin
                             TestMandatoryFields(ServLine);
@@ -1989,6 +1989,11 @@ table 5900 "Service Header"
         {
             Caption = 'Phone No.';
             ExtendedDatatype = PhoneNo;
+
+            trigger OnValidate()
+            begin
+                UpdateShipToAddressFromGeneralAddress(Rec.FieldNo("Ship-to Phone"));
+            end;
         }
         field(5916; "E-Mail"; Text[80])
         {
@@ -2000,12 +2005,18 @@ table 5900 "Service Header"
                 MailManagement: Codeunit "Mail Management";
             begin
                 MailManagement.ValidateEmailAddressField("E-Mail");
+                UpdateShipToAddressFromGeneralAddress(Rec.FieldNo("Ship-to E-Mail"));
             end;
         }
         field(5917; "Phone No. 2"; Text[30])
         {
             Caption = 'Phone No. 2';
             ExtendedDatatype = PhoneNo;
+
+            trigger OnValidate()
+            begin
+                UpdateShipToAddressFromGeneralAddress(Rec.FieldNo("Ship-to Phone 2"));
+            end;
         }
         field(5918; "Fax No."; Text[30])
         {
@@ -2939,22 +2950,34 @@ table 5900 "Service Header"
     end;
 
     var
+#pragma warning disable AA0074
         Text000: Label 'You cannot delete this document. Your identification is set up to process from Responsibility Center %1 only.', Comment = '%1=User management service filter;';
+#pragma warning disable AA0470
         Text001: Label 'Changing %1 in service header %2 will not update the existing service lines.\You must update the existing service lines manually.';
+#pragma warning restore AA0470
         Text003: Label 'You cannot change the %1 because the %2 %3 %4 is associated with a %5 %6.', Comment = '%1=Customer number field caption;%2=Document type;%3=Number field caption;%4=Number;%5=Contract number field caption;%6=Contract number; ';
+#pragma warning disable AA0470
         Text004: Label 'When you change the %1 the existing Service item line and service line will be deleted.\Do you want to change the %1?';
         Text005: Label 'Do you want to change the %1?';
         Text007: Label '%1 cannot be greater than %2.';
+#pragma warning restore AA0470
         Text008: Label 'You cannot create Service %1 with %2=%3 because this number has already been used in the system.', Comment = '%1=Document type format;%2=Number field caption;%3=Number;';
         Text010: Label 'Your identification is set up to process from %1 %2 only.', Comment = '%1=Resposibility center table caption;%2=User management service filter;';
+#pragma warning disable AA0470
         Text011: Label '%1 cannot be greater than %2 in the %3 table.';
         Text012: Label 'If you change %1, the existing service lines will be deleted and the program will create new service lines based on the new information on the header.\Do you want to change the %1?';
         Text013: Label 'Deleting this document will cause a gap in the number series for posted credit memos. An empty posted credit memo %1 will be created to fill this gap in the number series.\\Do you want to continue?';
+#pragma warning restore AA0470
         Text015: Label 'Do you want to update the exchange rate?';
+#pragma warning disable AA0470
         Text016: Label 'You have modified %1.\Do you want to update the service lines?';
+#pragma warning restore AA0470
         Text018: Label 'You have not specified the %1 for %2 %3=%4, %5=%6.', Comment = '%1=Service order type field caption;%2=table caption;%3=Document type field caption;%4=Document type format;%5=Number field caption;%6=Number format;';
+#pragma warning disable AA0470
         Text019: Label 'You have changed %1 on the service header, but it has not been changed on the existing service lines.\The change may affect the exchange rate used in the price calculation of the service lines.';
         Text021: Label 'You have changed %1 on the %2, but it has not been changed on the existing service lines.\You must update the existing service lines manually.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ServiceMgtSetup: Record "Service Mgt. Setup";
         Cust: Record Customer;
         ServHeader: Record "Service Header";
@@ -2983,43 +3006,65 @@ table 5900 "Service Header"
         CurrencyDate: Date;
         TempLinkToServItem: Boolean;
         HideValidationDialog: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text024: Label 'The %1 cannot be greater than the minimum %1 of the\ Service Item Lines.';
         Text025: Label 'The %1 cannot be less than the maximum %1 of the related\ Service Item Lines.';
         Text026: Label '%1 cannot be earlier than the %2.';
         Text027: Label 'The %1 cannot be greater than the minimum %2 of the related\ Service Item Lines.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ValidatingFromLines: Boolean;
         LinesExist: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text028: Label 'You cannot change the %1 because %2 exists.';
         Text029: Label 'The %1 field on the %2 will be updated if you change %3 manually.\Do you want to continue?';
+#pragma warning restore AA0470
         Text031: Label 'You cannot change %1 to %2 in %3 %4.\\%5 %6 in %7 %8 line is preventing it.', Comment = '%1=Status field caption;%2=Status format;%3=table caption;%4=Number;%5=ServItemLine repair status code field caption;%6=ServItemLine repair status code;%7=ServItemLine table caption;%8=ServItemLine line number;';
         Text037: Label 'Contact %1 %2 is not related to customer %3.', Comment = '%1=Contact number;%2=Contact name;%3=Customer number;';
         Text038: Label 'Contact %1 %2 is related to a different company than customer %3.', Comment = '%1=Contact number;%2=Contact name;%3=Customer number;';
         Text039: Label 'Contact %1 %2 is not related to a customer.', Comment = '%1=Contact number;%2=Contact name;';
+#pragma warning restore AA0074
         ContactNo: Code[20];
+#pragma warning disable AA0074
         Text040: Label 'You cannot delete %1 %2 because the %4 %5 for Service Item Line %3 has not been received.', Comment = '%1=table caption;%2=ServItemLine document number;%3=ServItemLine line number;%4=ServItemLine loaner number field caption;%5=ServItemLine loaner number;';
+#pragma warning restore AA0074
         SkipContact: Boolean;
         SkipBillToContact: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text041: Label 'Contract %1 is not signed.';
         Text042: Label 'The service period for contract %1 has not yet started.';
         Text043: Label 'The service period for contract %1 has expired.';
         Text044: Label 'You cannot rename a %1.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         Confirmed: Boolean;
+#pragma warning disable AA0074
         Text045: Label 'You can not change the %1 field because %2 %3 has %4 = %5 and the %6 has already been assigned %7 %8.', Comment = '%1=Posting date field caption;%2=Posting number series field caption;%3=Posting number series;%4=NoSeries date order field caption;%5=NoSeries date order;%6=Document type;%7=posting number field caption;%8=Posting number;';
+#pragma warning disable AA0470
         Text047: Label 'You cannot change %1 because reservation, item tracking, or order tracking exists on the sales order.';
         Text050: Label 'You cannot reset %1 because the document still has one or more lines.';
+#pragma warning restore AA0470
         Text051: Label 'The service %1 %2 already exists.', Comment = '%1=Document type format;%2=Number;';
+#pragma warning disable AA0470
         Text053: Label 'Deleting this document will cause a gap in the number series for shipments. An empty shipment %1 will be created to fill this gap in the number series.\\Do you want to continue?';
         Text054: Label 'Deleting this document will cause a gap in the number series for posted invoices. An empty posted invoice %1 will be created to fill this gap in the number series.\\Do you want to continue?';
         Text055: Label 'You have modified the %1 field. Note that the recalculation of VAT may cause penny differences, so you must check the amounts afterwards. Do you want to update the %2 field on the lines to reflect the new value of %1?';
         Text057: Label 'When you change the %1 the existing service line will be deleted.\Do you want to change the %1?';
+#pragma warning restore AA0470
         Text058: Label 'You cannot change %1 because %2 %3 is linked to Contract %4.', Comment = '%1=Currency code field caption;%2=Document type;%3=Number;%4=Contract number;';
         Text060: Label 'Responsibility Center is set up to process from %1 %2 only.', Comment = '%1=Assigned user ID;%2=User management service filter assigned user id;';
         Text061: Label 'You may have changed a dimension.\\Do you want to update the lines?';
+#pragma warning disable AA0470
         Text062: Label 'An open inventory pick exists for the %1 and because %2 is %3.\\You must first post or delete the inventory pick or change %2 to Partial.';
         Text063: Label 'An open warehouse shipment exists for the %1 and %2 is %3.\\You must add the item(s) as new line(s) to the existing warehouse shipment or change %2 to Partial.';
         Text064: Label 'You cannot change %1 to %2 because an open inventory pick on the %3.';
         Text065: Label 'You cannot change %1  to %2 because an open warehouse shipment exists for the %3.';
+#pragma warning restore AA0470
         Text066: Label 'You cannot change the dimension because there are service entries connected to this line.';
+#pragma warning restore AA0074
         PostedDocsToPrintCreatedMsg: Label 'One or more related posted documents have been generated during deletion to fill gaps in the posting number series. You can view or print the documents from the respective document archive.';
         DocumentNotPostedClosePageQst: Label 'The document has been saved but is not yet posted.\\Are you sure you want to exit?';
         MissingExchangeRatesQst: Label 'There are no exchange rates for currency %1 and date %2. Do you want to add them now? Otherwise, the last change you made will be reverted.', Comment = '%1 - currency code, %2 - posting date';
@@ -3155,6 +3200,7 @@ table 5900 "Service Header"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
+        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec);
         if ServItemLineExists() or ServLineExists() then
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
 
@@ -3178,7 +3224,7 @@ table 5900 "Service Header"
                 "Currency Factor" := CurrExchRate.ExchangeRate(CurrencyDate, "Currency Code");
                 if "Currency Code" <> xRec."Currency Code" then
                     RecreateServLines(FieldCaption("Currency Code"));
-            end else begin
+            end else
                 if ConfirmManagement.GetResponseOrDefault(
                      StrSubstNo(MissingExchangeRatesQst, "Currency Code", CurrencyDate), true)
                 then begin
@@ -3186,7 +3232,6 @@ table 5900 "Service Header"
                     UpdateCurrencyFactor();
                 end else
                     RevertCurrencyCodeAndPostingDate();
-            end;
         end else begin
             "Currency Factor" := 0;
             if "Currency Code" <> xRec."Currency Code" then
@@ -3263,13 +3308,12 @@ table 5900 "Service Header"
                 if not IsHandled then
                     ServLine.DeleteAll(true);
 
-                if "Document Type" = "Document Type"::Invoice then begin
+                if "Document Type" = "Document Type"::Invoice then
                     if TempServDocReg.Find('-') then
                         repeat
                             ServDocReg := TempServDocReg;
                             ServDocReg.Insert();
                         until TempServDocReg.Next() = 0;
-                end;
 
                 CreateServiceLines(TempServLine, ExtendedTextAdded, TempServiceCommentLine);
                 TempServLine.SetRange(Type);
@@ -3465,10 +3509,8 @@ table 5900 "Service Header"
 
                     case PassedServLine.Type of
                         PassedServLine.Type::Item:
-                            begin
-                                if ServiceMgtSetup."Unit of Measure Mandatory" then
-                                    PassedServLine.TestField("Unit of Measure Code", ErrorInfo.Create());
-                            end;
+                            if ServiceMgtSetup."Unit of Measure Mandatory" then
+                                PassedServLine.TestField("Unit of Measure Code", ErrorInfo.Create());
                         PassedServLine.Type::Resource:
                             begin
                                 if ServiceMgtSetup."Work Type Code Mandatory" then
@@ -3500,10 +3542,8 @@ table 5900 "Service Header"
 
                         case ServLine.Type of
                             ServLine.Type::Item:
-                                begin
-                                    if ServiceMgtSetup."Unit of Measure Mandatory" then
-                                        ServLine.TestField("Unit of Measure Code", ErrorInfo.Create());
-                                end;
+                                if ServiceMgtSetup."Unit of Measure Mandatory" then
+                                    ServLine.TestField("Unit of Measure Code", ErrorInfo.Create());
                             ServLine.Type::Resource:
                                 begin
                                     if ServiceMgtSetup."Work Type Code Mandatory" then
@@ -3889,7 +3929,7 @@ table 5900 "Service Header"
         ServHeader: Record "Service Header";
         ContBusinessRelation: Record "Contact Business Relation";
         Cont: Record Contact;
-        CustCheckCreditLimit: Codeunit "Cust-Check Cr. Limit";
+        ServCheckCreditLimit: Codeunit "Serv. Check Credit Limit";
         IsHandled: Boolean;
     begin
         if HideCreditCheckDialogue then
@@ -3901,7 +3941,7 @@ table 5900 "Service Header"
             if GetFilter("Customer No.") <> '' then begin
                 if GetRangeMin("Customer No.") = GetRangeMax("Customer No.") then begin
                     ServHeader."Bill-to Customer No." := GetRangeMin("Customer No.");
-                    CustCheckCreditLimit.ServiceHeaderCheck(ServHeader);
+                    ServCheckCreditLimit.ServiceHeaderCheck(ServHeader);
                 end
             end else
                 if GetFilter("Contact No.") <> '' then
@@ -3909,7 +3949,7 @@ table 5900 "Service Header"
                         Cont.Get(GetRangeMin("Contact No."));
                         if ContBusinessRelation.FindByContact(ContBusinessRelation."Link to Table"::Customer, Cont."Company No.") then begin
                             ServHeader."Bill-to Customer No." := ContBusinessRelation."No.";
-                            CustCheckCreditLimit.ServiceHeaderCheck(ServHeader);
+                            ServCheckCreditLimit.ServiceHeaderCheck(ServHeader);
                         end;
                     end;
     end;
@@ -3990,9 +4030,9 @@ table 5900 "Service Header"
                 NoSeriesMgt.RaiseObsoleteOnBeforeInitSeries("No. Series", xRec."No. Series", "Posting Date", "No.", "No. Series", IsHandled);
                 if not IsHandled then begin
 #endif
-                if NoSeries.AreRelated("No. Series", xRec."No. Series") then
-                    "No. Series" := xRec."No. Series";
-                "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
+                    if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+                        "No. Series" := xRec."No. Series";
+                    "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
 #if not CLEAN24
                     NoSeriesMgt.RaiseObsoleteOnAfterInitSeries("No. Series", GetNoSeriesCode(), "Posting Date", "No.");
                 end;
@@ -4132,19 +4172,17 @@ table 5900 "Service Header"
 #endif
                 end;
             "Document Type"::"Credit Memo":
-                begin
-                    if ("No. Series" <> '') and (ServiceMgtSetup."Service Credit Memo Nos." = PostingNoSeries) then
-                        "Posting No. Series" := "No. Series"
-                    else
+                if ("No. Series" <> '') and (ServiceMgtSetup."Service Credit Memo Nos." = PostingNoSeries) then
+                    "Posting No. Series" := "No. Series"
+                else
 #if CLEAN24
-                        if NoSeries.IsAutomatic(PostingNoSeries) then
-                            "Posting No. Series" := PostingNoSeries;
+                    if NoSeries.IsAutomatic(PostingNoSeries) then
+                        "Posting No. Series" := PostingNoSeries;
 #else
 #pragma warning disable AL0432
-                        NoSeriesMgt.SetDefaultSeries("Posting No. Series", PostingNoSeries);
+                    NoSeriesMgt.SetDefaultSeries("Posting No. Series", PostingNoSeries);
 #pragma warning restore AL0432
 #endif
-                end;
         end;
     end;
 
@@ -4227,6 +4265,7 @@ table 5900 "Service Header"
                 SetShipToAddress(
                   Location.Name, Location."Name 2", Location.Address, Location."Address 2",
                   Location.City, Location."Post Code", Location.County, Location."Country/Region Code");
+                "Ship-to Phone" := Location."Phone No.";
                 "Ship-to Contact" := Location.Contact;
             end else begin
                 CompanyInfo.Get();
@@ -4235,6 +4274,7 @@ table 5900 "Service Header"
                   CompanyInfo."Ship-to Name", CompanyInfo."Ship-to Name 2", CompanyInfo."Ship-to Address", CompanyInfo."Ship-to Address 2",
                   CompanyInfo."Ship-to City", CompanyInfo."Ship-to Post Code", CompanyInfo."Ship-to County",
                   CompanyInfo."Ship-to Country/Region Code");
+                "Ship-to Phone" := CompanyInfo."Ship-to Phone No.";
                 "Ship-to Contact" := CompanyInfo."Ship-to Contact";
             end;
             "VAT Country/Region Code" := "Country/Region Code";
@@ -4336,32 +4376,30 @@ table 5900 "Service Header"
 
         case "Document Type" of
             "Document Type"::Order, "Document Type"::Invoice:
-                begin
-                    if ServiceLine.FindSet() then
-                        repeat
-                            if (ServiceLine.Type = ServiceLine.Type::Item) and (ServiceLine.Quantity <> 0) then
-                                if ServiceLine."Shipment No." <> '' then begin
-                                    ServiceShptLine.SetRange("Document No.", ServiceLine."Shipment No.");
-                                    ServiceShptLine.SetRange("Line No.", ServiceLine."Shipment Line No.");
-                                end else begin
-                                    ServiceShptLine.SetCurrentKey("Order No.", "Order Line No.");
-                                    ServiceShptLine.SetRange("Order No.", ServiceLine."Document No.");
-                                    ServiceShptLine.SetRange("Order Line No.", ServiceLine."Line No.");
-                                end;
-                            ServiceShptLine.SetRange(Correction, false);
-                            if QtyType = QtyType::Invoicing then
-                                ServiceShptLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
+                if ServiceLine.FindSet() then
+                    repeat
+                        if (ServiceLine.Type = ServiceLine.Type::Item) and (ServiceLine.Quantity <> 0) then
+                            if ServiceLine."Shipment No." <> '' then begin
+                                ServiceShptLine.SetRange("Document No.", ServiceLine."Shipment No.");
+                                ServiceShptLine.SetRange("Line No.", ServiceLine."Shipment Line No.");
+                            end else begin
+                                ServiceShptLine.SetCurrentKey("Order No.", "Order Line No.");
+                                ServiceShptLine.SetRange("Order No.", ServiceLine."Document No.");
+                                ServiceShptLine.SetRange("Order Line No.", ServiceLine."Line No.");
+                            end;
+                        ServiceShptLine.SetRange(Correction, false);
+                        if QtyType = QtyType::Invoicing then
+                            ServiceShptLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
 
-                            if ServiceShptLine.FindSet() then
-                                repeat
-                                    ServiceShptLine.FilterPstdDocLnItemLedgEntries(ItemLedgEntry);
-                                    if ItemLedgEntry.FindSet() then
-                                        repeat
-                                            CreateTempAdjmtValueEntries(TempValueEntry, ItemLedgEntry."Entry No.");
-                                        until ItemLedgEntry.Next() = 0;
-                                until ServiceShptLine.Next() = 0;
-                        until ServiceLine.Next() = 0;
-                end;
+                        if ServiceShptLine.FindSet() then
+                            repeat
+                                ServiceShptLine.FilterPstdDocLnItemLedgEntries(ItemLedgEntry);
+                                if ItemLedgEntry.FindSet() then
+                                    repeat
+                                        CreateTempAdjmtValueEntries(TempValueEntry, ItemLedgEntry."Entry No.");
+                                    until ItemLedgEntry.Next() = 0;
+                            until ServiceShptLine.Next() = 0;
+                    until ServiceLine.Next() = 0;
         end;
         PAGE.RunModal(0, TempValueEntry);
     end;
@@ -4600,7 +4638,7 @@ table 5900 "Service Header"
 
     local procedure CreateServiceLines(var TempServLine: Record "Service Line" temporary; var ExtendedTextAdded: Boolean; var TempServiceCommentLine: Record "Service Comment Line" temporary)
     var
-        TransferExtendedText: Codeunit "Transfer Extended Text";
+        ServiceTransferExtText: Codeunit "Service Transfer Ext. Text";
     begin
         ServLine.Init();
         ServLine."Line No." := 0;
@@ -4670,8 +4708,8 @@ table 5900 "Service Header"
                 ExtendedTextAdded := false;
             end else
                 if not ExtendedTextAdded then begin
-                    TransferExtendedText.ServCheckIfAnyExtText(ServLine, true);
-                    TransferExtendedText.InsertServExtText(ServLine);
+                    ServiceTransferExtText.ServCheckIfAnyExtText(ServLine, true);
+                    ServiceTransferExtText.InsertServExtText(ServLine);
                     OnAfterTransferExtendedTextForServLineRecreation(ServLine);
                     ServLine.Find('+');
                     ExtendedTextAdded := true;
@@ -4735,6 +4773,12 @@ table 5900 "Service Header"
             FieldNo("Ship-to Country/Region Code"):
                 if xRec."Country/Region Code" = "Ship-to Country/Region Code" then
                     "Ship-to Country/Region Code" := "Country/Region Code";
+            Rec.FieldNo("Ship-to Phone"):
+                if xRec."Phone No." = "Ship-to Phone" then
+                    "Ship-to Phone" := "Phone No.";
+            Rec.FieldNo("Ship-to Phone 2"):
+                if xRec."Phone No. 2" = "Ship-to Phone 2" then
+                    "Ship-to Phone 2" := "Phone No. 2";
         end;
         OnAfterUpdateShipToAddressFromGeneralAddress(Rec, xRec, FieldNumber);
     end;
@@ -5223,6 +5267,97 @@ table 5900 "Service Header"
             ServiceContractHeader."Last Invoice Date" := 0D;
 
         exit(true);
+    end;
+
+    procedure CopyToGenJournalLine(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+        GenJournalLine."Source Currency Code" := "Currency Code";
+        GenJournalLine.Correction := Correction;
+        GenJournalLine."VAT Base Discount %" := "VAT Base Discount %";
+        GenJournalLine."Sell-to/Buy-from No." := "Customer No.";
+        GenJournalLine."Bill-to/Pay-to No." := "Bill-to Customer No.";
+        GenJournalLine."Country/Region Code" := "VAT Country/Region Code";
+        GenJournalLine."VAT Registration No." := "VAT Registration No.";
+        GenJournalLine."Source Type" := GenJournalLine."Source Type"::Customer;
+        GenJournalLine."Source No." := "Bill-to Customer No.";
+        GenJournalLine."Posting No. Series" := "Posting No. Series";
+        GenJournalLine."Ship-to/Order Address Code" := "Ship-to Code";
+        GenJournalLine."EU 3-Party Trade" := "EU 3-Party Trade";
+        GenJournalLine."Salespers./Purch. Code" := "Salesperson Code";
+        GeneralLedgerSetup.GetRecordOnce();
+        if GeneralLedgerSetup."Journal Templ. Name Mandatory" then
+            GenJournalLine."Journal Template Name" := "Journal Templ. Name";
+
+        OnAfterCopyToGenJnlLine(GenJournalLine, Rec);
+#if not CLEAN25
+        GenJournalLine.RunOnAfterCopyGenJnlLineFromServHeader(Rec, GenJournalLine);
+#endif
+    end;
+
+    procedure CopyToGenJournalLineApplyTo(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+        GenJournalLine."Applies-to Doc. Type" := "Applies-to Doc. Type";
+        GenJournalLine."Applies-to Doc. No." := "Applies-to Doc. No.";
+        GenJournalLine."Applies-to ID" := "Applies-to ID";
+        GenJournalLine."Allow Application" := "Bal. Account No." = '';
+
+        OnAfterCopyToGenJnlLineApplyTo(GenJournalLine, Rec);
+#if not CLEAN25
+        GenJournalLine.RunOnAfterCopyGenJnlLineFromServHeaderApplyTo(Rec, GenJournalLine);
+#endif
+    end;
+
+    procedure CopyToGenJournalLinePayment(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+        GenJournalLine."Due Date" := "Due Date";
+        GenJournalLine."Payment Terms Code" := "Payment Terms Code";
+        GenJournalLine."Payment Method Code" := "Payment Method Code";
+        GenJournalLine."Pmt. Discount Date" := "Pmt. Discount Date";
+        GenJournalLine."Payment Discount %" := "Payment Discount %";
+        GenJournalLine."Direct Debit Mandate ID" := "Direct Debit Mandate ID";
+
+        OnAfterCopyToGenJnlLinePayment(GenJournalLine, Rec);
+#if not CLEAN25
+        GenJournalLine.RunOnAfterCopyGenJnlLineFromServHeaderPayment(Rec, GenJournalLine);
+#endif
+    end;
+
+    procedure CopyToItemJnlLine(var ItemJournalLine: Record "Item Journal Line")
+    begin
+        ItemJournalLine."Document Date" := Rec."Document Date";
+        ItemJournalLine."Order Date" := Rec."Order Date";
+        ItemJournalLine."Source Posting Group" := Rec."Customer Posting Group";
+        ItemJournalLine."Salespers./Purch. Code" := Rec."Salesperson Code";
+        ItemJournalLine."Reason Code" := Rec."Reason Code";
+        ItemJournalLine."Source Type" := ItemJournalLine."Source Type"::Customer;
+        ItemJournalLine."Source No." := Rec."Customer No.";
+        ItemJournalLine."Shpt. Method Code" := Rec."Shipment Method Code";
+        ItemJournalLine."Price Calculation Method" := Rec."Price Calculation Method";
+
+        if Rec.IsCreditDocType() then
+            ItemJournalLine."Country/Region Code" := Rec."Country/Region Code"
+        else
+            if Rec."Ship-to Country/Region Code" <> '' then
+                ItemJournalLine."Country/Region Code" := Rec."Ship-to Country/Region Code"
+            else
+                ItemJournalLine."Country/Region Code" := Rec."Country/Region Code";
+
+        OnAfterCopyToItemJnlLine(ItemJournalLine, Rec);
+#if not CLEAN25
+        ItemJournalLine.RunOnAfterCopyItemJnlLineFromServHeader(ItemJournalLine, Rec);
+#endif
+    end;
+
+    procedure CopyToResJournalLine(var ResJournalLine: Record "Res. Journal Line")
+    begin
+        ResJournalLine."Document Date" := Rec."Document Date";
+        ResJournalLine."Reason Code" := Rec."Reason Code";
+        ResJournalLine."Order No." := Rec."No.";
+
+        OnAfterCopyToResJournalLine(ResJournalLine, Rec);
+#if not CLEAN25
+        ResJournalLine.RunOnAfterCopyResJnlLineFromServHeader(Rec, ResJournalLine);
+#endif
     end;
 
     [IntegrationEvent(false, false)]
@@ -5791,6 +5926,11 @@ table 5900 "Service Header"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeLookupContactNo(var ServiceHeader: Record "Service Header")
     begin
     end;
@@ -5849,5 +5989,29 @@ table 5900 "Service Header"
     local procedure OnAfterSetCustomerFromFilter(var ServiceHeader: Record "Service Header")
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyToGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyToGenJnlLineApplyTo(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyToGenJnlLinePayment(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyToItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyToResJournalLine(var ResJournalLine: Record "Res. Journal Line"; ServiceHeader: Record "Service Header")
+    begin
+    end;
+}

@@ -1087,14 +1087,6 @@ table 210 "Job Journal Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(5900; "Service Order No."; Code[20])
-        {
-            Caption = 'Service Order No.';
-        }
-        field(5901; "Posted Service Shipment No."; Code[20])
-        {
-            Caption = 'Posted Service Shipment No.';
-        }
         field(6501; "Lot No."; Code[50])
         {
             Caption = 'Lot No.';
@@ -1268,13 +1260,19 @@ table 210 "Job Journal Line"
         CurrencyDate: Date;
         CheckedAvailability: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot change %1 when %2 is %3.';
         Text001: Label 'cannot be specified without %1';
+#pragma warning restore AA0470
         Text002: Label 'must be positive';
         Text003: Label 'must be negative';
+#pragma warning disable AA0470
         Text004: Label '%1 is only editable when a %2 is defined.';
         Text006: Label '%1 cannot be changed when %2 is set.';
         Text007: Label '%1 %2 is already linked to %3 %4. Hence %5 cannot be calculated correctly. Posting the line may update the linked %3 unexpectedly. Do you want to continue?', Comment = 'Project Journal Line project DEFAULT 30000 is already linked to Project Planning Line  DEERFIELD, 8 WP 1120 10000. Hence Remaining Qty. cannot be calculated correctly. Posting the line may update the linked %3 unexpectedly. Do you want to continue?';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     protected var
         JobJnlTemplate: Record "Job Journal Template";

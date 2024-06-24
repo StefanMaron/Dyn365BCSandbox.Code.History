@@ -65,16 +65,20 @@ codeunit 5815 "Undo Sales Shipment Line"
         HideDialog: Boolean;
         NextLineNo: Integer;
 
+#pragma warning disable AA0074
         Text000: Label 'Do you really want to undo the selected Shipment lines?';
         Text001: Label 'Undo quantity posting...';
         Text002: Label 'There is not enough space to insert correction lines.';
         Text003: Label 'Checking lines...';
         Text004: Label 'Some shipment lines may have unused service items. Do you want to delete them?';
         Text005: Label 'This shipment has already been invoiced. Undo Shipment can be applied only to posted, but not invoiced shipments.';
+#pragma warning disable AA0470
         Text055: Label '#1#################################\\Checking Undo Assembly #2###########.';
         Text056: Label '#1#################################\\Posting Undo Assembly #2###########.';
         Text057: Label '#1#################################\\Finalizing Undo Assembly #2###########.';
+#pragma warning restore AA0470
         Text059: Label '%1 %2 %3', Comment = '%1 = SalesShipmentLine."Document No.". %2 = SalesShipmentLine.FIELDCAPTION("Line No."). %3 = SalesShipmentLine."Line No.". This is used in a progress window.';
+#pragma warning restore AA0074
         AlreadyReversedErr: Label 'This shipment has already been reversed.';
 
     procedure SetHideDialog(NewHideDialog: Boolean)

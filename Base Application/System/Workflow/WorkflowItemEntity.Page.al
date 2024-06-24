@@ -641,14 +641,6 @@ page 6409 "Workflow - Item Entity"
                     ApplicationArea = All;
                     Caption = 'Scheduled Receipt (Qty.)', Locked = true;
                 }
-                field(scheduledNeedQty; Rec."Scheduled Need (Qty.)")
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Use the field ''qtyOnComponentLines'' instead';
-                    ObsoleteTag = '18.0';
-                    ApplicationArea = All;
-                    Caption = 'Scheduled Need (Qty.)', Locked = true;
-                }
                 field(roundingPrecision; Rec."Rounding Precision")
                 {
                     ApplicationArea = All;

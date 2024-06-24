@@ -1120,6 +1120,8 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntries: TestPage "Job Queue Entries";
     begin
         CreateFailingJobQueueEntry(JobQueueEntry);
+        // The message does not matter, it is replaced when JQE page is opened
+        // Replaced to "Something went wrong and the job has stopped." and status becomes error
         JobQueueEntry."Error Message" := 'Part 1' + 'Part 2' + 'Part 3' + 'Part 4';
         JobQueueEntry.Modify(true);
 
@@ -1399,7 +1401,7 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueDispatcher.MockTaskScheduler();
         JobQueueDispatcher.Run(JobQueueEntryB);
 
-        JobQueueEntryB.TestField(Status, JobQueueEntryB.Status::Waiting);
+        JobQueueEntryB.TestField(Status, JobQueueEntryB.Status::Ready);
         UnbindSubscription(LibraryJobQueue);
     end;
 
@@ -1488,8 +1490,6 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
         JobQueueEntry."Object ID to Run" := 132453;
         JobQueueEntry.Status := JobQueueEntry.Status::"In Process";
-        // Do not set "User Service Instance ID", that is set is a separate session
-        JobQueueEntry."User Session ID" := SessionId();
         JobQueueEntry.Insert(true);
     end;
 

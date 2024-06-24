@@ -34,21 +34,74 @@ codeunit 134 "Import Attachment - Inc. Doc."
         ChooseFileTitleMsg: Label 'Choose the file to upload.';
         IsTestMode: Boolean;
 
+    procedure ImportMultiple(var IncDocAttachment: Record "Incoming Document Attachment"; RethrowError: Boolean; files: List of [FileUpload]): Boolean
+    begin
+        // Default to MS-DOS encoding to keep consistent with the previous behavior
+        exit(ImportMultiple(IncDocAttachment, RethrowError, files, TextEncoding::MSDos));
+    end;
+
+    procedure ImportMultiple(var IncDocAttachment: Record "Incoming Document Attachment"; RethrowError: Boolean; files: List of [FileUpload]; Encoding: TextEncoding): Boolean
+    var
+        CurrentFile: FileUpload;
+        AllFileUploadedSuccessFlag: Boolean;
+    begin
+        AllFileUploadedSuccessFlag := true;
+        foreach CurrentFile in files do begin
+            IncDocAttachment.Init();
+            IncDocAttachment."Incoming Document Entry No." := 0;
+            IncDocAttachment."Line No." := 0;
+            AllFileUploadedSuccessFlag := AllFileUploadedSuccessFlag and ImportAttachment(IncDocAttachment, CurrentFile, Encoding);
+        end;
+
+        if AllFileUploadedSuccessFlag then
+            exit(true);
+
+        if not RethrowError then
+            exit(false);
+
+        Error(GetLastErrorText());
+    end;
+
+    internal procedure ImportAttachment(var IncomingDocumentAttachment: Record "Incoming Document Attachment"; SingleFile: FileUpload): Boolean
+    begin
+        // Default to MS-DOS encoding to keep consistent with the previous behavior
+        exit(ImportAttachment(IncomingDocumentAttachment, SingleFile, TextEncoding::MSDos));
+    end;
+
+    internal procedure ImportAttachment(var IncomingDocumentAttachment: Record "Incoming Document Attachment"; SingleFile: FileUpload; Encoding: TextEncoding): Boolean
+    var
+        TempBlob: Codeunit "Temp Blob";
+        TempInStream: InStream;
+        TempOutStream: OutStream;
+    begin
+        SingleFile.CreateInStream(TempInStream, Encoding);
+        TempBlob.CreateOutStream(TempOutStream, Encoding);
+        CopyStream(TempOutStream, TempInStream);
+
+        CheckFileContentBeforeUploadFile(IncomingDocumentAttachment);
+        IncomingDocumentAttachment.SetContentFromBlob(TempBlob);
+        exit(ImportAttachment(IncomingDocumentAttachment, SingleFile.FileName, TempBlob));
+    end;
+
     [Scope('OnPrem')]
     procedure UploadFile(var IncomingDocumentAttachment: Record "Incoming Document Attachment"; var FileName: Text)
     var
         TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
     begin
+        CheckFileContentBeforeUploadFile(IncomingDocumentAttachment);
+
+        FileName := FileManagement.BLOBImportWithFilter(TempBlob, ImportTxt, FileName, StrSubstNo(FileDialogTxt, FilterTxt), FilterTxt);
+        IncomingDocumentAttachment.SetContentFromBlob(TempBlob);
+    end;
+
+    local procedure CheckFileContentBeforeUploadFile(var IncomingDocumentAttachment: Record "Incoming Document Attachment")
+    begin
         OnBeforeUploadFile(IncomingDocumentAttachment);
         IncomingDocumentAttachment.CalcFields(Content);
         if IncomingDocumentAttachment.Content.HasValue() then
             if not Confirm(ReplaceContentQst, false) then
                 Error('');
-
-        FileName := FileManagement.BLOBImportWithFilter(
-            TempBlob, ImportTxt, FileName, StrSubstNo(FileDialogTxt, FilterTxt), FilterTxt);
-        IncomingDocumentAttachment.SetContentFromBlob(TempBlob);
     end;
 
     [Scope('OnPrem')]

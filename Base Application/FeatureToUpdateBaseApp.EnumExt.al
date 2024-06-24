@@ -15,22 +15,6 @@ enumextension 2611 "Feature To Update - BaseApp" extends "Feature To Update"
         ObsoleteTag = '19.0';
     }
 #endif
-#if not CLEAN22
-    value(5405; CurrencySymbolMapping)
-    {
-        Implementation = "Feature Data Update" = "Feature Map Currency Symbol";
-        ObsoleteState = Pending;
-        ObsoleteReason = 'Feature CurrencySymbolMapping will be enabled by default in version 22.0.';
-        ObsoleteTag = '22.0';
-    }
-    value(5408; OptionMapping)
-    {
-        Implementation = "Feature Data Update" = "Feature - Option Mapping";
-        ObsoleteState = Pending;
-        ObsoleteReason = 'Feature OptionMapping will be enabled by default in version 22.0.';
-        ObsoleteTag = '22.0';
-    }
-#endif
     value(5409; EnablePlatformBasedReportSelection)
     {
         Implementation = "Feature Data Update" = "Feature - Report Selection";

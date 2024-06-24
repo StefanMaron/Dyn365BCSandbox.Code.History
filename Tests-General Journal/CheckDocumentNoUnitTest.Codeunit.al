@@ -488,7 +488,7 @@ codeunit 134073 "Check Document No. Unit Test"
 
         // [THEN] TryNoSeriesCode was not reset.
         asserterror NoSeriesMgtInstance.Run();
-        Assert.ExpectedError(StrSubstNo('The No. Series does not exist. Identification fields and values: Code=''%1''', TryNoSeriesCode));
+        Assert.ExpectedErrorCannotFind(Database::"No. Series", TryNoSeriesCode);
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
 #pragma warning restore AL0432
