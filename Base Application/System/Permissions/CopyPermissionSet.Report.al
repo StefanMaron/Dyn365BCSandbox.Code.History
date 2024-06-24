@@ -119,7 +119,9 @@ report 9802 "Copy Permission Set"
     var
         InputRoleID: Code[20];
         InputCopyType: Enum "Permission Set Copy Type";
+#pragma warning disable AA0470
         CopySuccessMsg: Label 'New permission set, %1, has been created.', Comment = 'New permission set, D365 Basic Set, has been created.';
+#pragma warning restore AA0470
         MissingSourceErr: Label 'There is no permission set to copy from.';
         MultipleSourcesErr: Label 'You can only copy one permission set at a time.';
         TargetExistsErr: Label 'The new permission set already exists.';

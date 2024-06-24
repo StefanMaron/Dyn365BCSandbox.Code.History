@@ -143,11 +143,15 @@ table 9650 "Custom Report Layout"
         FileFilterRdlcTxt: Label 'SQL Report Builder (*.rdl;*.rdlc)|*.rdl;*.rdlc', Comment = '{Split=r''\|''}{Locked=s''1''}';
         NoRecordsErr: Label 'There is no record in the list.';
         BuiltInTxt: Label 'Built-in layout';
+#pragma warning disable AA0470
         CopyOfTxt: Label 'Copy of %1';
+#pragma warning restore AA0470
         NewLayoutTxt: Label 'New layout';
         ErrorInLayoutErr: Label 'The following issue has been found in the layout %1 for report ID  %2:\%3.', Comment = '%1=a name, %2=a number, %3=a sentence/error description.';
         TemplateValidationQst: Label 'The RDLC layout does not comply with the current report design (for example, fields are missing or the report ID is wrong).\The following errors were detected during the layout validation:\%1\Do you want to continue?', Comment = '%1 = an error message.';
+#pragma warning disable AA0470
         TemplateValidationErr: Label 'The RDLC layout does not comply with the current report design (for example, fields are missing or the report ID is wrong).\The following errors were detected during the document validation:\%1\You must update the layout to match the current report design.';
+#pragma warning restore AA0470
         AbortWithValidationErr: Label 'The RDLC layout action has been canceled because of validation errors.';
         ModifyBuiltInLayoutQst: Label 'This is a built-in custom report layout, and it cannot be modified.\\Do you want to modify a copy of the custom report layout instead?';
         NoLayoutSelectedMsg: Label 'You must specify if you want to insert a Word layout or an RDLC layout for the report.';
@@ -760,10 +764,12 @@ table 9650 "Custom Report Layout"
     procedure CanModify(): Boolean
     var
         User: Record User;
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        CustomReportLayout: Record "Custom Report Layout";
     begin
         if CurrentTransactionType() = TransactionType::Report then
             exit(false);
-        if not WritePermission then
+        if not CustomReportLayout.WritePermission() then
             exit(false);
         if not User.Get(UserSecurityId()) then
             exit(true);

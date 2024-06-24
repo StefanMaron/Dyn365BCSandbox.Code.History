@@ -179,7 +179,9 @@ report 499 "Delete Invoiced Purch. Orders"
         WhseRequest: Record "Warehouse Request";
         ArchiveManagement: Codeunit ArchiveManagement;
 
+#pragma warning disable AA0470
         Text000Txt: Label 'Processing purch. orders #1##########';
+#pragma warning restore AA0470
 
     protected var
         Window: Dialog;

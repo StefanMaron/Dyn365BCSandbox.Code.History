@@ -8,19 +8,10 @@ using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Projects.Project.Job;
-#if not CLEAN23
-using Microsoft.Purchases.Document;
-#endif
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-#if not CLEAN23
-using Microsoft.Sales.Document;
-#endif
 using Microsoft.Sales.History;
-#if not CLEAN23
-using Microsoft.Service.Document;
-#endif
 
 table 5771 "Warehouse Source Filter"
 {
@@ -361,19 +352,23 @@ table 5771 "Warehouse Source Filter"
     }
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 must be chosen.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     procedure SetFilters(var GetSourceDocuments: Report "Get Source Documents"; LocationCode: Code[10])
     var
         WhseRequest: Record "Warehouse Request";
 #if not CLEAN23
-        SalesLine: Record "Sales Line";
-        PurchLine: Record "Purchase Line";
+        SalesLine: Record Microsoft.Sales.Document."Sales Line";
+        PurchLine: Record Microsoft.Purchases.Document."Purchase Line";
         TransLine: Record "Transfer Line";
-        SalesHeader: Record "Sales Header";
-        PurchHeader: Record "Purchase Header";
-        ServiceHeader: Record "Service Header";
-        ServiceLine: Record "Service Line";
+        SalesHeader: Record Microsoft.Sales.Document."Sales Header";
+        PurchHeader: Record Microsoft.Purchases.Document."Purchase Header";
+        ServiceHeader: Record Microsoft.Service.Document."Service Header";
+        ServiceLine: Record Microsoft.Service.Document."Service Line";
 #endif
     begin
         "Source Document" := '';
@@ -523,7 +518,12 @@ table 5771 "Warehouse Source Filter"
 #if not CLEAN23
     [Obsolete('Related code moved to codeunits [Source Table] Warehouse Mgt. This event is replaced with similar events in [Source Table] Warehouse Mgt. codeunits.', '23.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetTableView(var WarehouseRequest: Record "Warehouse Request"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var PurchaseLine: Record "Purchase Line"; var TransferLine: Record "Transfer Line"; var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var WarehouseSourceFilter: Record "Warehouse Source Filter"; var PurchaseHeader: Record "Purchase Header")
+    local procedure OnBeforeSetTableView(
+        var WarehouseRequest: Record "Warehouse Request";
+        var SalesHeader: Record Microsoft.Sales.Document."Sales Header"; var SalesLine: Record Microsoft.Sales.Document."Sales Line";
+        var PurchaseLine: Record Microsoft.Purchases.Document."Purchase Line"; var TransferLine: Record "Transfer Line";
+        var ServiceHeader: Record Microsoft.Service.Document."Service Header"; var ServiceLine: Record Microsoft.Service.Document."Service Line";
+        var WarehouseSourceFilter: Record "Warehouse Source Filter"; var PurchaseHeader: Record Microsoft.Purchases.Document."Purchase Header")
     begin
     end;
 #endif

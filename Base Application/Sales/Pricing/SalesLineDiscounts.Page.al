@@ -367,7 +367,9 @@ page 7004 "Sales Line Discounts"
         Item: Record Item;
         ItemDiscGr: Record "Item Discount Group";
         ClientTypeManagement: Codeunit "Client Type Management";
+#pragma warning disable AA0074
         Text000: Label 'All Customers';
+#pragma warning restore AA0074
         PageCaptionText: Text;
         SalesCodeEditable: Boolean;
         SalesCodeFilterCtrlEnable: Boolean;

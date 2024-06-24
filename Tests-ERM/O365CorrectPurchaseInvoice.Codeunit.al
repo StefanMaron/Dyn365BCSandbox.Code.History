@@ -1424,7 +1424,7 @@ codeunit 138025 "O365 Correct Purchase Invoice"
 
         // [WHEN] Invoice is corrected
         // [THEN] Error message 'Amount must have a value in Purchase Invoice Header' appears
-        asserterror CorrectPostedPurchInvoice.TestCorrectInvoiceIsAllowed(PurchInvoiceHeader, FALSE);
+        asserterror CorrectPostedPurchInvoice.TestCorrectInvoiceIsAllowed(PurchInvoiceHeader, false);
         Assert.ExpectedError(AmountPurchInvErr);
     end;
 
@@ -1453,7 +1453,7 @@ codeunit 138025 "O365 Correct Purchase Invoice"
         CreateItemWithCost(Item2, Type::Inventory, 10);
         LibraryPurchase.CreatePurchaseLine(PurchLine, PurchaseHeader, PurchLineType::Item, Item1."No.", 1);
         LibraryPurchase.CreatePurchaseLine(PurchLine, PurchaseHeader, PurchLineType::Item, Item2."No.", 1);
-        PostedPurchInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, TRUE, TRUE);
+        PostedPurchInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
         PurchInvoiceHeader.GET(PostedPurchInvoiceNo);
 
         // [WHEN] Correct Posted Invoice is invoked
@@ -2005,14 +2005,12 @@ codeunit 138025 "O365 Correct Purchase Invoice"
         LibraryDimension.CreateDimension(Dimension);
         LibraryDimension.CreateDimensionValue(DimValue, Dimension.Code);
 
-        with DefaultDim do begin
-            Validate("Table ID", TableID);
-            Validate("No.", No);
-            Validate("Dimension Code", DimValue."Dimension Code");
-            Validate("Dimension Value Code", DimValue.Code);
-            Validate("Value Posting", "Value Posting"::"Code Mandatory");
-            Insert(true);
-        end;
+        DefaultDim.Validate("Table ID", TableID);
+        DefaultDim.Validate("No.", No);
+        DefaultDim.Validate("Dimension Code", DimValue."Dimension Code");
+        DefaultDim.Validate("Dimension Value Code", DimValue.Code);
+        DefaultDim.Validate("Value Posting", DefaultDim."Value Posting"::"Code Mandatory");
+        DefaultDim.Insert(true);
     end;
 
     local procedure TurnOffExactCostReversing()

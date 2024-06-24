@@ -106,6 +106,9 @@
       "path": "./Tests-SCM"
     },
     {
+      "path": "./Tests-Service"
+    },
+    {
       "path": "./Tests-SINGLESERVER"
     },
     {
@@ -140,11 +143,11 @@
     }
   ],
   "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
   }
 }

@@ -180,6 +180,7 @@ codeunit 101995 "Create RapidStart Package"
         CreateTable(DATABASE::"Reminder Terms");
         CreateTable(DATABASE::"Reminder Level");
         CreateTable(DATABASE::"Reminder Attachment Text");
+        CreateTable(DATABASE::"Reminder Attachment Text Line");
         CreateTable(DATABASE::"Reminder Email Text");
         CreateTable(DATABASE::"Reminder Text");
         CreateTable(Database::"Reminder Action Group");

@@ -410,18 +410,22 @@ report 5600 "Fixed Asset - Analysis"
         SalesReport: Boolean;
         TypeExist: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'Fixed Asset - Analysis';
         Text001: Label '(Budget Report)';
         Text002: Label 'Group Total';
         Text003: Label 'Sold';
+#pragma warning disable AA0470
         Text004: Label 'Group Totals: %1';
         Text005: Label '%1 or %2 must be specified only together with the option %3.';
         Text006: Label 'The Starting Date must be specified when you use the option %1.';
         Text007: Label 'The date type %1 is not a valid option.';
         Text008: Label 'The posting type %1 is not a valid option.';
         Text009: Label '%1 has been modified in fixed asset %2.';
+#pragma warning restore AA0470
         Text010: Label 'before Starting Date,Net Change,at Ending Date';
         Text011: Label ' ,FA Class,FA Subclass,FA Location,Main Asset,Global Dimension 1,Global Dimension 2,FA Posting Group';
+#pragma warning restore AA0074
         CurrReportPAGENOCaptionLbl: Label 'Page';
         TotalCaptionLbl: Label 'Total';
         OnlySoldAssetsLbl: Label '(Only Sold Assets)';

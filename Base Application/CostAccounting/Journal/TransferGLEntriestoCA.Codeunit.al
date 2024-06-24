@@ -42,13 +42,17 @@ codeunit 1105 "Transfer GL Entries to CA"
         PostingDate: Date;
         BatchRun: Boolean;
         GotCostAccSetup: Boolean;
+#pragma warning disable AA0074
         Text000: Label 'Income statement accounts that have cost centers or cost objects will be transferred to Cost Accounting.\All entries since the last transfer will be processed.\\The link between cost type and G/L account will be verified.\\Do you want to start the transfer?';
+#pragma warning disable AA0470
         Text001: Label 'Transfer G/L Entries to Cost Accounting.\G/L Entry No.          #1########\Cost Type              #2########\Combined entries       #3########\No. of Cost Entries    #4########';
         Text002: Label 'G/L entries from No. %1 have been processed. %2 cost entries have been created.';
+#pragma warning restore AA0470
         Text003: Label 'Combined entries per month %1', Comment = '%1 - Posting Date.';
         Text004: Label 'Combined entries per day %1', Comment = '%1 - Posting Date';
         Text005: Label 'There are no G/L entries that meet the criteria for transfer to cost accounting.';
         Text006: Label 'Posting Cost Entries @1@@@@@@@@@@\';
+#pragma warning restore AA0074
 
     local procedure ConfirmTransferGLtoCA()
     begin

@@ -529,6 +529,9 @@ report 5900 "Service Order"
                         column(ShiptoAddressCaption; ShiptoAddressCaptionLbl)
                         {
                         }
+                        column(ShipToPhoneNo; "Service Header"."Ship-to Phone")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -650,8 +653,12 @@ report 5900 "Service Order"
         TotalAmt: Decimal;
         TotalGrossAmt: Decimal;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'Service Order %1';
         Text002: Label 'Page %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ContractNoCaptionLbl: Label 'Contract No.';
         ServiceHeaderOrderDateCaptionLbl: Label 'Order Date';
         InvoicetoCaptionLbl: Label 'Invoice to';
@@ -684,12 +691,14 @@ report 5900 "Service Order"
     end;
 
     local procedure FormatAddressFields(var ServiceHeader: Record "Service Header")
+    var
+        ServiceFormatAddress: Codeunit "Service Format Address";
     begin
         FormatAddr.GetCompanyAddr(ServiceHeader."Responsibility Center", RespCenter, CompanyInfo, CompanyAddr);
-        FormatAddr.ServiceOrderSellto(CustAddr, ServiceHeader);
+        ServiceFormatAddress.ServiceOrderSellto(CustAddr, ServiceHeader);
         ShowShippingAddr := ServiceHeader."Ship-to Code" <> '';
         if ShowShippingAddr then
-            FormatAddr.ServiceOrderShipto(ShipToAddr, ServiceHeader);
+            ServiceFormatAddress.ServiceOrderShipto(ShipToAddr, ServiceHeader);
     end;
 }
 

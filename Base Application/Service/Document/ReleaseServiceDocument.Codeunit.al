@@ -23,7 +23,9 @@ codeunit 416 "Release Service Document"
         InvtSetup: Record "Inventory Setup";
         WhseServiceRelease: Codeunit "Whse.-Service Release";
         SkipWhseRequestOperations: Boolean;
+#pragma warning disable AA0470
         NothingToReleaseErr: Label 'There is nothing to release for %1 %2.', Comment = 'Example: There is nothing to release for Order 12345.';
+#pragma warning restore AA0470
 
     local procedure "Code"()
     var
@@ -57,16 +59,17 @@ codeunit 416 "Release Service Document"
         OnCodeOnBeforeCheckLocationCode(ServLine, IsHandled);
         if not IsHandled then begin
             InvtSetup.Get();
-            if InvtSetup."Location Mandatory" then begin
-                ServLine.SetCurrentKey(Type);
-                ServLine.SetRange(Type, ServLine.Type::Item);
-                ServLine.SetRange("Location Code", '');
-                if ServLine.FindSet() then
-                    repeat
-                        VerifyLocationCode(ServLine);
-                    until ServLine.Next() = 0;
-                ServLine.SetFilter(Type, '<>%1', ServLine.Type::" ");
-            end;
+            ServLine.SetCurrentKey(Type);
+            ServLine.SetRange(Type, ServLine.Type::Item);
+            if ServLine.FindSet() then
+                repeat
+                    if InvtSetup."Location Mandatory" then
+                        if ServLine."Location Code" = '' then
+                            VerifyLocationCode(ServLine);
+                    if ServLine.IsInventoriableItem() then
+                        ServLine.TestField("Unit of Measure Code");
+                until ServLine.Next() = 0;
+            ServLine.SetFilter(Type, '<>%1', ServLine.Type::" ");
         end;
 
         OnCodeOnAfterCheck(ServiceHeader, ServLine);

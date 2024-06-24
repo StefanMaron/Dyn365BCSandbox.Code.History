@@ -82,7 +82,9 @@ table 1001 "Job Task"
                 if (xRec."Job Task Type" = "Job Task Type"::Posting) and
                    ("Job Task Type" <> "Job Task Type"::Posting)
                 then begin
-                    if JobLedgEntriesExist() or JobPlanningLinesExist() then
+                    if JobLedgEntriesExist() then
+                        Error(CannotChangeAssociatedEntriesErr, FieldCaption("Job Task Type"), TableCaption);
+                    if JobPlanningLinesExist() then
                         Error(CannotChangeAssociatedEntriesErr, FieldCaption("Job Task Type"), TableCaption);
                     ClearCustomerData();
                 end;
@@ -909,6 +911,14 @@ table 1001 "Job Task"
             Caption = 'Coupled to Field Service';
             Editable = false;
             CalcFormula = exist("CRM Integration Record" where("Integration ID" = field(SystemId), "Table ID" = const(Database::"Job Task")));
+            ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+#if not CLEAN25
+            ObsoleteState = Pending;
+            ObsoleteTag = '25.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '28.0';
+#endif
         }
     }
 
@@ -1057,30 +1067,29 @@ table 1001 "Job Task"
         exit(0);
     end;
 
-    local procedure JobLedgEntriesExist(): Boolean
+    local procedure JobLedgEntriesExist() Result: Boolean
     var
-        JobLedgEntry: Record "Job Ledger Entry";
+        JobLedgerEntry: Record "Job Ledger Entry";
     begin
-        JobLedgEntry.SetCurrentKey("Job No.", "Job Task No.");
-        JobLedgEntry.SetRange("Job No.", "Job No.");
-        JobLedgEntry.SetRange("Job Task No.", "Job Task No.");
-        OnJobLedgEntriesExistOnAfterSetFilter(Rec, JobLedgEntry);
-        exit(JobLedgEntry.FindFirst());
+        JobLedgerEntry.SetCurrentKey("Job No.", "Job Task No.");
+        JobLedgerEntry.SetRange("Job No.", "Job No.");
+        JobLedgerEntry.SetRange("Job Task No.", "Job Task No.");
+        OnJobLedgEntriesExistOnAfterSetFilter(Rec, JobLedgerEntry);
+        Result := not JobLedgerEntry.IsEmpty();
     end;
 
-    local procedure JobPlanningLinesExist(): Boolean
+    local procedure JobPlanningLinesExist() Result: Boolean
     var
         JobPlanningLine: Record "Job Planning Line";
     begin
-        JobPlanningLine.SetCurrentKey("Job No.", "Job Task No.");
         JobPlanningLine.SetRange("Job No.", "Job No.");
         JobPlanningLine.SetRange("Job Task No.", "Job Task No.");
-        exit(JobPlanningLine.FindFirst());
+        Result := not JobPlanningLine.IsEmpty();
     end;
 
     procedure Caption(): Text
     var
-        Job: Record Job;
+        JobForCaption: Record Job;
         Result: Text;
         IsHandled: Boolean;
     begin
@@ -1090,11 +1099,12 @@ table 1001 "Job Task"
         if IsHandled then
             exit(Result);
 
-        if not Job.Get("Job No.") then
+        JobForCaption.SetLoadFields("No.", Description);
+        if not JobForCaption.Get("Job No.") then
             exit('');
         exit(StrSubstNo('%1 %2 %3 %4',
-            Job."No.",
-            Job.Description,
+            JobForCaption."No.",
+            JobForCaption.Description,
             "Job Task No.",
             Description));
     end;
@@ -1181,7 +1191,7 @@ table 1001 "Job Task"
             Location.Get(LocationCode);
     end;
 
-    local procedure MessageIfJobPlanningLineExist(ChangedFieldName: Text[100])
+    local procedure MessageIfJobPlanningLineExist(ChangedFieldName: Text)
     var
         MessageText: Text;
     begin
@@ -1192,25 +1202,24 @@ table 1001 "Job Task"
         end;
     end;
 
-    procedure JobPlanningLineExist(): Boolean
+    procedure JobPlanningLineExist() Result: Boolean
     var
         JobPlanningLine: Record "Job Planning Line";
     begin
         JobPlanningLine.SetRange("Job No.", "Job No.");
         JobPlanningLine.SetRange("Job Task No.", "Job Task No.");
         JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Item);
-        exit(not JobPlanningLine.IsEmpty());
+        Result := not JobPlanningLine.IsEmpty();
     end;
 
     procedure SalesJobLedgEntryExist() Result: Boolean
     var
-        JobLedgEntry: Record "Job Ledger Entry";
+        JobLedgerEntry: Record "Job Ledger Entry";
     begin
-        JobLedgEntry.SetCurrentKey("Job No.", "Job Task No.", "Entry Type", "Posting Date");
-        JobLedgEntry.SetRange("Job No.", "Job No.");
-        JobLedgEntry.SetRange("Job Task No.", "Job Task No.");
-        JobLedgEntry.SetRange("Entry Type", JobLedgEntry."Entry Type"::Sale);
-        Result := not JobLedgEntry.IsEmpty();
+        JobLedgerEntry.SetRange("Job No.", "Job No.");
+        JobLedgerEntry.SetRange("Job Task No.", "Job Task No.");
+        JobLedgerEntry.SetRange("Entry Type", JobLedgerEntry."Entry Type"::Sale);
+        Result := not JobLedgerEntry.IsEmpty();
     end;
 
     procedure SalesLineExist() Result: Boolean
@@ -1220,7 +1229,6 @@ table 1001 "Job Task"
         if "Job No." = '' then
             exit(false);
 
-        SalesLine.SetCurrentKey("Job No.");
         SalesLine.SetRange("Job No.", "Job No.");
         Result := not SalesLine.IsEmpty();
     end;
@@ -1328,6 +1336,8 @@ table 1001 "Job Task"
     var
         JobPlanningLine: Record "Job Planning Line";
         ConfirmManagement: Codeunit "Confirm Management";
+        ConfirmResult: Boolean;
+        IsHandled: Boolean;
     begin
         JobPlanningLine.SetRange("Job No.", JobTask."Job No.");
         JobPlanningLine.SetRange("Job Task No.", JobTask."Job Task No.");
@@ -1336,7 +1346,11 @@ table 1001 "Job Task"
         if JobPlanningLine.IsEmpty() then
             exit;
 
-        if not ConfirmManagement.GetResponseOrDefault(UpdateCostPricesOnRelatedLinesQst, true) then
+        IsHandled := false;
+        OnUpdateCostPricesOnRelatedJobPlanningLinesOnBeforeConfirmUpdate(JobTask, ConfirmResult, IsHandled);
+        if not IsHandled then
+            ConfirmResult := ConfirmManagement.GetResponseOrDefault(UpdateCostPricesOnRelatedLinesQst, true);
+        if not ConfirmResult then
             exit;
 
         JobTask.Modify(true);
@@ -1359,7 +1373,7 @@ table 1001 "Job Task"
         if not JobTaskDim.IsEmpty() then
             JobTaskDim.DeleteAll();
 
-        CustDefaultDimension.SetRange("Table ID", DATABASE::Customer);
+        CustDefaultDimension.SetRange("Table ID", Database::Customer);
         CustDefaultDimension.SetRange("No.", BillToCustomerNo);
         if CustDefaultDimension.FindSet() then
             repeat
@@ -1708,12 +1722,11 @@ table 1001 "Job Task"
 
     procedure JobLedgEntryExist() Result: Boolean
     var
-        JobLedgEntry: Record "Job Ledger Entry";
+        JobLedgerEntry: Record "Job Ledger Entry";
     begin
-        JobLedgEntry.SetCurrentKey("Job No.");
-        JobLedgEntry.SetRange("Job No.", "Job No.");
-        JobLedgEntry.SetRange("Job Task No.", "Job Task No.");
-        Result := not JobLedgEntry.IsEmpty();
+        JobLedgerEntry.SetRange("Job No.", "Job No.");
+        JobLedgerEntry.SetRange("Job Task No.", "Job Task No.");
+        Result := not JobLedgerEntry.IsEmpty();
     end;
 
     procedure JobPlanLineExist() Result: Boolean
@@ -1814,6 +1827,11 @@ table 1001 "Job Task"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSyncShipToWithSellTo(var JobTask: Record "Job Task")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateCostPricesOnRelatedJobPlanningLinesOnBeforeConfirmUpdate(var JobTask: Record "Job Task"; var ConfirmResult: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
