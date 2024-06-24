@@ -389,15 +389,6 @@ page 279 "Source Code Setup"
                     ToolTip = 'Specifies the code that is used for def. dimension priorities on Prod. Order Components.';
                 }
             }
-            group(Service)
-            {
-                Caption = 'Service';
-                field("Service Management"; Rec."Service Management")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the code linked to entries that are posted from the Service Management application area.';
-                }
-            }
             group(Warehouse)
             {
                 Caption = 'Warehouse';

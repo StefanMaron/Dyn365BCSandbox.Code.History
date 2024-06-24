@@ -559,6 +559,11 @@ table 114 "Sales Cr.Memo Header"
             Caption = 'Work Description';
             DataClassification = CustomerContent;
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -692,67 +697,6 @@ table 114 "Sales Cr.Memo Header"
         {
             Caption = 'Draft Cr. Memo System Id';
             DataClassification = SystemMetadata;
-        }
-        field(13600; "EAN No."; Code[13])
-        {
-            Caption = 'EAN No.';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13601; "Electronic Credit Memo Created"; Boolean)
-        {
-            Caption = 'Electronic Credit Memo Created';
-            Editable = false;
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13602; "Account Code"; Text[30])
-        {
-            Caption = 'Account Code';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13604; "OIOUBL Profile Code"; Code[10])
-        {
-            Caption = 'OIOUBL Profile Code';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13605; "Sell-to Contact Phone No."; Text[30])
-        {
-            Caption = 'Sell-to Contact Phone No.';
-            ExtendedDatatype = PhoneNo;
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13606; "Sell-to Contact Fax No."; Text[30])
-        {
-            Caption = 'Sell-to Contact Fax No.';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13607; "Sell-to Contact E-Mail"; Text[80])
-        {
-            Caption = 'Sell-to Contact E-Mail';
-            ExtendedDatatype = EMail;
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13608; "Sell-to Contact Role"; Option)
-        {
-            Caption = 'Sell-to Contact Role';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            OptionCaption = ' ,,,Purchase Responsible,,,Accountant,,,Budget Responsible,,,Requisitioner';
-            OptionMembers = " ",,,"Purchase Responsible",,,Accountant,,,"Budget Responsible",,,Requisitioner;
-            ObsoleteTag = '15.0';
         }
     }
 
@@ -975,15 +919,19 @@ table 114 "Sales Cr.Memo Header"
         exit(FieldCaption("VAT Registration No."));
     end;
 
+#if not CLEAN25
+    [Obsolete('The procedure is not used and will be obsoleted.', '25.0')]
     procedure GetCustomerGlobalLocationNumber(): Text
     begin
         exit('');
     end;
 
+    [Obsolete('The procedure is not used and will be obsoleted.', '25.0')]
     procedure GetCustomerGlobalLocationNumberLbl(): Text
     begin
         exit('');
     end;
+#endif
 
     procedure GetLegalStatement(): Text
     var

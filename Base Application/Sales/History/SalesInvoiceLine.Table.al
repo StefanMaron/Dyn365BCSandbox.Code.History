@@ -597,13 +597,6 @@ table 113 "Sales Invoice Line"
         {
             Caption = 'Price description';
         }
-        field(13600; "Account Code"; Text[30])
-        {
-            Caption = 'Account Code';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
     }
 
     keys

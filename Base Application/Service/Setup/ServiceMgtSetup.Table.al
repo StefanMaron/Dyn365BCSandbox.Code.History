@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Service.Setup;
+namespace Microsoft.Service.Setup;
 
 using Microsoft.CRM.Setup;
 using Microsoft.CRM.Team;
@@ -381,20 +381,6 @@ table 5911 "Service Mgt. Setup"
             AccessByPermission = TableData "Service Contract Line" = R;
             Caption = 'Contract Credit Memo Nos.';
             TableRelation = "No. Series";
-        }
-        field(13600; "OIOUBL Service Invoice Path"; Text[250])
-        {
-            Caption = 'OIOUBL Service Invoice Path';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
-        }
-        field(13601; "OIOUBL Service Cr. Memo Path"; Text[250])
-        {
-            Caption = 'OIOUBL Service Cr. Memo Path';
-            ObsoleteReason = 'Moved to OIOUBL extension, the same table, same field name prefixed with OIOUBL-.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
         }
     }
 

@@ -316,17 +316,29 @@ report 5757 "Items with Negative Inventory"
         WhseWkshLine: Record "Whse. Worksheet Line";
         Window: Dialog;
         LocCode: Code[10];
+#pragma warning disable AA0074
         Text001: Label 'Enter a location code.';
+#pragma warning disable AA0470
         Text002: Label 'Checking %1 %2 for negative inventory...\\';
         Text003: Label 'Count #100##### @102@@@@@@@@';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         i: Integer;
         ILECounter: Integer;
+#pragma warning disable AA0074
         Text004: Label 'No negative inventory was found.';
+#pragma warning disable AA0470
         Text005: Label 'A %1 exists for %2 %3. It must be either posted or deleted before running the Create Whse. Location batch job.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ErrorCounter: Integer;
         ErrorText: array[5] of Text[250];
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text006: Label 'A %1 exists for %2 %3. It must be either registered or deleted before running the Create Whse. Location batch job.';
         Text007: Label 'A %1 exists for %2 %3. It must be deleted before running the Create Whse. Location batch job.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         Items_with_Negative_InventoryLbl: Label 'Items with Negative Inventory';
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         ItemLedgEntryBufferRemainQtyCaption: Text;

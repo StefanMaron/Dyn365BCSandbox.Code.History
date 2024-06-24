@@ -7,7 +7,6 @@ namespace Microsoft.Projects.TimeSheet;
 using Microsoft.Assembly.Document;
 using Microsoft.HumanResources.Absence;
 using Microsoft.Projects.Project.Job;
-using Microsoft.Service.Document;
 using Microsoft.Utilities;
 using System.Security.User;
 
@@ -66,15 +65,6 @@ table 955 "Time Sheet Line Archive"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = "User Setup";
-        }
-        field(13; "Service Order No."; Code[20])
-        {
-            Caption = 'Service Order No.';
-            TableRelation = if (Posted = const(false)) "Service Header"."No." where("Document Type" = const(Order));
-        }
-        field(14; "Service Order Line No."; Integer)
-        {
-            Caption = 'Service Order Line No.';
         }
         field(15; "Total Quantity"; Decimal)
         {

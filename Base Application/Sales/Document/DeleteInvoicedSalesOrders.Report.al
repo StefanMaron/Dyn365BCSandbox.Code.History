@@ -172,7 +172,9 @@ report 299 "Delete Invoiced Sales Orders"
         Window: Dialog;
         AllLinesDeleted: Boolean;
 
+#pragma warning disable AA0470
         Text000Txt: Label 'Processing sales orders #1##########';
+#pragma warning restore AA0470
 
     local procedure UpdateAssociatedPurchOrder()
     var

@@ -109,7 +109,11 @@ report 291 "Delete Invd Blnkt Sales Orders"
         ArchiveManagement: Codeunit ArchiveManagement;
         Window: Dialog;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Processing sales orders #1##########';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     local procedure DeleteApprovalEntries(SalesHeader: Record "Sales Header")
     var

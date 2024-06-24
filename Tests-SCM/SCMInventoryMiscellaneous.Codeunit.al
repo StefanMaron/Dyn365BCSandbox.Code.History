@@ -213,10 +213,12 @@ codeunit 137293 "SCM Inventory Miscellaneous"
         BatchName: Code[10];
     begin
         // [FEATURE] [Planning Worksheet] [Production Order] 
-        // [SCENARIO 502388] Calculate Order Plan and Recalculate Requisition Plan for Item with Frozen period. Specific scenario.
+        // [SCENARIO 502388] Calculate Order Plan and Recalculate Requisition Plan for Item with Frozen period. 
+        // Calculation have the issue just with specific scenario with exact values for dates and Rescheduling Period.
         Initialize();
 
-        // [GIVEN] Create Item
+        // [GIVEN] Create Item with Replenishment System as Prod. Order and Reordering Policy as Lot-for-Lot.
+        // [GIVEN] Set Rescheduling Period as 215D as with that exact value system had an issue.
         CreateItem(Item, Item."Replenishment System"::"Prod. Order");
         Item."Reordering Policy" := Item."Reordering Policy"::"Lot-for-Lot";
         Evaluate(Item."Rescheduling Period", '215D');
@@ -2680,12 +2682,10 @@ codeunit 137293 "SCM Inventory Miscellaneous"
 
     local procedure UpdateSKUReorderingPolicy(var SKU: Record "Stockkeeping Unit"; ReorderingPolicy: Enum "Reordering Policy"; ReorderPoint: Decimal; ReorderQty: Decimal)
     begin
-        with SKU do begin
-            Validate("Reordering Policy", ReorderingPolicy);
-            Validate("Reorder Point", ReorderPoint);
-            Validate("Reorder Quantity", ReorderQty);
-            Modify(true);
-        end;
+        SKU.Validate("Reordering Policy", ReorderingPolicy);
+        SKU.Validate("Reorder Point", ReorderPoint);
+        SKU.Validate("Reorder Quantity", ReorderQty);
+        SKU.Modify(true);
     end;
 
     local procedure VerifyDimensionOnTransferLine(DefaultDimension: Record "Default Dimension"; DimensionSetID: Integer)

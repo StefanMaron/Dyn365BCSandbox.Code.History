@@ -391,8 +391,12 @@ page 5604 "FA Ledger Entries"
         CalcRunningFABalance: Codeunit "Calc. Running FA Balance";
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
         Navigate: Page Navigate;
+#pragma warning disable AA0470
         CannotUndoErr: Label 'You cannot undo the FA Ledger Entry No. %1 by using the Reverse Transaction function because Depreciation Book %2 does not have the appropriate G/L integration setup.';
+#pragma warning restore AA0470
+#pragma warning disable AA0074
         Text001: Label 'You cannot reverse the transaction because the fixed asset has been sold.';
+#pragma warning restore AA0074
 
     protected var
         Dim1Visible: Boolean;

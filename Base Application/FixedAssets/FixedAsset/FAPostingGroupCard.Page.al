@@ -391,7 +391,9 @@ page 5612 "FA Posting Group Card"
     }
 
     var
+#pragma warning disable AA0074
         Text19064976: Label 'Allocated %';
         Text19080001: Label 'Allocated %';
+#pragma warning restore AA0074
 }
 

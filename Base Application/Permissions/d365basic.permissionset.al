@@ -179,6 +179,7 @@ permissionset 207 "D365 BASIC"
 
     Permissions = tabledata "Add-in" = imd,
                   tabledata "Aggregate Permission Set" = Rimd,
+                  tabledata "All Profile Page Metadata" = imd,
                   tabledata AllObj = imd,
                   tabledata AllObjWithCaption = Rimd,
                   tabledata "Alt. Customer Posting Group" = R,
@@ -202,19 +203,6 @@ permissionset 207 "D365 BASIC"
 #if not CLEAN24
                   tabledata "Deposits Page Setup" = R,
 #endif
-                  tabledata "Designed Query" = R,
-                  tabledata "Designed Query Caption" = R,
-                  tabledata "Designed Query Category" = R,
-                  tabledata "Designed Query Column" = R,
-                  tabledata "Designed Query Column Filter" = R,
-                  tabledata "Designed Query Data Item" = R,
-                  tabledata "Designed Query Filter" = R,
-                  tabledata "Designed Query Group" = R,
-                  tabledata "Designed Query Join" = R,
-                  tabledata "Designed Query Management" = RIMD,
-                  tabledata "Designed Query Obj" = Rimd,
-                  tabledata "Designed Query Order By" = R,
-                  tabledata "Designed Query Permission" = R,
                   tabledata "Dispute Status" = R,
                   tabledata Device = Rimd,
                   tabledata "Direct Trans. Header" = RIMD,
@@ -545,13 +533,6 @@ permissionset 207 "D365 BASIC"
                   tabledata "Incoming Documents Setup" = R,
                   tabledata "Interaction Merge Data" = RIMD,
                   tabledata "Interaction Template Setup" = RIMD,
-#if not CLEAN22
-                  tabledata "Advanced Intrastat Checklist" = RIMD,
-                  tabledata "Intrastat Jnl. Batch" = RIMD,
-                  tabledata "Intrastat Jnl. Line" = Rim,
-                  tabledata "Intrastat Jnl. Template" = RIMD,
-                  tabledata "Intrastat Setup" = R,
-#endif
                   tabledata "Invalidated Dim Correction" = R,
                   tabledata "Inventory Adjustment Buffer" = Rimd,
                   tabledata "Inventory Buffer" = Rimd,
@@ -656,9 +637,6 @@ permissionset 207 "D365 BASIC"
                   tabledata "Order Address" = Rim,
                   tabledata "Over-Receipt Code" = RIMD,
                   tabledata "Overdue Approval Entry" = Rimd,
-#if not CLEAN22
-                  tabledata "Payment Buffer" = RIMD,
-#endif
                   tabledata "Vendor Payment Buffer" = RIMD,
                   tabledata "Payment Export Data" = Rimd,
                   tabledata "Payment Export Remittance Text" = RIMD,
@@ -691,9 +669,6 @@ permissionset 207 "D365 BASIC"
                   tabledata "Posted Docs. With No Inc. Buf." = RIMD,
                   tabledata "Posted Gen. Journal Batch" = RIMD,
                   tabledata "Posted Gen. Journal Line" = RIMD,
-#if not CLEAN22
-                  tabledata "Power BI Service Status Setup" = RIMD,
-#endif
 #if not CLEAN23
                   tabledata "Power BI User Configuration" = RIMD,
                   tabledata "Power BI Report Configuration" = RIMD,
@@ -752,6 +727,7 @@ permissionset 207 "D365 BASIC"
                   tabledata "Referenced XML Schema" = RIMD,
                   tabledata "Relationship Mgmt. Cue" = RIMD,
                   tabledata "Reminder Attachment Text" = R,
+                  tabledata "Reminder Attachment Text Line" = R,
                   tabledata "Reminder Email Text" = R,
                   tabledata "Reminder Terms" = R,
                   tabledata "Reminder Terms Translation" = RIMD,
@@ -891,12 +867,6 @@ permissionset 207 "D365 BASIC"
                   tabledata "Unit of Measure" = RIMD,
                   tabledata "Unit of Measure Translation" = RIMD,
                   tabledata "Unlinked Attachment" = RIMD,
-#if not CLEAN22
-                  tabledata "User Group" = R,
-                  tabledata "User Group Access Control" = R,
-                  tabledata "User Group Member" = R,
-                  tabledata "User Group Permission Set" = R,
-#endif
                   tabledata "User Preference" = RIMD,
                   tabledata "User Setup" = R,
                   tabledata "User Task" = RIMD,

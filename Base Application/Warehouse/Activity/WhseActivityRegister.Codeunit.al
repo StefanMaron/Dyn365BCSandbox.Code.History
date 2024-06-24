@@ -23,11 +23,11 @@ using Microsoft.Warehouse.InventoryDocument;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Request;
-using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
 using Microsoft.Warehouse.Tracking;
 using Microsoft.Warehouse.Worksheet;
 using System.Utilities;
+using Microsoft.Warehouse.Setup;
 
 codeunit 7307 "Whse.-Activity-Register"
 {
@@ -50,9 +50,13 @@ codeunit 7307 "Whse.-Activity-Register"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Warehouse Activity    #1##########\\';
         Text001: Label 'Checking lines        #2######\';
         Text002: Label 'Registering lines     #3###### @4@@@@@@@@@@@@@';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         Location: Record Location;
         Item: Record Item;
         GlobalWhseActivHeader: Record "Warehouse Activity Header";
@@ -85,9 +89,13 @@ codeunit 7307 "Whse.-Activity-Register"
         NoOfRecords: Integer;
         LineCount: Integer;
         HideDialog: Boolean;
+#pragma warning disable AA0074
         Text003: Label 'There is nothing to register.';
+#pragma warning restore AA0074
         InsufficientQtyItemTrkgErr: Label 'Item tracking defined for source line %1 of %2 %3 amounts to more than the quantity you have entered.\\You must adjust the existing item tracking specification and then reenter a new quantity.', Comment = '%1=Source Line No.,%2=Source Document,%3=Source No.';
+#pragma warning disable AA0470
         InventoryNotAvailableErr: Label '%1 %2 is not available on inventory or it has already been reserved for another document.';
+#pragma warning restore AA0470
         ItemAlreadyConsumedErr: Label 'Cannot register pick for more than %1 %2 for %3 %4. %5 %6 is partially or completely consumed in %7 of %8 %9 %10.', Comment = 'Cannot Register Pick for more than %1=3 %2=BOX for %3=Line No %4=10000. %5=Item, %6=Item No. is partially or completely consumed in the %7=Project Usage of %8=Project No. %9=Source Line No. %10=Project Contract Entry No.';
         OrderToOrderBindingOnSalesLineQst: Label 'Registering the pick will remove the existing order-to-order reservation for the sales order.\Do you want to continue?';
         RegisterInterruptedErr: Label 'The action has been interrupted to respect the warning.';
@@ -128,8 +136,9 @@ codeunit 7307 "Whse.-Activity-Register"
         TempWhseActivLineToReserve.DeleteAll();
         TempWhseActivityLineGrouped.DeleteAll();
 
-        GlobalWhseActivLine.LockTable();
-        WhseJnlRegisterLine.LockTables();
+        GlobalWhseActivLine.ReadIsolation(IsolationLevel::UpdLock);
+        WhseJnlRegisterLine.LockIfLegacyPosting();
+
         // breakbulk first to provide quantity for pick lines in smaller UoM
         GlobalWhseActivLine.SetFilter("Breakbulk No.", '<>0');
         RegisterWhseActivityLines(GlobalWhseActivLine, TempWhseActivLineToReserve, TempWhseActivityLineGrouped);

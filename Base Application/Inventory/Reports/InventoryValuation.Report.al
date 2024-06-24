@@ -262,7 +262,11 @@ report 1001 "Inventory Valuation"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text005: Label 'As of %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         BoM_TextLbl: Label 'Base UoM';
         Inventory_ValuationCaptionLbl: Label 'Inventory Valuation';
         CurrReport_PAGENOCaptionLbl: Label 'Page';
