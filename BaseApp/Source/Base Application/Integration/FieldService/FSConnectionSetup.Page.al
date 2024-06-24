@@ -2,6 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+#if not CLEAN25
 namespace Microsoft.Integration.FieldService;
 
 using Microsoft.Integration.Dataverse;
@@ -14,16 +15,16 @@ using Microsoft.Projects.Project.Journal;
 
 page 6420 "FS Connection Setup"
 {
-    AccessByPermission = TableData "FS Connection Setup" = IM;
-    ApplicationArea = Suite;
     Caption = 'Dynamics 365 Field Service Integration Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     ShowFilter = false;
     SourceTable = "FS Connection Setup";
-    UsageCategory = Administration;
     AdditionalSearchTerms = 'Dynamics 365 Field Service Connection Setup';
+    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '25.0';
 
     layout
     {
@@ -40,7 +41,7 @@ page 6420 "FS Connection Setup"
 
                     trigger OnValidate()
                     begin
-                        ConnectionString := Rec.GetConnectionString();
+                        ConnectionString := Rec.GetConnectionStringAsStoredInSetup();
                     end;
                 }
                 field("Is Enabled"; Rec."Is Enabled")
@@ -376,7 +377,7 @@ page 6420 "FS Connection Setup"
         end else begin
             if not Rec."Is Enabled" then
                 Rec.LoadConnectionStringElementsFromCDSConnectionSetup();
-            ConnectionString := Rec.GetConnectionString();
+            ConnectionString := Rec.GetConnectionStringAsStoredInSetup();
             Rec.UnregisterConnection();
             if (not IsValidProxyVersion()) then begin
                 if not IsValidProxyVersion() then
@@ -508,4 +509,4 @@ page 6420 "FS Connection Setup"
         Rec.Validate("Proxy Version", CRMIntegrationManagement.GetLastProxyVersionItem());
     end;
 }
-
+#endif

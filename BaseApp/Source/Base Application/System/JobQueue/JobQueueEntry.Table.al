@@ -539,6 +539,9 @@ table 472 "Job Queue Entry"
         {
             IncludedFields = Status, "User ID", "System Task ID", "Job Queue Category Code", "Earliest Start Date/Time";
         }
+        key(Key8; "Error Message Register Id")
+        {
+        }
     }
 
     fieldgroups
@@ -802,8 +805,11 @@ table 472 "Job Queue Entry"
 
     procedure CheckRequiredPermissions()
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
         DummyJobQueueLogEntry: Record "Job Queue Log Entry";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         DummyErrorMessageRegister: Record "Error Message Register";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         DummyErrorMessage: Record "Error Message";
     begin
         if not DummyJobQueueLogEntry.WritePermission() then
@@ -818,8 +824,11 @@ table 472 "Job Queue Entry"
 
     procedure HasRequiredPermissions(): Boolean
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
         DummyJobQueueLogEntry: Record "Job Queue Log Entry";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         DummyErrorMessageRegister: Record "Error Message Register";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         DummyErrorMessage: Record "Error Message";
     begin
         if not DummyJobQueueLogEntry.WritePermission() then

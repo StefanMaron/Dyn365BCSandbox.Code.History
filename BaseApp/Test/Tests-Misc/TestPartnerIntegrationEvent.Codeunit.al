@@ -79,7 +79,9 @@ codeunit 134299 "Test Partner Integration Event"
         OnAfterSalesCrMemoLineInsertTxt: Label 'OnAfterSalesCrMemoLineInsert';
         OnAfterPurchInvLineInsertTxt: Label 'OnAfterPurchInvLineInsert';
         OnAfterPurchCrMemoLineInsertTxt: Label 'OnAfterPurchCrMemoLineInsert';
+#if not CLEAN23
         OnBeforePostBalancingEntryTxt: Label 'OnBeforePostBalancingEntry';
+#endif
         OnBeforePostCustomerEntryTxt: Label 'OnBeforePostCustomerEntry';
         OnBeforePostVendorEntryTxt: Label 'OnBeforePostVendorEntry';
         OnBeforePostInvPostBufferTxt: Label 'OnBeforePostInvPostBuffer';
@@ -163,16 +165,14 @@ codeunit 134299 "Test Partner Integration Event"
         InactiveEventsCounter: Integer;
     begin
         // [SCENARIO] All existing event subscribtions should be Active, meaning all Publisher-Subscriber signatures are matched
-        with EventSubscription do begin
-            SetRange(Active, false);
-            InactiveEventsCounter := Count;
-            if FindSet() then
-                repeat
-                    InactiveSubscribers += StrSubstNo(' %1.%2', "Subscriber Codeunit ID", "Subscriber Function");
-                until Next() = 0;
-            if InactiveEventsCounter > 0 then
-                Error(InactiveEventSuscriptionErr, InactiveEventsCounter, InactiveSubscribers);
-        end;
+        EventSubscription.SetRange(Active, false);
+        InactiveEventsCounter := EventSubscription.Count;
+        if EventSubscription.FindSet() then
+            repeat
+                InactiveSubscribers += StrSubstNo(' %1.%2', EventSubscription."Subscriber Codeunit ID", EventSubscription."Subscriber Function");
+            until EventSubscription.Next() = 0;
+        if InactiveEventsCounter > 0 then
+            Error(InactiveEventSuscriptionErr, InactiveEventsCounter, InactiveSubscribers);
     end;
 
     [Test]
@@ -184,16 +184,14 @@ codeunit 134299 "Test Partner Integration Event"
         ErrorEventsCounter: Integer;
     begin
         // [SCENARIO] All existing event subscribtions should have a blank "Error Information"
-        with EventSubscription do begin
-            SetFilter("Error Information", '<>%1', '');
-            ErrorEventsCounter := Count;
-            if FindSet() then
-                repeat
-                    SubscribersWithError += StrSubstNo(' %1.%2="%3"', "Subscriber Codeunit ID", "Subscriber Function", "Error Information");
-                until Next() = 0;
-            if ErrorEventsCounter > 0 then
-                Error(ErrorEventSuscriptionErr, ErrorEventsCounter, SubscribersWithError);
-        end;
+        EventSubscription.SetFilter("Error Information", '<>%1', '');
+        ErrorEventsCounter := EventSubscription.Count;
+        if EventSubscription.FindSet() then
+            repeat
+                SubscribersWithError += StrSubstNo(' %1.%2="%3"', EventSubscription."Subscriber Codeunit ID", EventSubscription."Subscriber Function", EventSubscription."Error Information");
+            until EventSubscription.Next() = 0;
+        if ErrorEventsCounter > 0 then
+            Error(ErrorEventSuscriptionErr, ErrorEventsCounter, SubscribersWithError);
     end;
 
     [Test]
@@ -949,7 +947,9 @@ codeunit 134299 "Test Partner Integration Event"
         CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
 
         // Verify G/L posting events
+#if not CLEAN23
         VerifyDataTypeBuffer(OnBeforePostBalancingEntryTxt);
+#endif
         VerifyDataTypeBuffer(OnBeforePostCustomerEntryTxt);
         VerifyDataTypeBuffer(OnBeforePostInvPostBufferTxt);
     end;
@@ -1244,7 +1244,9 @@ codeunit 134299 "Test Partner Integration Event"
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
 
         // Verify G/L posting events
+#if not CLEAN23
         VerifyDataTypeBuffer(OnBeforePostBalancingEntryTxt);
+#endif
         VerifyDataTypeBuffer(OnBeforePostVendorEntryTxt);
         VerifyDataTypeBuffer(OnBeforePostInvPostBufferTxt);
     end;

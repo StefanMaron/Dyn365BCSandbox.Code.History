@@ -1744,6 +1744,7 @@ codeunit 699 "Exch. Rate Adjmt. Process"
                     GenJournalLine."Shortcut Dimension 1 Code" := GetGlobalDimVal(GLSetup."Global Dimension 1 Code", DimensionSetEntry);
                     GenJournalLine."Shortcut Dimension 2 Code" := GetGlobalDimVal(GLSetup."Global Dimension 2 Code", DimensionSetEntry);
                     GenJournalLine."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+                    OnSetPostingDimensionsOnCaseSourceEntryDimensions(GenJournalLine, DimensionSetEntry);
                 end;
             "Exch. Rate Adjmt. Dimensions"::"G/L Account Dimensions":
                 if GenJournalLine."Account Type" = "Gen. Journal Account Type"::"G/L Account" then begin
@@ -3010,6 +3011,11 @@ codeunit 699 "Exch. Rate Adjmt. Process"
 
     [IntegrationEvent(false, false)]
     local procedure OnPrepareTempEmplLedgEntryOnAfterSetDtldEmplLedgerEntryFilters(var DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetPostingDimensionsOnCaseSourceEntryDimensions(var GenJournalLine: Record "Gen. Journal Line"; var DimensionSetEntry: Record "Dimension Set Entry")
     begin
     end;
 }

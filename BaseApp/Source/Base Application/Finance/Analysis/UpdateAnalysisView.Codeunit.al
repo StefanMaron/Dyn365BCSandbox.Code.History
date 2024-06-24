@@ -60,13 +60,17 @@ codeunit 410 "Update Analysis View"
         LastBudgetEntryNo: Integer;
         LastEntryNoIsInitialized: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text005: Label 'Analysis View     #1############################\\';
         Text006: Label 'Updating table    #2############################\';
         Text007: Label 'Speed: (Entries/s)#4########\';
         Text008: Label 'Average Speed     #5########';
         Text009: Label '#6############### @3@@@@@@@@@@@@@@@@@@@@@@@@@@@@\\';
+#pragma warning restore AA0470
         Text010: Label 'Summarizing';
         Text011: Label 'Updating Database';
+#pragma warning restore AA0074
         AccountSourceNotSupportedErr: Label 'The selected account source is not supported.';
 
     local procedure InitLastEntryNo()
@@ -227,7 +231,7 @@ codeunit 410 "Update Analysis View"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateEntriesForGLAccount(TempAnalysisViewEntry, AnalysisView, LastGLEntryNo, NoOfEntries, IsHandled);
+        OnBeforeUpdateEntriesForGLAccount(TempAnalysisViewEntry, AnalysisView, LastGLEntryNo, NoOfEntries, IsHandled, ShowProgressWindow);
         if IsHandled then
             exit;
 
@@ -709,7 +713,7 @@ codeunit 410 "Update Analysis View"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeUpdateEntriesForGLAccount(var TempAnalysisViewEntry: Record "Analysis View Entry" temporary; AnalysisView: Record "Analysis View"; LastGLEntryNo: Integer; var NoOfEntries: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeUpdateEntriesForGLAccount(var TempAnalysisViewEntry: Record "Analysis View Entry" temporary; AnalysisView: Record "Analysis View"; LastGLEntryNo: Integer; var NoOfEntries: Integer; var IsHandled: Boolean; ShowProgressWindow: Boolean)
     begin
     end;
 

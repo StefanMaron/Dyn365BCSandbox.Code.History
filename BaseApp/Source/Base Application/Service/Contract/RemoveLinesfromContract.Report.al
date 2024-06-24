@@ -161,11 +161,15 @@ report 6034 "Remove Lines from Contract"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 contract lines were removed.';
         Text001: Label '%1 contract line was removed.';
+#pragma warning restore AA0470
         Text002: Label 'You must fill in the Remove Lines to field.';
         Text003: Label 'You must fill in the Reason Code field.';
         Text004: Label 'Removing contract lines... \\';
+#pragma warning restore AA0074
         ServMgtSetup: Record "Service Mgt. Setup";
         ServContract: Record "Service Contract Header";
         FiledServContract: Record "Filed Service Contract Header";
@@ -180,8 +184,12 @@ report 6034 "Remove Lines from Contract"
         DeleteLines: Option "Delete Lines","Print Only";
         ReasonCode: Code[10];
         LastContractNo: Code[20];
+#pragma warning disable AA0074
         Text006: Label 'A credit memo was created/updated.';
+#pragma warning restore AA0074
         CreditMemoCreated: Integer;
+#pragma warning disable AA0074
         Text007: Label 'Credit memos were created/updated.';
+#pragma warning restore AA0074
 }
 

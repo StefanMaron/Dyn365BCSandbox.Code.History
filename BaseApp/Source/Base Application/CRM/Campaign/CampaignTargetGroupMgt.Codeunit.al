@@ -27,13 +27,17 @@ codeunit 7030 "Campaign Target Group Mgt"
         CampaignTargetGr: Record "Campaign Target Group";
         InteractLogEntry: Record "Interaction Log Entry";
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 %2 is now activated.';
         Text001: Label '%1 %2 is now deactivated.';
         Text002: Label 'To activate the sales prices and/or line discounts, you must apply the relevant %1(s) to the %2 and place a check mark in the %3 field on the %1.';
         Text004: Label 'There are no Sales Prices or Sales Line Discounts currently linked to this %1. Do you still want to activate?';
+#pragma warning restore AA0470
         Text006: Label 'Activating prices for the Contacts...\\';
         Text007: Label 'Segment Lines  @1@@@@@@@@@@';
         Text008: Label 'Logged Segment Lines  @1@@@@@@@@@@';
+#pragma warning restore AA0074
 
     procedure ActivateCampaign(var Campaign: Record Campaign)
     var

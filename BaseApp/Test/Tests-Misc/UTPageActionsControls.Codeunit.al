@@ -4794,14 +4794,12 @@ codeunit 134341 "UT Page Actions & Controls"
 
     local procedure MockTodo(var ToDo: Record "To-do")
     begin
-        with ToDo do begin
-            Init();
-            "No." := '';
-            Date := LibraryRandom.RandDate(10);
-            Duration := LibraryRandom.RandIntInRange(2, 10) * 1000 * 60 * 60 * 24;
-            Type := Type::" ";
-            Insert();
-        end;
+        ToDo.Init();
+        ToDo."No." := '';
+        ToDo.Date := LibraryRandom.RandDate(10);
+        ToDo.Duration := LibraryRandom.RandIntInRange(2, 10) * 1000 * 60 * 60 * 24;
+        ToDo.Type := ToDo.Type::" ";
+        ToDo.Insert();
     end;
 
 #if not CLEAN23
@@ -4840,13 +4838,11 @@ codeunit 134341 "UT Page Actions & Controls"
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
     begin
         LibraryERM.CreateGLAccount(GLAccount);
-        with GLAccount do begin
-            "Account Type" := "Account Type"::Posting;
-            "Account Category" := "Account Category"::Assets;
-            "Account Subcategory Entry No." :=
-              GLAccountCategoryMgt.GetSubcategoryEntryNo("Account Category".AsInteger(), GLAccountCategoryMgt.GetInventory());
-            Modify(true);
-        end;
+        GLAccount."Account Type" := GLAccount."Account Type"::Posting;
+        GLAccount."Account Category" := GLAccount."Account Category"::Assets;
+        GLAccount."Account Subcategory Entry No." :=
+          GLAccountCategoryMgt.GetSubcategoryEntryNo(GLAccount."Account Category".AsInteger(), GLAccountCategoryMgt.GetInventory());
+        GLAccount.Modify(true);
     end;
 
     local procedure EnqueueValuesAndRunFilteredPage(KeyValue: Variant; ActionValue: Integer; PageNo: Integer; RecVar: Variant)

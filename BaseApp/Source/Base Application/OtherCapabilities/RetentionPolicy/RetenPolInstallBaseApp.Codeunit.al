@@ -266,6 +266,7 @@ codeunit 3999 "Reten. Pol. Install - BaseApp"
     local procedure EnableRetentionPolicySetup(TableId: Integer)
     var
         RetentionPolicySetup: Record "Retention Policy Setup";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         JobQueueEntry: Record "Job Queue Entry";
     begin
         if not TaskScheduler.CanCreateTask() then

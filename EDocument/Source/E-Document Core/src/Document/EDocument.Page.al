@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -543,7 +543,7 @@ page 6121 "E-Document"
         if not EDocIntegrationManagement.Send(Rec, EDocService, IsAsync) then
             exit;
         if IsAsync then
-            EDocumentBackgroundjobs.GetEDocumentResponse();
+            EDocumentBackgroundjobs.ScheduleGetResponseJob();
     end;
 
     local procedure SetIncomingDocActions()

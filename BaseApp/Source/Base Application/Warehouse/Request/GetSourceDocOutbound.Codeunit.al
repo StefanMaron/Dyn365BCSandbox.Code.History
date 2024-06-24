@@ -22,9 +22,13 @@ codeunit 5752 "Get Source Doc. Outbound"
     var
         GetSourceDocuments: Report "Get Source Documents";
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'If %1 is %2 in %3 no. %4, then all associated lines where type is %5 must use the same location.';
         Text002: Label 'The warehouse shipment was not created because the Shipping Advice field is set to Complete, and item no. %1 is not available in location code %2.\\You can create the warehouse shipment by either changing the Shipping Advice field to Partial in %3 no. %4 or by manually filling in the warehouse shipment document.';
         Text003: Label 'The warehouse shipment was not created because an open warehouse shipment exists for the Sales Header and Shipping Advice is %1.\\You must add the item(s) as new line(s) to the existing warehouse shipment or change Shipping Advice to Partial.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     local procedure CreateWhseShipmentHeaderFromWhseRequest(var WarehouseRequest: Record "Warehouse Request") Result: Boolean
     var
@@ -479,7 +483,7 @@ codeunit 5752 "Get Source Doc. Outbound"
         exit((CurrItemVariant."Item No." = ItemNo) and (CurrItemVariant.Code = VariantCode));
     end;
 
-    local procedure FindWarehouseRequestForSalesOrder(var WhseRqst: Record "Warehouse Request"; SalesHeader: Record "Sales Header")
+    procedure FindWarehouseRequestForSalesOrder(var WhseRqst: Record "Warehouse Request"; SalesHeader: Record "Sales Header")
     begin
         SalesHeader.TestField(Status, SalesHeader.Status::Released);
         CheckWhseShipmentConflict(SalesHeader);
