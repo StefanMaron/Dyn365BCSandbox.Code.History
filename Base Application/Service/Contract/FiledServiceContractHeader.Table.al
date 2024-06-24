@@ -480,6 +480,11 @@ table 5970 "Filed Service Contract Header"
             Caption = 'Contract No. Relation';
             TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = field("Contract Type Relation"));
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -537,7 +542,11 @@ table 5970 "Filed Service Contract Header"
         DimMgt: Codeunit DimensionManagement;
         SigningQuotation: Boolean;
         CancelContract: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text027: Label '%1 to %2';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     procedure GetLastEntryNo(): Integer;
     var
@@ -574,10 +583,11 @@ table 5970 "Filed Service Contract Header"
             ServContractHeader."Ship-to County" := ServContractHeader.County;
             ServContractHeader."Ship-to Country/Region Code" := ServContractHeader."Country/Region Code";
             ServContractHeader."Ship-to Name 2" := ServContractHeader."Name 2";
+            ServContractHeader."Ship-to Phone No." := ServContractHeader."Phone No.";
         end else
             ServContractHeader.CalcFields(
               "Ship-to Name", "Ship-to Address", "Ship-to Address 2", "Ship-to Post Code", "Ship-to City",
-              "Ship-to County", "Ship-to Country/Region Code", "Ship-to Name 2");
+              "Ship-to County", "Ship-to Country/Region Code", "Ship-to Name 2", "Ship-to Phone No.");
 
         FiledServContractHeader.TransferFields(ServContractHeader);
 
@@ -617,6 +627,7 @@ table 5970 "Filed Service Contract Header"
         FiledServContractHeader."Country/Region Code" := ServContractHeader."Country/Region Code";
         FiledServContractHeader."Bill-to Country/Region Code" := ServContractHeader."Bill-to Country/Region Code";
         FiledServContractHeader."Ship-to Country/Region Code" := ServContractHeader."Ship-to Country/Region Code";
+        FiledServContractHeader."Ship-to Phone No." := ServContractHeader."Ship-to Phone No.";
         FiledServContractHeader."Name 2" := ServContractHeader."Name 2";
         FiledServContractHeader."Bill-to Name 2" := ServContractHeader."Bill-to Name 2";
         FiledServContractHeader."Ship-to Name 2" := ServContractHeader."Ship-to Name 2";

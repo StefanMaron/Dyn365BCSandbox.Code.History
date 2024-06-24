@@ -834,18 +834,6 @@ page 9001 "Accounting Manager Role Center"
                 RunObject = Page "Analysis View List";
                 ToolTip = 'Analyze amounts in your general ledger by their dimensions using analysis views that you have set up.';
             }
-            action("Analysis by &Dimensions")
-            {
-                ApplicationArea = Dimensions;
-                Caption = 'Analysis by &Dimensions';
-                Image = AnalysisViewDimension;
-                RunObject = Page "Analysis by Dimensions";
-                ToolTip = 'Analyze activities using dimensions information.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'This functionality runs correctly from the Analysis View List page';
-                ObsoleteTag = '18.0';
-            }
             action("Calculate Deprec&iation")
             {
                 ApplicationArea = Basic, Suite;

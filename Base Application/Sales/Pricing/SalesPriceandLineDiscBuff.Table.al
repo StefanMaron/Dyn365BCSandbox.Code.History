@@ -373,8 +373,10 @@ table 1304 "Sales Price and Line Disc Buff"
 #endif
 
     var
+#pragma warning disable AA0470
         EndDateErr: Label '%1 cannot be after %2.';
         MustBeBlankErr: Label '%1 must be blank.';
+#pragma warning restore AA0470
         CustNotInPriceGrErr: Label 'This customer is not assigned to any price group, therefore a price group could not be used in context of this customer.';
         CustNotInDiscGrErr: Label 'This customer is not assigned to any discount group, therefore a discount group could not be used in context of this customer.';
 #if not CLEAN23

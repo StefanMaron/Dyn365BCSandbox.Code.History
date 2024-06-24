@@ -1696,15 +1696,13 @@ codeunit 139154 "Incoming Doc. To Data Exch.UT"
 
     local procedure CreateDataExchangeColumnValuePair(var TempExpectedDataExchField: Record "Data Exch. Field" temporary; DataExch: Record "Data Exch."; ColumnNo: Integer; NodeValue: Text[250]; LineDef: Text[20])
     begin
-        with TempExpectedDataExchField do begin
-            Init();
-            Validate("Data Exch. No.", DataExch."Entry No.");
-            Validate("Line No.", 1);
-            Validate("Column No.", ColumnNo);
-            Validate(Value, CopyStr(NodeValue, 1, MaxStrLen(Value)));
-            Validate("Data Exch. Line Def Code", LineDef);
-            Insert();
-        end;
+        TempExpectedDataExchField.Init();
+        TempExpectedDataExchField.Validate("Data Exch. No.", DataExch."Entry No.");
+        TempExpectedDataExchField.Validate("Line No.", 1);
+        TempExpectedDataExchField.Validate("Column No.", ColumnNo);
+        TempExpectedDataExchField.Validate(Value, CopyStr(NodeValue, 1, MaxStrLen(TempExpectedDataExchField.Value)));
+        TempExpectedDataExchField.Validate("Data Exch. Line Def Code", LineDef);
+        TempExpectedDataExchField.Insert();
     end;
 
     local procedure CreateDataExchMapping(DataExchLineDef: Record "Data Exch. Line Def")
@@ -2740,41 +2738,40 @@ codeunit 139154 "Incoming Doc. To Data Exch.UT"
             Error(NoDocCreatedForChoiceErr, RelatedDocumentType);
 
         // Assert - error will occur is casting fails
-        with IncomingDocument do
-            case RelatedDocumentType of
-                "Document Type"::"Sales Invoice":
-                    begin
-                        SalesHeader := RecordVar;
-                        Assert.AreEqual(SalesHeader."Document Type", SalesHeader."Document Type"::Invoice, '');
-                        SalesHeader.Delete();
-                    end;
-                "Document Type"::"Sales Credit Memo":
-                    begin
-                        SalesHeader := RecordVar;
-                        Assert.AreEqual(SalesHeader."Document Type", SalesHeader."Document Type"::"Credit Memo", '');
-                        SalesHeader.Delete();
-                    end;
-                "Document Type"::"Purchase Invoice":
-                    begin
-                        PurchaseHeader := RecordVar;
-                        Assert.AreEqual(PurchaseHeader."Document Type", PurchaseHeader."Document Type"::Invoice, '');
-                        PurchaseHeader.Delete();
-                    end;
-                "Document Type"::"Purchase Credit Memo":
-                    begin
-                        PurchaseHeader := RecordVar;
-                        Assert.AreEqual(PurchaseHeader."Document Type", PurchaseHeader."Document Type"::"Credit Memo", '');
-                        PurchaseHeader.Delete();
-                    end;
-                "Document Type"::Journal:
-                    begin
-                        GenJournalLine := RecordVar;
-                        GenJournalLine.Find();
-                        GenJournalLine.Delete();
-                    end;
-                else
-                    Error(UnknownChoiceErr, RelatedDocumentType);
-            end;
+        case RelatedDocumentType of
+            IncomingDocument."Document Type"::"Sales Invoice":
+                begin
+                    SalesHeader := RecordVar;
+                    Assert.AreEqual(SalesHeader."Document Type", SalesHeader."Document Type"::Invoice, '');
+                    SalesHeader.Delete();
+                end;
+            IncomingDocument."Document Type"::"Sales Credit Memo":
+                begin
+                    SalesHeader := RecordVar;
+                    Assert.AreEqual(SalesHeader."Document Type", SalesHeader."Document Type"::"Credit Memo", '');
+                    SalesHeader.Delete();
+                end;
+            IncomingDocument."Document Type"::"Purchase Invoice":
+                begin
+                    PurchaseHeader := RecordVar;
+                    Assert.AreEqual(PurchaseHeader."Document Type", PurchaseHeader."Document Type"::Invoice, '');
+                    PurchaseHeader.Delete();
+                end;
+            IncomingDocument."Document Type"::"Purchase Credit Memo":
+                begin
+                    PurchaseHeader := RecordVar;
+                    Assert.AreEqual(PurchaseHeader."Document Type", PurchaseHeader."Document Type"::"Credit Memo", '');
+                    PurchaseHeader.Delete();
+                end;
+            IncomingDocument."Document Type"::Journal:
+                begin
+                    GenJournalLine := RecordVar;
+                    GenJournalLine.Find();
+                    GenJournalLine.Delete();
+                end;
+            else
+                Error(UnknownChoiceErr, RelatedDocumentType);
+        end;
     end;
 
     local procedure AreEqualRecords(ExpectedRecord: Variant; ActualRecord: Variant; Msg: Text)

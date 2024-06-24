@@ -280,6 +280,11 @@ page 6630 "Sales Return Order"
                 {
                     ApplicationArea = SalesReturnOrder;
                     ToolTip = 'Specifies the campaign number the document is linked to.';
+                    trigger OnValidate()
+                    begin
+                        if Rec."Campaign No." <> xRec."Campaign No." then
+                            CurrPage.Update();
+                    end;
                 }
                 field("Responsibility Center"; Rec."Responsibility Center")
                 {
@@ -560,6 +565,12 @@ page 6630 "Sales Return Order"
                             IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
                         end;
                     }
+                    field("Ship-to Phone No."; Rec."Ship-to Phone No.")
+                    {
+                        ApplicationArea = SalesReturnOrder;
+                        Caption = 'Phone No.';
+                        ToolTip = 'Specifies the telephone number of the company''s shipping address.';
+                    }
                     field("Ship-to Contact"; Rec."Ship-to Contact")
                     {
                         ApplicationArea = SalesReturnOrder;
@@ -759,10 +770,23 @@ page 6630 "Sales Return Order"
                 SubPageLink = "No." = field("No."),
                               "Document Type" = field("Document Type");
             }
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
                               "Document Type" = field("Document Type");
@@ -1102,6 +1126,7 @@ page 6630 "Sales Return Order"
                 {
                     ApplicationArea = SalesReturnOrder;
                     Caption = 'Re&lease';
+                    Enabled = Rec.Status <> Rec.Status::Released;
                     Image = ReleaseDoc;
                     ShortCutKey = 'Ctrl+F9';
                     ToolTip = 'Release the document to the next stage of processing. You must reopen the document before you can make changes to it.';

@@ -269,10 +269,18 @@ table 7002 "Sales Price"
         Cust: Record Customer;
         Campaign: Record Campaign;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label '%1 must be blank.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 #endif
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 cannot be after %2';
         Text002: Label 'If Sales Type = %1, then you can only change Starting Date and Ending Date from the Campaign Card.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
 #if not CLEAN23
     protected var

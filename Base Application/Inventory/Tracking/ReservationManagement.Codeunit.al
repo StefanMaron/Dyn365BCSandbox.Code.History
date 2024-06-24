@@ -4,7 +4,6 @@ using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.UOM;
-using Microsoft.Inventory.Document;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
@@ -14,12 +13,9 @@ using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Setup;
-using Microsoft.Projects.Project.Journal;
-using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
-using Microsoft.Service.Document;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Availability;
 using Microsoft.Warehouse.Ledger;
@@ -39,7 +35,9 @@ codeunit 99000845 "Reservation Management"
     end;
 
     var
+#pragma warning disable AA0074
         Text007: Label 'CU99000845 DeleteReservEntries2: Surplus order tracking double record detected.';
+#pragma warning restore AA0074
         CalcReservEntry: Record "Reservation Entry";
         CalcReservEntry2: Record "Reservation Entry";
         CalcItemLedgEntry: Record "Item Ledger Entry";
@@ -56,7 +54,7 @@ codeunit 99000845 "Reservation Management"
         UOMMgt: Codeunit "Unit of Measure Management";
         LateBindingMgt: Codeunit "Late Binding Management";
         SourceRecRef: RecordRef;
-        RefOrderType: Option;
+        RefOrderType: Enum "Requisition Ref. Order Type";
         PlanningLineOrigin: Enum "Planning Line Origin Type";
         Positive: Boolean;
         CurrentBindingIsSet: Boolean;
@@ -66,13 +64,27 @@ codeunit 99000845 "Reservation Management"
         ValueArray: array[30] of Integer;
         CurrentBinding: Enum "Reservation Binding";
         ItemTrackingHandling: Option "None","Allow deletion",Match;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text008: Label 'Item tracking defined for item %1 in the %2 accounts for more than the quantity you have entered.\You must adjust the existing item tracking and then reenter the new quantity.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+#pragma warning disable AA0470
         ItemTrackingCannotBeFullyMatchedErr: Label 'Item Tracking cannot be fully matched.\Serial No.: %1, Lot No.: %2, outstanding quantity: %3.';
+#pragma warning restore AA0470
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text010: Label 'Item tracking is defined for item %1 in the %2.\You must delete the existing item tracking before modifying or deleting the %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         TotalAvailQty: Decimal;
         QtyAllocInWhse: Decimal;
         QtyOnOutBound: Decimal;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text011: Label 'Item tracking is defined for item %1 in the %2.\Do you want to delete the %2 and the item tracking lines?';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         QtyReservedOnPickShip: Decimal;
         DeleteDocLineWithItemReservQst: Label '%1 %2 has item reservation. Do you want to delete it anyway?', Comment = '%1 = Document Type, %2 = Document No.';
         DeleteTransLineWithItemReservQst: Label 'Transfer order %1 has item reservation. Do you want to delete it anyway?', Comment = '%1 = Document No.';
@@ -132,194 +144,10 @@ codeunit 99000845 "Reservation Management"
 
         SourceRecRef := NewSourceRecRef;
 
-        OnSetReservSource(SourceRecRef, CalcReservEntry, Direction);
-        case SourceRecRef.Number of
-            Database::"Sales Line":
-                SetSourceForSalesLine();
-            Database::"Requisition Line":
-                SetSourceForReqLine();
-            Database::"Purchase Line":
-                SetSourceForPurchLine();
-            Database::"Item Journal Line":
-                SetSourceForItemJnlLine();
-            Database::"Item Ledger Entry":
-                SetSourceForItemLedgerEntry();
-            Database::"Prod. Order Line":
-                SetSourceForProdOrderLine();
-            Database::"Prod. Order Component":
-                SetSourceForProdOrderComp();
-            Database::"Planning Component":
-                SetSourceForPlanningComp();
-            Database::"Transfer Line":
-                SetSourceForTransferLine(Direction);
-            Database::"Service Line":
-                SetSourceForServiceLine();
-            Database::"Job Journal Line":
-                SetSourceForJobJournalLine();
-            Database::"Job Planning Line":
-                SetSourceForJobPlanningLine();
-            Database::"Assembly Header":
-                SetSourceForAssemblyHeader();
-            Database::"Assembly Line":
-                SetSourceForAssemblyLine();
-            Database::"Invt. Document Line":
-                SetSourceForInvtDocLine();
-        end;
+        // Use this event to subscribe from any source table included in reservation
+        OnSetReservSource(SourceRecRef, CalcReservEntry, Direction, RefOrderType, PlanningLineOrigin, Positive);
 
         OnAfterSetReservSource(SourceRecRef, CalcReservEntry, Direction);
-    end;
-
-    local procedure SetSourceForAssemblyHeader()
-    var
-        AssemblyHeader: Record "Assembly Header";
-    begin
-        SourceRecRef.SetTable(AssemblyHeader);
-        AssemblyHeader.SetReservationEntry(CalcReservEntry);
-        OnSetAssemblyHeaderOnBeforeUpdateReservation(CalcReservEntry, AssemblyHeader);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * AssemblyHeader."Remaining Quantity (Base)") < 0);
-    end;
-
-    local procedure SetSourceForAssemblyLine()
-    var
-        AssemblyLine: Record "Assembly Line";
-    begin
-        SourceRecRef.SetTable(AssemblyLine);
-        AssemblyLine.SetReservationEntry(CalcReservEntry);
-        OnSetAssemblyLineOnBeforeUpdateReservation(CalcReservEntry, AssemblyLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * AssemblyLine."Remaining Quantity (Base)") <= 0);
-    end;
-
-    local procedure SetSourceForInvtDocLine()
-    var
-        InvtDocLine: Record "Invt. Document Line";
-    begin
-        SourceRecRef.SetTable(InvtDocLine);
-        InvtDocLine.SetReservationEntry(CalcReservEntry);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * InvtDocLine."Quantity (Base)") < 0);
-    end;
-
-    local procedure SetSourceForItemJnlLine()
-    var
-        ItemJnlLine: Record "Item Journal Line";
-    begin
-        SourceRecRef.SetTable(ItemJnlLine);
-        ItemJnlLine.SetReservationEntry(CalcReservEntry);
-        OnSetItemJnlLineOnBeforeUpdateReservation(CalcReservEntry, ItemJnlLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * ItemJnlLine."Quantity (Base)") < 0);
-    end;
-
-    local procedure SetSourceForItemLedgerEntry()
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-    begin
-        SourceRecRef.SetTable(ItemLedgerEntry);
-        ItemLedgerEntry.SetReservationEntry(CalcReservEntry);
-        CalcReservEntry.CopyTrackingFromItemLedgEntry(ItemLedgerEntry);
-        OnSetItemLedgEntryOnBeforeUpdateReservation(CalcReservEntry, ItemLedgerEntry);
-        UpdateReservation(Positive);
-    end;
-
-    local procedure SetSourceForJobJournalLine()
-    var
-        JobJournalLine: Record "Job Journal Line";
-    begin
-        SourceRecRef.SetTable(JobJournalLine);
-        JobJournalLine.SetReservationEntry(CalcReservEntry);
-        OnSetJobJnlLineOnBeforeUpdateReservation(CalcReservEntry, JobJournalLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * JobJournalLine."Quantity (Base)") < 0);
-    end;
-
-    local procedure SetSourceForJobPlanningLine()
-    var
-        JobPlanningLine: Record "Job Planning Line";
-    begin
-        SourceRecRef.SetTable(JobPlanningLine);
-        JobPlanningLine.SetReservationEntry(CalcReservEntry);
-        OnSetJobPlanningLineOnBeforeUpdateReservation(CalcReservEntry, JobPlanningLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * JobPlanningLine."Remaining Qty. (Base)") <= 0);
-    end;
-
-    local procedure SetSourceForReqLine()
-    var
-        ReqLine: Record "Requisition Line";
-    begin
-        SourceRecRef.SetTable(ReqLine);
-        ReqLine.SetReservationEntry(CalcReservEntry);
-        RefOrderType := ReqLine."Ref. Order Type";
-        PlanningLineOrigin := ReqLine."Planning Line Origin";
-        OnSetReqLineOnBeforeUpdateReservation(CalcReservEntry, ReqLine);
-        UpdateReservation(ReqLine."Net Quantity (Base)" < 0);
-    end;
-
-    local procedure SetSourceForProdOrderLine()
-    var
-        ProdOrderLine: Record "Prod. Order Line";
-    begin
-        SourceRecRef.SetTable(ProdOrderLine);
-        ProdOrderLine.SetReservationEntry(CalcReservEntry);
-        OnSetProdOrderLineOnBeforeUpdateReservation(CalcReservEntry, ProdOrderLine);
-        UpdateReservation(ProdOrderLine."Remaining Qty. (Base)" < 0);
-    end;
-
-    local procedure SetSourceForProdOrderComp()
-    var
-        ProdOrderComp: Record "Prod. Order Component";
-    begin
-        SourceRecRef.SetTable(ProdOrderComp);
-        ProdOrderComp.SetReservationEntry(CalcReservEntry);
-        OnSetProdOrderCompOnBeforeUpdateReservation(CalcReservEntry, ProdOrderComp);
-        UpdateReservation(ProdOrderComp."Remaining Qty. (Base)" > 0);
-    end;
-
-    local procedure SetSourceForPlanningComp()
-    var
-        PlanningComponent: Record "Planning Component";
-    begin
-        SourceRecRef.SetTable(PlanningComponent);
-        PlanningComponent.SetReservationEntry(CalcReservEntry);
-        OnSetPlanningCompOnBeforeUpdateReservation(CalcReservEntry, PlanningComponent);
-        UpdateReservation(PlanningComponent."Net Quantity (Base)" > 0);
-    end;
-
-    local procedure SetSourceForPurchLine()
-    var
-        PurchLine: Record "Purchase Line";
-    begin
-        SourceRecRef.SetTable(PurchLine);
-        PurchLine.SetReservationEntry(CalcReservEntry);
-        OnSetPurchLineOnBeforeUpdateReservation(CalcReservEntry, PurchLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * PurchLine."Outstanding Qty. (Base)") < 0);
-    end;
-
-    local procedure SetSourceForTransferLine(Direction: Enum "Transfer Direction")
-    var
-        TransferLine: Record "Transfer Line";
-    begin
-        SourceRecRef.SetTable(TransferLine);
-        TransferLine.SetReservationEntry(CalcReservEntry, Direction);
-        OnSetTransLineOnBeforeUpdateReservation(CalcReservEntry, TransferLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * TransferLine."Outstanding Qty. (Base)") <= 0);
-    end;
-
-    local procedure SetSourceForSalesLine()
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        SourceRecRef.SetTable(SalesLine);
-        SalesLine.SetReservationEntry(CalcReservEntry);
-        OnSetSalesLineOnBeforeUpdateReservation(CalcReservEntry, SalesLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * SalesLine."Outstanding Qty. (Base)") <= 0);
-        OnAfterSetSourceForSalesLine(CalcReservEntry, SalesLine);
-    end;
-
-    local procedure SetSourceForServiceLine()
-    var
-        ServiceLine: Record "Service Line";
-    begin
-        SourceRecRef.SetTable(ServiceLine);
-        ServiceLine.SetReservationEntry(CalcReservEntry);
-        OnSetServLineOnBeforeUpdateReservation(CalcReservEntry, ServiceLine);
-        UpdateReservation((CreateReservEntry.SignFactor(CalcReservEntry) * ServiceLine."Outstanding Qty. (Base)") <= 0);
     end;
 
     procedure SetExternalDocumentResEntry(ReservEntry: Record "Reservation Entry"; UpdReservation: Boolean)
@@ -509,7 +337,6 @@ codeunit 99000845 "Reservation Management"
 
     procedure AutoReserve(var FullAutoReservation: Boolean; Description: Text[100]; AvailabilityDate: Date; MaxQtyToReserve: Decimal; MaxQtyToReserveBase: Decimal)
     var
-        SalesLine: Record "Sales Line";
         RemainingQtyToReserve: Decimal;
         RemainingQtyToReserveBase: Decimal;
         i: Integer;
@@ -524,28 +351,7 @@ codeunit 99000845 "Reservation Management"
 
         CalcReservEntry.TestField("Source Type");
 
-        if CalcReservEntry."Source Type" in [Database::"Sales Line", Database::"Purchase Line", Database::"Service Line"] then
-            StopReservation := not (CalcReservEntry."Source Subtype" in [1, 5]); // Only order and return order
-
-        if CalcReservEntry."Source Type" in [Database::"Assembly Line", Database::"Assembly Header"] then
-            StopReservation := not (CalcReservEntry."Source Subtype" = 1); // Only Assembly Order
-
-        if CalcReservEntry."Source Type" in [Database::"Prod. Order Line", Database::"Prod. Order Component"]
-        then
-            StopReservation := CalcReservEntry."Source Subtype" < 2; // Not simulated or planned
-
-        if CalcReservEntry."Source Type" = Database::"Sales Line" then begin
-            SourceRecRef.SetTable(SalesLine);
-            if (CalcReservEntry."Source Subtype" = 1) and (SalesLine.Quantity < 0) then
-                StopReservation := true;
-            if (CalcReservEntry."Source Subtype" = 5) and (SalesLine.Quantity >= 0) then
-                StopReservation := true;
-        end;
-
-        if CalcReservEntry."Source Type" = Database::"Job Planning Line" then
-            StopReservation := CalcReservEntry."Source Subtype" <> 2;
-
-        OnAutoReserveOnBeforeStopReservation(CalcReservEntry, FullAutoReservation, AvailabilityDate, MaxQtyToReserve, MaxQtyToReserveBase, StopReservation);
+        OnAutoReserveOnBeforeStopReservation(CalcReservEntry, FullAutoReservation, AvailabilityDate, MaxQtyToReserve, MaxQtyToReserveBase, StopReservation, SourceRecRef);
         if StopReservation then begin
             FullAutoReservation := true;
             exit;
@@ -626,47 +432,6 @@ codeunit 99000845 "Reservation Management"
             Enum::"Reservation Summary Type"::"Item Ledger Entry":
                 AutoReserveItemLedgEntry(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
-            Enum::"Reservation Summary Type"::"Purchase Order",
-            Enum::"Reservation Summary Type"::"Purchase Return Order":
-                AutoReservePurchLine(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Sales Quote",
-            Enum::"Reservation Summary Type"::"Sales Order",
-            Enum::"Reservation Summary Type"::"Sales Return Order":
-                AutoReserveSalesLine(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Simulated Production Order",
-            Enum::"Reservation Summary Type"::"Planned Production Order",
-            Enum::"Reservation Summary Type"::"Firm Planned Production Order",
-            Enum::"Reservation Summary Type"::"Released Production Order":
-                AutoReserveProdOrderLine(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.",
-            Enum::"Reservation Summary Type"::"Planned Prod. Order Comp.",
-            Enum::"Reservation Summary Type"::"Firm Planned Prod. Order Comp.",
-            Enum::"Reservation Summary Type"::"Released Prod. Order Comp.":
-                AutoReserveProdOrderComp(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Transfer Shipment",
-            Enum::"Reservation Summary Type"::"Transfer Receipt":
-                AutoReserveTransLine(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Service Order":
-                AutoReserveServLine(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Job Planning Order":
-                AutoReserveJobPlanningLine(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Assembly Order Header":
-                AutoReserveAssemblyHeader(
-                    ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Assembly Order Line":
-                AutoReserveAssemblyLine(
-                  ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            Enum::"Reservation Summary Type"::"Inventory Receipt",
-            Enum::"Reservation Summary Type"::"Inventory Shipment":
-                AutoInvtDocLineReserve(
-                  ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
             else
                 OnAfterAutoReserveOneLine(
                   ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep, CalcReservEntry, CalcReservEntry2, Positive);
@@ -773,482 +538,6 @@ codeunit 99000845 "Reservation Management"
         OnAfterAutoReserveItemLedgEntry(CalcItemLedgEntry, RemainingQtyToReserveBase);
     end;
 
-    local procedure AutoReservePurchLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        PurchLine: Record "Purchase Line";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReservePurchLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        PurchLine.FilterLinesForReservation(
-          CalcReservEntry, Enum::"Purchase Document Type".FromInteger(ReservSummEntryNo - Enum::"Reservation Summary Type"::"Purchase Quote".AsInteger()),
-          GetAvailabilityFilter(AvailabilityDate), Positive);
-        if PurchLine.Find(Search) then
-            repeat
-                PurchLine.CalcFields("Reserved Qty. (Base)");
-                if not PurchLine."Special Order" then begin
-                    QtyThisLine := PurchLine."Outstanding Quantity";
-                    QtyThisLineBase := PurchLine."Outstanding Qty. (Base)";
-                end;
-                if ReservSummEntryNo = Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger() then
-                    ReservQty := -PurchLine."Reserved Qty. (Base)"
-                else
-                    ReservQty := PurchLine."Reserved Qty. (Base)";
-                if (Positive = (QtyThisLineBase < 0)) and (ReservSummEntryNo <> Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger()) or
-                   (Positive = (QtyThisLineBase > 0)) and (ReservSummEntryNo = Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger())
-                then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                OnAutoReservePurchLineOnBeforeSetQtyToReserveDownToTrackedQuantity(
-                    PurchLine, CalcReservEntry, ReservQty, QtyThisLine, QtyThisLineBase);
-                SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, PurchLine.RowID1(), QtyThisLine, QtyThisLineBase);
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                    Database::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", '', 0, PurchLine."Line No.",
-                    PurchLine."Variant Code", PurchLine."Location Code", PurchLine."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, PurchLine."Expected Receipt Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (PurchLine.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-
-        OnAfterAutoReservePurchLine(PurchLine, ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
-    end;
-
-    local procedure AutoReserveSalesLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        SalesLine: Record "Sales Line";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveSalesLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        SalesLine.FilterLinesForReservation(
-          CalcReservEntry, Enum::"Sales Document Type".FromInteger(ReservSummEntryNo - Enum::"Reservation Summary Type"::"Sales Quote".AsInteger()), GetAvailabilityFilter(AvailabilityDate), Positive);
-        if SalesLine.Find(Search) then
-            repeat
-                SalesLine.CalcFields("Reserved Qty. (Base)");
-                QtyThisLine := SalesLine."Outstanding Quantity";
-                QtyThisLineBase := SalesLine."Outstanding Qty. (Base)";
-                if ReservSummEntryNo = Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger() then // Return Order
-                    ReservQty := -SalesLine."Reserved Qty. (Base)"
-                else
-                    ReservQty := SalesLine."Reserved Qty. (Base)";
-                if (Positive = (QtyThisLineBase > 0)) and (ReservSummEntryNo <> Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger()) or
-                   (Positive = (QtyThisLineBase < 0)) and (ReservSummEntryNo = Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger())
-                then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, SalesLine.RowID1(), QtyThisLine, QtyThisLineBase);
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                  Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", '', 0, SalesLine."Line No.",
-                  SalesLine."Variant Code", SalesLine."Location Code", SalesLine."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, SalesLine."Shipment Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (SalesLine.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoReserveProdOrderLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        ProdOrderLine: Record "Prod. Order Line";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveProdOrderLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        ProdOrderLine.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Simulated Production Order".AsInteger(),
-            GetAvailabilityFilter(AvailabilityDate), Positive);
-        if ProdOrderLine.Find(Search) then
-            repeat
-                ProdOrderLine.CalcFields("Reserved Qty. (Base)");
-                QtyThisLine := ProdOrderLine."Remaining Quantity";
-                QtyThisLineBase := ProdOrderLine."Remaining Qty. (Base)";
-                ReservQty := ProdOrderLine."Reserved Qty. (Base)";
-                if Positive = (QtyThisLineBase < 0) then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, ProdOrderLine.RowID1(), QtyThisLine, QtyThisLineBase);
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                    Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0,
-                    ProdOrderLine."Variant Code", ProdOrderLine."Location Code", ProdOrderLine."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, ProdOrderLine."Due Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (ProdOrderLine.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoReserveProdOrderComp(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        ProdOrderComp: Record "Prod. Order Component";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveProdOrderComp(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        ProdOrderComp.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger(),
-            GetAvailabilityFilter(AvailabilityDate), Positive);
-        if ProdOrderComp.Find(Search) then
-            repeat
-                ProdOrderComp.CalcFields("Reserved Qty. (Base)");
-                QtyThisLine := ProdOrderComp."Remaining Quantity";
-                QtyThisLineBase := ProdOrderComp."Remaining Qty. (Base)";
-                ReservQty := ProdOrderComp."Reserved Qty. (Base)";
-                if Positive = (QtyThisLineBase > 0) then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, ProdOrderComp.RowID1(), QtyThisLine, QtyThisLineBase);
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                    Database::"Prod. Order Component", ProdOrderComp.Status.AsInteger(), ProdOrderComp."Prod. Order No.", '',
-                    ProdOrderComp."Prod. Order Line No.", ProdOrderComp."Line No.",
-                    ProdOrderComp."Variant Code", ProdOrderComp."Location Code", ProdOrderComp."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, ProdOrderComp."Due Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (ProdOrderComp.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoReserveAssemblyHeader(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        AssemblyHeader: Record "Assembly Header";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveAssemblyHeader(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        AssemblyHeader.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Assembly Quote Header".AsInteger(),
-            GetAvailabilityFilter(AvailabilityDate), Positive);
-        if AssemblyHeader.Find(Search) then
-            repeat
-                AssemblyHeader.CalcFields("Reserved Qty. (Base)");
-                QtyThisLine := AssemblyHeader."Remaining Quantity";
-                QtyThisLineBase := AssemblyHeader."Remaining Quantity (Base)";
-                ReservQty := AssemblyHeader."Reserved Qty. (Base)";
-                if Positive = (QtyThisLineBase < 0) then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, AssemblyHeader.RowID1(), QtyThisLine, QtyThisLineBase);
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                  Database::"Assembly Header", AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", '', 0, 0,
-                  AssemblyHeader."Variant Code", AssemblyHeader."Location Code", AssemblyHeader."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, AssemblyHeader."Due Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (AssemblyHeader.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoReserveAssemblyLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        AssemblyLine: Record "Assembly Line";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveAssemblyLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        AssemblyLine.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Assembly Quote Line".AsInteger(),
-            GetAvailabilityFilter(AvailabilityDate), Positive);
-        if AssemblyLine.Find(Search) then
-            repeat
-                AssemblyLine.CalcFields("Reserved Qty. (Base)");
-                QtyThisLine := AssemblyLine."Remaining Quantity";
-                QtyThisLineBase := AssemblyLine."Remaining Quantity (Base)";
-                ReservQty := AssemblyLine."Reserved Qty. (Base)";
-                if Positive = (QtyThisLineBase > 0) then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, AssemblyLine.RowID1(), QtyThisLine, QtyThisLineBase);
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                  Database::"Assembly Line", AssemblyLine."Document Type".AsInteger(), AssemblyLine."Document No.", '', 0, AssemblyLine."Line No.",
-                  AssemblyLine."Variant Code", AssemblyLine."Location Code", AssemblyLine."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, AssemblyLine."Due Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (AssemblyLine.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoReserveTransLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        TransLine: Record "Transfer Line";
-        TransferDirection: Enum "Transfer Direction";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        LocationCode: Code[10];
-        EntryDate: Date;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveTransLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        case ReservSummEntryNo of
-            Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger():
-                TransLine.FilterOutboundLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
-            Enum::"Reservation Summary Type"::"Transfer Receipt".AsInteger():
-                TransLine.FilterInboundLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
-        end;
-        if TransLine.Find(Search) then
-            repeat
-                case ReservSummEntryNo of
-                    Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger():
-                        begin
-                            TransLine.CalcFields("Reserved Qty. Outbnd. (Base)");
-                            QtyThisLine := -TransLine."Outstanding Quantity";
-                            QtyThisLineBase := -TransLine."Outstanding Qty. (Base)";
-                            ReservQty := -TransLine."Reserved Qty. Outbnd. (Base)";
-                            EntryDate := TransLine."Shipment Date";
-                            LocationCode := TransLine."Transfer-from Code";
-                            if Positive = (QtyThisLineBase < 0) then begin
-                                QtyThisLine := 0;
-                                QtyThisLineBase := 0;
-                            end;
-                            SetQtyToReserveDownToTrackedQuantity(
-                                CalcReservEntry, TransLine.RowID1(TransferDirection::Outbound), QtyThisLine, QtyThisLineBase);
-                        end;
-                    Enum::"Reservation Summary Type"::"Transfer Receipt".AsInteger():
-                        begin
-                            TransLine.CalcFields("Reserved Qty. Inbnd. (Base)");
-                            QtyThisLine := TransLine."Outstanding Quantity";
-                            QtyThisLineBase := TransLine."Outstanding Qty. (Base)";
-                            ReservQty := TransLine."Reserved Qty. Inbnd. (Base)";
-                            EntryDate := TransLine."Receipt Date";
-                            LocationCode := TransLine."Transfer-to Code";
-                            if Positive = (QtyThisLineBase < 0) then begin
-                                QtyThisLine := 0;
-                                QtyThisLineBase := 0;
-                            end;
-                            SetQtyToReserveDownToTrackedQuantity(
-                                CalcReservEntry, TransLine.RowID1(TransferDirection::Inbound), QtyThisLine, QtyThisLineBase);
-                        end;
-                end;
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                  Database::"Transfer Line", ReservSummEntryNo - Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger(),
-                  TransLine."Document No.", '', TransLine."Derived From Line No.", TransLine."Line No.",
-                  TransLine."Variant Code", LocationCode, TransLine."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, EntryDate, QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (TransLine.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoReserveServLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        ServiceLine: Record "Service Line";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveServLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        ServiceLine.FindLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
-        if ServiceLine.Find(Search) then
-            repeat
-                ServiceLine.CalcFields("Reserved Qty. (Base)");
-                QtyThisLine := ServiceLine."Outstanding Quantity";
-                QtyThisLineBase := ServiceLine."Outstanding Qty. (Base)";
-                ReservQty := ServiceLine."Reserved Qty. (Base)";
-                if Positive = (QtyThisLineBase > 0) then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, ServiceLine.RowID1(), QtyThisLine, QtyThisLineBase);
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                  Database::"Service Line", ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", '', 0, ServiceLine."Line No.",
-                  ServiceLine."Variant Code", ServiceLine."Location Code", ServiceLine."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, ServiceLine."Needed by Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (ServiceLine.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoReserveJobPlanningLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        JobPlanningLine: Record "Job Planning Line";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-        IsReserved: Boolean;
-    begin
-        IsReserved := false;
-        OnBeforeAutoReserveJobPlanningLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-
-        JobPlanningLine.FilterLinesForReservation(
-          CalcReservEntry, ReservSummEntryNo - 131, GetAvailabilityFilter(AvailabilityDate), Positive);
-        if JobPlanningLine.Find(Search) then
-            repeat
-                JobPlanningLine.CalcFields("Reserved Qty. (Base)");
-                QtyThisLine := JobPlanningLine."Remaining Qty.";
-                QtyThisLineBase := JobPlanningLine."Remaining Qty. (Base)";
-                ReservQty := JobPlanningLine."Reserved Qty. (Base)";
-                if Positive = (QtyThisLineBase > 0) then begin
-                    QtyThisLine := 0;
-                    QtyThisLineBase := 0;
-                end;
-
-                CallTrackingSpecification.InitTrackingSpecification(
-                  Database::"Job Planning Line", JobPlanningLine.Status.AsInteger(), JobPlanningLine."Job No.", '',
-                  0, JobPlanningLine."Job Contract Entry No.",
-                  JobPlanningLine."Variant Code", JobPlanningLine."Location Code", JobPlanningLine."Qty. per Unit of Measure");
-                CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                InsertReservationEntries(
-                    RemainingQtyToReserve, RemainingQtyToReserveBase, ReservQty,
-                    Description, JobPlanningLine."Planning Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-            until (JobPlanningLine.Next(NextStep) = 0) or (RemainingQtyToReserveBase = 0);
-    end;
-
-    local procedure AutoInvtDocLineReserve(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; Search: Text[1]; NextStep: Integer)
-    var
-        InvtDocLine: Record "Invt. Document Line";
-        QtyThisLine: Decimal;
-        QtyThisLineBase: Decimal;
-        ReservQty: Decimal;
-    begin
-        case ReservSummEntryNo of
-            Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger():
-                InvtDocLine.FilterReceiptLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
-            Enum::"Reservation Summary Type"::"Inventory Shipment".AsInteger():
-                InvtDocLine.FilterShipmentLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
-        end;
-
-        if InvtDocLine.Find(Search) then
-            repeat
-                case ReservSummEntryNo of
-                    Enum::"Reservation Summary Type"::"Inventory Shipment".AsInteger():
-                        begin
-                            InvtDocLine.CalcFields("Reserved Qty. Outbnd. (Base)");
-                            QtyThisLine := -InvtDocLine.Quantity;
-                            QtyThisLineBase := -InvtDocLine."Quantity (Base)";
-                            ReservQty := -InvtDocLine."Reserved Qty. Outbnd. (Base)";
-                            if Positive = (QtyThisLine < 0) then begin
-                                QtyThisLine := 0;
-                                QtyThisLineBase := 0;
-                            end;
-                        end;
-                    Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger():
-                        begin
-                            InvtDocLine.CalcFields("Reserved Qty. Inbnd. (Base)");
-                            QtyThisLine := InvtDocLine.Quantity;
-                            QtyThisLineBase := InvtDocLine."Quantity (Base)";
-                            ReservQty := InvtDocLine."Reserved Qty. Inbnd. (Base)";
-                            if Positive = (QtyThisLine < 0) then begin
-                                QtyThisLine := 0;
-                                QtyThisLineBase := 0;
-                            end;
-                        end;
-                end;
-                if QtyThisLine <> 0 then
-                    if Abs(QtyThisLine - ReservQty) > 0 then begin
-                        if Abs(QtyThisLine - ReservQty) > Abs(RemainingQtyToReserve) then begin
-                            QtyThisLine := RemainingQtyToReserve;
-                            QtyThisLineBase := RemainingQtyToReserveBase;
-                        end else begin
-                            QtyThisLineBase := QtyThisLineBase - ReservQty;
-                            QtyThisLine := Round(RemainingQtyToReserve / RemainingQtyToReserveBase * QtyThisLineBase, UOMMgt.QtyRndPrecision());
-                        end;
-
-                        CopySign(RemainingQtyToReserve, QtyThisLine);
-                        CopySign(RemainingQtyToReserveBase, QtyThisLineBase);
-
-                        CallTrackingSpecification.InitTrackingSpecification(
-                          Database::"Invt. Document Line", ReservSummEntryNo - Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger(),
-                          InvtDocLine."Document No.", '', 0, InvtDocLine."Line No.", InvtDocLine."Variant Code", InvtDocLine."Location Code", InvtDocLine."Qty. per Unit of Measure");
-                        CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
-
-                        CreateReservation(Description, InvtDocLine."Posting Date", QtyThisLine, QtyThisLineBase, CallTrackingSpecification);
-
-                        RemainingQtyToReserve := RemainingQtyToReserve - QtyThisLine;
-                        RemainingQtyToReserveBase := RemainingQtyToReserveBase - QtyThisLineBase;
-                    end;
-            until (InvtDocLine.Next(NextStep) = 0) or (RemainingQtyToReserve = 0);
-    end;
-
     procedure InsertReservationEntries(var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; ReservQty: Decimal; Description: Text[100]; ExpectedDate: Date; QtyThisLine: Decimal; QtyThisLineBase: Decimal; TrackingSpecification: Record "Tracking Specification") ReservationCreated: Boolean
     begin
         if QtyThisLineBase = 0 then
@@ -1293,7 +582,7 @@ codeunit 99000845 "Reservation Management"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnDeleteReservEntriesOnBeforeDeleteReservEntries(CalcReservEntry, CalcReservEntry2, IsHandled);
+        OnDeleteReservEntriesOnBeforeDeleteReservEntries(CalcReservEntry, CalcReservEntry2, IsHandled, Item, ItemTrackingCode, SKU, MfgSetup, Positive, Location, TotalAvailQty, QtyAllocInWhse, QtyReservedOnPickShip);
         if IsHandled then
             exit;
 
@@ -1388,16 +677,14 @@ codeunit 99000845 "Reservation Management"
                 ItemTrackingHandling::None:
                     ReservEntry.SetTrackingFilterBlank();
                 ItemTrackingHandling::Match:
-                    begin
-                        if CurrentItemTrackingSetup.TrackingExists() then begin
-                            QtyToReleaseForLotSN := QuantityTracked2(ReservEntry);
-                            if Abs(QtyToReleaseForLotSN) > Abs(CurrentQty) then
-                                QtyToReleaseForLotSN := CurrentQty;
-                            DownToQuantity := (QtyTracked - QtyToReleaseForLotSN) * SignFactor;
-                            ReservEntry.SetTrackingFilterFromItemTrackingSetup(CurrentItemTrackingSetup);
-                        end else
-                            DownToQuantity += CalcDownToQtySyncingToAssembly(ReservEntry);
-                    end;
+                    if CurrentItemTrackingSetup.TrackingExists() then begin
+                        QtyToReleaseForLotSN := QuantityTracked2(ReservEntry);
+                        if Abs(QtyToReleaseForLotSN) > Abs(CurrentQty) then
+                            QtyToReleaseForLotSN := CurrentQty;
+                        DownToQuantity := (QtyTracked - QtyToReleaseForLotSN) * SignFactor;
+                        ReservEntry.SetTrackingFilterFromItemTrackingSetup(CurrentItemTrackingSetup);
+                    end else
+                        DownToQuantity += CalcDownToQtySyncingToAssembly(ReservEntry);
             end;
             OnDeleteReservEntriesOnAfterItemTrackingHandling(ReservEntry, ItemTrackingHandling);
         end;
@@ -1683,17 +970,13 @@ codeunit 99000845 "Reservation Management"
         DummyEntry: Record "Reservation Entry";
         AvailabilityDate: Date;
         QtyToTrack: Decimal;
+        ShouldExit: Boolean;
     begin
         CalcReservEntry.TestField("Source Type");
 
-        if CalcReservEntry."Source Type" in [Database::"Sales Line", Database::"Purchase Line", Database::"Service Line"] then
-            if not (CalcReservEntry."Source Subtype" in [1, 5]) then
-                exit; // Only order, return order
-
-        if CalcReservEntry."Source Type" in [Database::"Prod. Order Line", Database::"Prod. Order Component"]
-        then
-            if CalcReservEntry."Source Subtype" = 0 then
-                exit; // Not simulation
+        OnAutoTrackOnCheckSourceType(CalcReservEntry, ShouldExit);
+        if ShouldExit then
+            exit;
 
         if CalcReservEntry."Source Type" = Database::"Item Journal Line" then
             exit;
@@ -1804,6 +1087,7 @@ codeunit 99000845 "Reservation Management"
     var
         FromTrackingSpecification: Record "Tracking Specification";
         Sign: Integer;
+        IsHandled: Boolean;
     begin
         if Quantity < 0 then
             ToReservEntry."Shipment Date" := AvailabilityDate
@@ -1815,20 +1099,24 @@ codeunit 99000845 "Reservation Management"
         if FromReservEntry."Planning Flexibility" <> FromReservEntry."Planning Flexibility"::Unlimited then
             CreateReservEntry.SetPlanningFlexibility(FromReservEntry."Planning Flexibility");
 
-        Sign := CreateReservEntry.SignFactor(FromReservEntry);
-        CreateReservEntry.CreateReservEntryFor(
-          FromReservEntry."Source Type", FromReservEntry."Source Subtype", FromReservEntry."Source ID",
-          FromReservEntry."Source Batch Name", FromReservEntry."Source Prod. Order Line", FromReservEntry."Source Ref. No.",
-          FromReservEntry."Qty. per Unit of Measure", 0, Sign * Quantity,
-          FromReservEntry);
+        IsHandled := false;
+        OnMakeConnectionOnBeforeCreateReservEntry(FromReservEntry, ToReservEntry, Quantity, ReservationStatus, AvailabilityDate, Binding, FromTrackingSpecification, Sign, IsHandled);
+        if not IsHandled then begin
+            Sign := CreateReservEntry.SignFactor(FromReservEntry);
+            CreateReservEntry.CreateReservEntryFor(
+              FromReservEntry."Source Type", FromReservEntry."Source Subtype", FromReservEntry."Source ID",
+              FromReservEntry."Source Batch Name", FromReservEntry."Source Prod. Order Line", FromReservEntry."Source Ref. No.",
+              FromReservEntry."Qty. per Unit of Measure", 0, Sign * Quantity,
+              FromReservEntry);
 
-        FromTrackingSpecification.SetSourceFromReservEntry(ToReservEntry);
-        FromTrackingSpecification."Qty. per Unit of Measure" := ToReservEntry."Qty. per Unit of Measure";
-        FromTrackingSpecification.CopyTrackingFromReservEntry(ToReservEntry);
-        CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
-        CreateReservEntry.SetApplyFromEntryNo(FromReservEntry."Appl.-from Item Entry");
-        CreateReservEntry.SetApplyToEntryNo(FromReservEntry."Appl.-to Item Entry");
-        CreateReservEntry.SetUntrackedSurplus(ToReservEntry."Untracked Surplus");
+            FromTrackingSpecification.SetSourceFromReservEntry(ToReservEntry);
+            FromTrackingSpecification."Qty. per Unit of Measure" := ToReservEntry."Qty. per Unit of Measure";
+            FromTrackingSpecification.CopyTrackingFromReservEntry(ToReservEntry);
+            CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
+            CreateReservEntry.SetApplyFromEntryNo(FromReservEntry."Appl.-from Item Entry");
+            CreateReservEntry.SetApplyToEntryNo(FromReservEntry."Appl.-to Item Entry");
+            CreateReservEntry.SetUntrackedSurplus(ToReservEntry."Untracked Surplus");
+        end;
 
         if IsSpecialOrderOrDropShipment(ToReservEntry) then begin
             if FromReservEntry."Source Type" = Database::"Purchase Line" then
@@ -2055,7 +1343,7 @@ codeunit 99000845 "Reservation Management"
             if not FreeBinding then begin
                 ReservEntry.SetLoadFields(
                     "Source Type", "Source Subtype", "Source ID", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.");
-                if ReservEntry.Find('+') then begin
+                if ReservEntry.Find('+') then
                     if AllDeletedEntry."Entry No." > 0 then // The supply record has been deleted and cannot be reused.
                         repeat
                             Found := not AllDeletedEntry.HasSamePointer(ReservEntry);
@@ -2064,7 +1352,6 @@ codeunit 99000845 "Reservation Management"
                         until Found or NoMoreData
                     else
                         Found := true;
-                end;
             end;
 
             if Found then begin
@@ -2075,18 +1362,7 @@ codeunit 99000845 "Reservation Management"
                 ActionMessageEntry."Location Code" := SurplusEntry."Location Code";
                 ActionMessageEntry."Variant Code" := SurplusEntry."Variant Code";
                 ActionMessageEntry."Item No." := SurplusEntry."Item No.";
-
-                case SKU."Replenishment System" of
-                    SKU."Replenishment System"::Purchase:
-                        ActionMessageEntry."Source Type" := Database::"Purchase Line";
-                    SKU."Replenishment System"::"Prod. Order":
-                        ActionMessageEntry."Source Type" := Database::"Prod. Order Line";
-                    SKU."Replenishment System"::Transfer:
-                        ActionMessageEntry."Source Type" := Database::"Transfer Line";
-                    SKU."Replenishment System"::Assembly:
-                        ActionMessageEntry."Source Type" := Database::"Assembly Header";
-                end;
-
+                OnIssueActionMessageOnSetSourceTypeFromSKU(ActionMessageEntry, SKU);
                 ActionMessageEntry.Type := ActionMessageEntry.Type::New;
             end;
             ActionMessageEntry."Reservation Entry" := SurplusEntry."Entry No.";
@@ -2850,40 +2126,8 @@ codeunit 99000845 "Reservation Management"
     end;
 
     procedure TestItemType(SourceRecRef: RecordRef)
-    var
-        AssemblyLine: Record "Assembly Line";
-        JobPlanningLine: Record "Job Planning Line";
-        PurchaseLine: Record "Purchase Line";
-        SalesLine: Record "Sales Line";
-        ServiceLine: Record "Service Line";
     begin
-        case SourceRecRef.Number of
-            Database::"Assembly Line":
-                begin
-                    SourceRecRef.SetTable(AssemblyLine);
-                    AssemblyLine.TestField(Type, AssemblyLine.Type::Item);
-                end;
-            Database::"Sales Line":
-                begin
-                    SourceRecRef.SetTable(SalesLine);
-                    SalesLine.TestField(Type, SalesLine.Type::Item);
-                end;
-            Database::"Purchase Line":
-                begin
-                    SourceRecRef.SetTable(PurchaseLine);
-                    PurchaseLine.TestField(Type, PurchaseLine.Type::Item);
-                end;
-            Database::"Service Line":
-                begin
-                    SourceRecRef.SetTable(ServiceLine);
-                    ServiceLine.TestField(Type, ServiceLine.Type::Item);
-                end;
-            Database::"Job Planning Line":
-                begin
-                    SourceRecRef.SetTable(JobPlanningLine);
-                    JobPlanningLine.TestField(Type, JobPlanningLine.Type::Item);
-                end;
-        end;
+        OnTestItemType(SourceRecRef);
     end;
 
     [IntegrationEvent(false, false)]
@@ -2896,10 +2140,18 @@ codeunit 99000845 "Reservation Management"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnAfterAutoReservePurchLine(var PurchLine: Record "Purchase Line"; ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date)
+    begin
+        OnAfterAutoReservePurchLine(PurchLine, ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit PurchLineReserve', '25.0')]
     local procedure OnAfterAutoReservePurchLine(var PurchLine: Record "Purchase Line"; ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcReservation(var ReservEntry: Record "Reservation Entry"; var ItemLedgEntry: Record "Item Ledger Entry"; var ResSummEntryNo: Integer; var QtyThisLine: Decimal; var QtyThisLineBase: Decimal; TotalAvailQty: Decimal)
@@ -2982,7 +2234,7 @@ codeunit 99000845 "Reservation Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAutoReserveOnBeforeStopReservation(var CalcReservEntry: Record "Reservation Entry"; var FullAutoReservation: Boolean; var AvailabilityDate: Date; var MaxQtyToReserve: Decimal; var MaxQtyToReserveBase: Decimal; var StopReservation: Boolean)
+    local procedure OnAutoReserveOnBeforeStopReservation(var CalcReservEntry: Record "Reservation Entry"; var FullAutoReservation: Boolean; var AvailabilityDate: Date; var MaxQtyToReserve: Decimal; var MaxQtyToReserveBase: Decimal; var StopReservation: Boolean; SourceRecRef: RecordRef)
     begin
     end;
 
@@ -3001,10 +2253,18 @@ codeunit 99000845 "Reservation Management"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnAfterSetSourceForSalesLine(var CalcReservEntry: Record "Reservation Entry"; SalesLine: Record "Sales Line")
+    begin
+        OnAfterSetSourceForSalesLine(CalcReservEntry, SalesLine);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit SalesLineReserve', '25.0')]
     local procedure OnAfterSetSourceForSalesLine(var CalcReservEntry: Record "Reservation Entry"; SalesLine: Record "Sales Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAutoReserve(var CalcReservEntry: Record "Reservation Entry"; var FullAutoReservation: Boolean; var Description: Text[100]; var AvailabilityDate: Date; var MaxQtyToReserve: Decimal; var MaxQtyToReserveBase: Decimal; var IsHandled: Boolean)
@@ -3016,50 +2276,122 @@ codeunit 99000845 "Reservation Management"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReservePurchLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; var Search: Text[1]; var NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReservePurchLine(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit PurchLineReserve', '25.0')]
     local procedure OnBeforeAutoReservePurchLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; var Search: Text[1]; var NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveSalesLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveSalesLine(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit SalesLineReserve', '25.0')]
     local procedure OnBeforeAutoReserveSalesLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveProdOrderLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveProdOrderLine(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ProdOrderLineReserve', '25.0')]
     local procedure OnBeforeAutoReserveProdOrderLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveProdOrderComp(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveProdOrderComp(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ProdCompLineReserve', '25.0')]
     local procedure OnBeforeAutoReserveProdOrderComp(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveAssemblyHeader(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveAssemblyHeader(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit AssemblyHeaderReserve', '25.0')]
     local procedure OnBeforeAutoReserveAssemblyHeader(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveAssemblyLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveAssemblyLine(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit AssemblyLineReserve', '25.0')]
     local procedure OnBeforeAutoReserveAssemblyLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveTransLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; var Search: Text[1]; var NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveTransLine(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit TransLineReserve', '25.0')]
     local procedure OnBeforeAutoReserveTransLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; var Search: Text[1]; var NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveServLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveServLine(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ServiceLineReserve', '25.0')]
     local procedure OnBeforeAutoReserveServLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnBeforeAutoReserveJobPlanningLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
+    begin
+        OnBeforeAutoReserveJobPlanningLine(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit JobPlanningLineReserve', '25.0')]
     local procedure OnBeforeAutoReserveJobPlanningLine(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date; var IsReserved: Boolean; Search: Text[1]; NextStep: Integer; CalcReservEntry: Record "Reservation Entry")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcAvailAllocQuantities(
@@ -3174,80 +2506,192 @@ codeunit 99000845 "Reservation Management"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnSetAssemblyHeaderOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; AssemblyHeader: Record "Assembly Header")
+    begin
+        OnSetAssemblyHeaderOnBeforeUpdateReservation(ReservEntry, AssemblyHeader);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit AssemblyHeaderReserve', '25.0')]
     local procedure OnSetAssemblyHeaderOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; AssemblyHeader: Record "Assembly Header")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetAssemblyLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; AssemblyLine: Record "Assembly Line")
+    begin
+        OnSetAssemblyLineOnBeforeUpdateReservation(ReservEntry, AssemblyLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit AssemblyLineReserve', '25.0')]
     local procedure OnSetAssemblyLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; AssemblyLine: Record "Assembly Line")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetItemJnlLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ItemJnlLine: Record "Item Journal Line")
+    begin
+        OnSetItemJnlLineOnBeforeUpdateReservation(ReservEntry, ItemJnlLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ItemJnlLineReserve', '25.0')]
     local procedure OnSetItemJnlLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ItemJnlLine: Record "Item Journal Line")
     begin
     end;
+#endif
+
+#if not CLEAN24
+    internal procedure RunOnSetItemLedgEntryOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ItemLedgerEntry: Record "Item Ledger Entry")
+    begin
+        OnSetItemLedgEntryOnBeforeUpdateReservation(ReservEntry, ItemLedgerEntry);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ItemLedgerEntryReserve', '25.0')]
     local procedure OnSetItemLedgEntryOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ItemLedgerEntry: Record "Item Ledger Entry")
     begin
     end;
+#endif
 
-    [IntegrationEvent(false, false)]
-    local procedure OnSetJobPlanningLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; JobPlanningLine: Record "Job Planning Line")
+#if not CLEAN25
+    internal procedure RunOnSetJobPlanningLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; JobPlanningLine: Record Microsoft.Projects.Project.Planning."Job Planning Line")
     begin
+        OnSetJobPlanningLineOnBeforeUpdateReservation(ReservEntry, JobPlanningLine);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetJobJnlLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; JobJnlLine: Record "Job Journal Line")
+    [Obsolete('Replaced by same event in codeunit JobPlanningLineReserve', '25.0')]
+    local procedure OnSetJobPlanningLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; JobPlanningLine: Record Microsoft.Projects.Project.Planning."Job Planning Line")
     begin
+    end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetJobJnlLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; JobJnlLine: Record Microsoft.Projects.Project.Journal."Job Journal Line")
+    begin
+        OnSetJobJnlLineOnBeforeUpdateReservation(ReservEntry, JobJnlLine);
     end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit JobJnlLineReserve', '25.0')]
+    local procedure OnSetJobJnlLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; JobJnlLine: Record Microsoft.Projects.Project.Journal."Job Journal Line")
+    begin
+    end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetSalesLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; SalesLine: Record "Sales Line")
+    begin
+        OnSetSalesLineOnBeforeUpdateReservation(ReservEntry, SalesLine);
+    end;
+
+    [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit SalesLineReserve', '25.0')]
     local procedure OnSetSalesLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; SalesLine: Record "Sales Line")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetPlanningCompOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; PlanningComponent: Record "Planning Component")
+    begin
+        OnSetPlanningCompOnBeforeUpdateReservation(ReservEntry, PlanningComponent);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit PlngComponentReserve', '25.0')]
     local procedure OnSetPlanningCompOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; PlanningComponent: Record "Planning Component")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetProdOrderLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ProdOrderLine: Record "Prod. Order Line")
+    begin
+        OnSetProdOrderLineOnBeforeUpdateReservation(ReservEntry, ProdOrderLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ProdOrderLineReserve', '25.0')]
     local procedure OnSetProdOrderLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ProdOrderLine: Record "Prod. Order Line")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetProdOrderCompOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ProdOrderComp: Record "Prod. Order Component")
+    begin
+        OnSetProdOrderCompOnBeforeUpdateReservation(ReservEntry, ProdOrderComp);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ProdOrderCompReserve', '25.0')]
     local procedure OnSetProdOrderCompOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ProdOrderComp: Record "Prod. Order Component")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetPurchLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; PurchLine: Record "Purchase Line")
+    begin
+        OnSetPurchLineOnBeforeUpdateReservation(ReservEntry, PurchLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit PurchLineReserve', '25.0')]
     local procedure OnSetPurchLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; PurchLine: Record "Purchase Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(true, false)]
-    local procedure OnSetReservSource(SourceRecRef: RecordRef; var ReservEntry: Record "Reservation Entry"; Direction: Enum "Transfer Direction")
+    local procedure OnSetReservSource(SourceRecRef: RecordRef; var ReservEntry: Record "Reservation Entry"; Direction: Enum "Transfer Direction"; var RefOrderType: Enum "Requisition Ref. Order Type"; var PlanningLineOrigin: Enum "Planning Line Origin Type"; Positive: Boolean)
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnSetReqLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ReqLine: Record "Requisition Line")
+    begin
+        OnSetReqLineOnBeforeUpdateReservation(ReservEntry, ReqLine);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ReqLineReserve', '25.0')]
     local procedure OnSetReqLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ReqLine: Record "Requisition Line")
     begin
     end;
+#endif
 
-    [IntegrationEvent(false, false)]
-    local procedure OnSetServLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ServiceLine: Record "Service Line")
+#if not CLEAN25
+    internal procedure RunOnSetServLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ServiceLine: Record Microsoft.Service.Document."Service Line")
     begin
+        OnSetServLineOnBeforeUpdateReservation(ReservEntry, ServiceLine);
     end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit ServiceLineReserve', '25.0')]
+    local procedure OnSetServLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; ServiceLine: Record Microsoft.Service.Document."Service Line")
+    begin
+    end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnSetTransLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; TransferLine: Record "Transfer Line")
+    begin
+        OnSetTransLineOnBeforeUpdateReservation(ReservEntry, TransferLine)
+    end;
+
+    [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit TransferLineReserve', '25.0')]
     local procedure OnSetTransLineOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; TransferLine: Record "Transfer Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateItemLedgEntryStatsOnBeforePrepareTempEntrySummary(CalcReservationEntry: Record "Reservation Entry"; var TempEntrySummary: Record "Entry Summary")
@@ -3295,7 +2739,7 @@ codeunit 99000845 "Reservation Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDeleteReservEntriesOnBeforeDeleteReservEntries(CalcReservEntry: Record "Reservation Entry"; var CalcReservEntry2: Record "Reservation Entry"; var IsHandled: Boolean)
+    local procedure OnDeleteReservEntriesOnBeforeDeleteReservEntries(CalcReservEntry: Record "Reservation Entry"; var CalcReservEntry2: Record "Reservation Entry"; var IsHandled: Boolean; var Item: record Item; var ItemTrackingCode: Record "Item Tracking Code"; var SKU: Record "Stockkeeping Unit"; var MfgSetup: Record "Manufacturing Setup"; var Positive: Boolean; var Location: Record Location; var TotalAvailQty: Decimal; var QtyAllocInWhse: Decimal; var QtyReservedOnPickShip: Decimal)
     begin
     end;
 
@@ -3304,10 +2748,18 @@ codeunit 99000845 "Reservation Management"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnAutoReservePurchLineOnBeforeSetQtyToReserveDownToTrackedQuantity(PurchLine: Record "Purchase Line"; CalcReservEntry: Record "Reservation Entry"; var ReservQty: Decimal; var QtyThisLine: Decimal; var QtyThisLineBase: Decimal)
+    begin
+        OnAutoReservePurchLineOnBeforeSetQtyToReserveDownToTrackedQuantity(PurchLine, CalcReservEntry, ReservQty, QtyThisLine, QtyThisLineBase);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit PurchLineReserve', '25.0')]
     local procedure OnAutoReservePurchLineOnBeforeSetQtyToReserveDownToTrackedQuantity(PurchLine: Record "Purchase Line"; CalcReservEntry: Record "Reservation Entry"; var ReservQty: Decimal; var QtyThisLine: Decimal; var QtyThisLineBase: Decimal)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteReservEntriesOnBeforeReservEntryTestField(var ReservEntry: Record "Reservation Entry"; var IsHandled: Boolean)
@@ -3321,6 +2773,26 @@ codeunit 99000845 "Reservation Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteReservEntriesOnAfterItemTrackingHandling(var ReservationEntry: Record "Reservation Entry"; var ItemTrackingHandling: Option "None","Allow deletion",Match)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAutoTrackOnCheckSourceType(var ReservationEntry: Record "Reservation Entry"; var ShouldExit: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTestItemType(SourceRecRef: RecordRef);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIssueActionMessageOnSetSourceTypeFromSKU(var ActionMessageEntry: Record "Action Message Entry"; SKU: Record "Stockkeeping Unit")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnMakeConnectionOnBeforeCreateReservEntry(var FromReservationEntry: Record "Reservation Entry"; var ToReservationEntry: Record "Reservation Entry"; var Quantity: Decimal; ReservationStatus: Enum "Reservation Status"; var AvailabilityDate: Date; ReservationBinding: Enum "Reservation Binding"; var FromTrackingSpecification: Record "Tracking Specification"; var Sign: Integer; var IsHandled: Boolean)
     begin
     end;
 }

@@ -56,7 +56,6 @@ using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Peppol;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
-using Microsoft.Service.Setup;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Setup;
@@ -68,9 +67,6 @@ using System.Integration;
 using System.Globalization;
 using System.Feedback;
 using System.IO;
-#if not CLEAN22
-using System.Security.AccessControl;
-#endif
 using System.Upgrade;
 
 codeunit 2 "Company-Initialize"
@@ -96,11 +92,7 @@ codeunit 2 "Company-Initialize"
                   TableData "FA Setup" = i,
                   TableData "Nonstock Item Setup" = i,
                   TableData "Warehouse Setup" = i,
-                  TableData "Service Mgt. Setup" = i,
                   tabledata "Trial Balance Setup" = i,
-#if not CLEAN22
-                  TableData "User Group Member" = d,
-#endif
                   TableData "Config. Setup" = i,
                   TableData "VAT Setup" = i;
 
@@ -144,13 +136,20 @@ codeunit 2 "Company-Initialize"
     end;
 
     var
+#pragma warning disable AA0074
         Text000: Label 'Initializing company...';
+#pragma warning restore AA0074
         SEPACTCodeTxt: Label 'SEPACT', Comment = 'No need to translate - but can be translated at will.';
         SEPACTNameTxt: Label 'SEPA Credit Transfer';
         SEPADDCodeTxt: Label 'SEPADD', Comment = 'No need to translate - but can be translated at will.';
         SEPADDNameTxt: Label 'SEPA Direct Debit';
         ExportRemittanceCodeTxt: Label 'Remittance';
         ExportRemittanceNameTxt: Label 'Export Remittance';
+        SEPACTCode09Txt: Label 'SEPACTPAIN00100109', Locked = true;
+        SEPACTName09Txt: Label 'SEPA Credit Transfer pain.001.001.09';
+        SEPADDCode08Txt: Label 'SEPADDPAIN00800108', Locked = true;
+        SEPADDName08Txt: Label 'SEPA Direct Debit pain.008.001.08';
+#pragma warning disable AA0074
         Text001: Label 'SALES';
         Text002: Label 'Sales';
         Text003: Label 'PURCHASES';
@@ -172,11 +171,15 @@ codeunit 2 "Company-Initialize"
         Text023: Label 'PROJJNL';
         Text024: Label 'SALESAPPL';
         Text025: Label 'Sales Entry Application';
+#pragma warning restore AA0074
         PaymentReconJnlTok: Label 'PAYMTRECON', Comment = 'Payment Reconciliation Journal Code';
+#pragma warning disable AA0074
         Text026: Label 'PURCHAPPL';
         Text027: Label 'Purchase Entry Application';
+#pragma warning restore AA0074
         EmployeeEntryApplicationCodeTxt: Label 'EMPLAPPL', Comment = 'EMPL stands for employee, APPL stands for application';
         EmployeeEntryApplicationTxt: Label 'Employee Entry Application';
+#pragma warning disable AA0074
         Text028: Label 'VATSTMT';
         Text029: Label 'COMPRGL';
         Text030: Label 'COMPRVAT';
@@ -232,8 +235,10 @@ codeunit 2 "Company-Initialize"
         Text085: Label 'Intercompany';
         Text086: Label 'UNAPPSALES';
         Text087: Label 'Unapplied Sales Entry Application';
+#pragma warning restore AA0074
         UnappliedEmplEntryApplnCodeTxt: Label 'UNAPPEMPL', Comment = 'EMPL stands for employee, UNAPP stands for unapply';
         UnappliedEmplEntryApplnTxt: Label 'Unapplied Employee Entry Application';
+#pragma warning disable AA0074
         Text088: Label 'UNAPPPURCH';
         Text089: Label 'Unapplied Purchase Entry Application';
         Text090: Label 'REVERSAL';
@@ -264,6 +269,7 @@ codeunit 2 "Company-Initialize"
         Text116: Label 'Cost Allocation';
         Text117: Label 'TRABUD', Comment = 'Uppercase of the translation of Transfer Budget to Actual with a max of 10 char';
         Text118: Label 'Transfer Budget to Actual';
+#pragma warning restore AA0074
         DocumentCreatedToAvoidGapInNoSeriesTxt: Label 'Document created to avoid gap in No. Series';
         InvtReceiptsTxt: Label 'INVTRCPT', Comment = 'INVENTORY RECEIPTS';
         InvtShipmentsTxt: Label 'INVTSHPT', Comment = 'INVENTORY SHIPMENTS';
@@ -278,6 +284,8 @@ codeunit 2 "Company-Initialize"
         SourceCodePurchaseDeferralTxt: Label 'Purchase Deferral';
         NorgeSEPACTCodeTxt: Label 'NORGE SEPA', Comment = 'No need to translate - but can be translated at will.';
         NorgeSEPACTNameTxt: Label 'Norge SEPA Credit Transfer';
+        NorgeSEPACTCode09Txt: Label 'NORGE SEPA CT 09', Comment = 'No need to translate - but can be translated at will.';
+        NorgeSEPACTName09Txt: Label 'Norge SEPA Credit Transfer pain.001.001.09';
         ProductionOrderLbl: Label 'PRODUCTION';
         ProductionOrderTxt: Label 'Production Order';
 
@@ -300,10 +308,10 @@ codeunit 2 "Company-Initialize"
         HumanResourcesSetup: Record "Human Resources Setup";
         MarketingSetup: Record "Marketing Setup";
         InteractionTemplateSetup: Record "Interaction Template Setup";
-        ServiceMgtSetup: Record "Service Mgt. Setup";
         NonstockItemSetup: Record "Nonstock Item Setup";
         FASetup: Record "FA Setup";
         CashFlowSetup: Record "Cash Flow Setup";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         CostAccSetup: Record "Cost Accounting Setup";
         WhseSetup: Record "Warehouse Setup";
         AssemblySetup: Record "Assembly Setup";
@@ -336,11 +344,6 @@ codeunit 2 "Company-Initialize"
         if not InteractionTemplateSetup.FindFirst() then begin
             InteractionTemplateSetup.Init();
             InteractionTemplateSetup.Insert();
-        end;
-
-        if not ServiceMgtSetup.FindFirst() then begin
-            ServiceMgtSetup.Init();
-            ServiceMgtSetup.Insert();
         end;
 
         if not PurchSetup.FindFirst() then begin
@@ -560,6 +563,7 @@ codeunit 2 "Company-Initialize"
 
     local procedure InitReportSelection()
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
         ReportSelections: Record "Report Selections";
         ReportSelectionMgt: Codeunit "Report Selection Mgt.";
     begin
@@ -612,7 +616,43 @@ codeunit 2 "Company-Initialize"
               CODEUNIT::"Export Remittance", 0, 0);
             InsertBankExportImportSetup(NorgeSEPACTCodeTxt, NorgeSEPACTNameTxt, BankExportImportSetup.Direction::Export,
               CODEUNIT::"Norge SEPA CC-Export File", XMLPORT::"SEPA CT pain.001.001.03", CODEUNIT::"SEPA CT-Check Line");
+            InsertBankExportImportSetup(NorgeSEPACTCode09Txt, NorgeSEPACTName09Txt, BankExportImportSetup.Direction::Export,
+              CODEUNIT::"Norge SEPA CC-Export File", XMLPORT::"SEPA CT pain.001.001.09", CODEUNIT::"SEPA CT-Check Line");
+            InsertBankExportImportSetup(SEPACTCode09Txt, SEPACTName09Txt, BankExportImportSetup.Direction::Export,
+              CODEUNIT::"SEPA CT-Export File", XMLPORT::"SEPA CT pain.001.001.09", CODEUNIT::"SEPA CT-Check Line");
+            InsertBankExportImportSetup(SEPADDCode08Txt, SEPADDName08Txt, BankExportImportSetup.Direction::Export,
+              CODEUNIT::"SEPA DD-Export File", XMLPORT::"SEPA DD pain.008.001.08", CODEUNIT::"SEPA DD-Check Line");
         end;
+    end;
+
+    procedure GetSEPACT09Code(): Code[20]
+    begin
+        exit(SEPACTCode09Txt);
+    end;
+
+    procedure GetNorgeSEPACT09Code(): Code[20]
+    begin
+        exit(NorgeSEPACTCode09Txt);
+    end;
+
+    procedure GetSEPADD08Code(): Code[20]
+    begin
+        exit(SEPADDCode08Txt);
+    end;
+
+    procedure GetSEPACT09Name(): Text[100]
+    begin
+        exit(SEPACTName09Txt);
+    end;
+
+    procedure GetNorgeSEPACT09Name(): Text[100]
+    begin
+        exit(NorgeSEPACTName09Txt);
+    end;
+
+    procedure GetSEPADD08Name(): Text[100]
+    begin
+        exit(SEPADDName08Txt);
     end;
 
     local procedure InitDocExchServiceSetup()
@@ -707,7 +747,7 @@ codeunit 2 "Company-Initialize"
         JobWIPMethod.Insert();
     end;
 
-    local procedure InsertBankExportImportSetup(CodeTxt: Text[20]; NameTxt: Text[100]; DirectionOpt: Option; CodeunitID: Integer; XMLPortID: Integer; CheckCodeunitID: Integer)
+    internal procedure InsertBankExportImportSetup(CodeTxt: Text[20]; NameTxt: Text[100]; DirectionOpt: Option; CodeunitID: Integer; XMLPortID: Integer; CheckCodeunitID: Integer)
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
     begin
@@ -761,10 +801,6 @@ codeunit 2 "Company-Initialize"
     local procedure OnAfterCompanyDeleteRemoveReferences(var Rec: Record Company; RunTrigger: Boolean)
     var
         AssistedCompanySetupStatus: Record "Assisted Company Setup Status";
-#if not CLEAN22
-        UserGroupMember: Record "User Group Member";
-        UserGroupAccessControl: Record "User Group Access Control";
-#endif
         ApplicationAreaSetup: Record "Application Area Setup";
         CustomReportLayout: Record "Custom Report Layout";
         ReportLayoutSelection: Record "Report Layout Selection";
@@ -775,12 +811,6 @@ codeunit 2 "Company-Initialize"
 
         AssistedCompanySetupStatus.SetRange("Company Name", Rec.Name);
         AssistedCompanySetupStatus.DeleteAll();
-#if not CLEAN22
-        UserGroupMember.SetRange("Company Name", Rec.Name);
-        UserGroupMember.DeleteAll();
-        UserGroupAccessControl.SetRange("Company Name", Rec.Name);
-        UserGroupAccessControl.DeleteAll();
-#endif
         ApplicationAreaSetup.SetRange("Company Name", Rec.Name);
         ApplicationAreaSetup.DeleteAll();
         CustomReportLayout.SetRange("Company Name", Rec.Name);

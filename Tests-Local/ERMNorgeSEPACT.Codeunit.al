@@ -16,7 +16,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         LibraryJournals: Codeunit "Library - Journals";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryRandom: Codeunit "Library - Random";
-        NamespaceTxt: Label 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03';
+        NamespaceTxt: Label 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.09';
         ExportHasErrorsErr: Label 'The file export has one or more errors.\\For each line to be exported, resolve the errors displayed to the right and then try to export again.';
         ALotOfRegRepCodesNotAllowedErr: Label 'It is not allowed to have more than 10 regulatory reporting codes.';
         LibraryXPathXMLReader: Codeunit "Library - XPath XML Reader";
@@ -254,7 +254,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         TempBlob.CreateOutStream(OutStr);
         BankAccount.Get(GenJournalLine."Bal. Account No.");
 
-        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.03 port
+        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.09 port
         XMLPORT.Export(BankAccount.GetPaymentExportXMLPortID(), OutStr, GenJournalLine);
         LibraryXPathXMLReader.InitializeWithBlob(TempBlob, NamespaceTxt);
 
@@ -291,7 +291,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         TempBlob.CreateOutStream(OutStr);
         BankAccount.Get(GenJournalLine."Bal. Account No.");
 
-        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.03 port
+        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.09 port
         XMLPORT.Export(BankAccount.GetPaymentExportXMLPortID(), OutStr, GenJournalLine);
 
         // [THEN] Xml file contains 2 tags 'RgltryRptg' for "G1"
@@ -501,7 +501,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         RgltryRptgIndex: Integer;
     begin
         // [FEATURE] [Regulatory Reporting Threshold] [KID] [UT]
-        // [SCENARIO 309201] In SEPA CT pain.001.001.03 port 'RmtInf' goes after 'RgltryRptg' tag
+        // [SCENARIO 309201] In SEPA CT pain.001.001.09 port 'RmtInf' goes after 'RgltryRptg' tag
 
         // [GIVEN] Gen. Journal Line "G1" with Reg. Rep. Code and KID
         Amount := LibraryRandom.RandDec(100, 2);
@@ -518,7 +518,7 @@ codeunit 144137 "ERM Norge SEPA CT"
 
         BankAccount.Get(GenJournalLine."Bal. Account No.");
 
-        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.03 port
+        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.09 port
         XMLPORT.Export(BankAccount.GetPaymentExportXMLPortID(), OutStr, GenJournalLine);
 
         // [THEN] Xml file contains 'RgltryRptg' and 'RmtInf' tags
@@ -552,7 +552,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         // [GIVEN] GenJnl Lines: GJL1 with "Posting Date" := WorkDate(), GJL2 and GJL3 with "Posting Date" := WorkDate() - 1D
         CreateGenJnlLineWithDateGrouping(GenJournalLine);
 
-        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.03 port
+        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.09 port
         TempBlob.CreateOutStream(OutStr);
 
         BankAccount.Get(GenJournalLine."Bal. Account No.");
@@ -594,7 +594,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         KundeID: Code[30];
     begin
         // [FEATURE] [Regulatory Reporting Threshold] [KID] [UT]
-        // [SCENARIO 318353] In SEPA CT pain.001.001.03 there's structure around KID value
+        // [SCENARIO 318353] In SEPA CT pain.001.001.09 there's structure around KID value
 
         // [GIVEN] Gen. Journal Line "G1" with  KID
         Amount := LibraryRandom.RandDec(100, 2);
@@ -610,7 +610,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         TempBlob.CreateOutStream(OutStr);
         BankAccount.Get(GenJournalLine."Bal. Account No.");
 
-        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.03 port
+        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.09 port
         XMLPORT.Export(BankAccount.GetPaymentExportXMLPortID(), OutStr, GenJournalLine);
 
         // [THEN] Xml file contains 'SCOR' and KID value in structure
@@ -638,7 +638,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         Amount: Decimal;
         ExtDocNo: Code[35];
     begin
-        // [SCENARIO 418639] SEPA CT pain.001.001.03 "Ref" tag should contain "External Document No." if "KID" is empty
+        // [SCENARIO 418639] SEPA CT pain.001.001.09 "Ref" tag should contain "External Document No." if "KID" is empty
         // [GIVEN] Gen. Journal Line "G1" with "External Document No." = "ExtDocNo", "KID" not specified
         Amount := LibraryRandom.RandDec(100, 2);
         ExtDocNo := '12345678911';
@@ -654,7 +654,7 @@ codeunit 144137 "ERM Norge SEPA CT"
         TempBlob.CreateOutStream(OutStr);
         BankAccount.Get(GenJournalLine."Bal. Account No.");
 
-        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.03 port
+        // [WHEN] Export Gen. Journal Line with SEPA CT pain.001.001.09 port
         XMLPORT.Export(BankAccount.GetPaymentExportXMLPortID(), OutStr, GenJournalLine);
 
         // [THEN] Xml file contains 'SCOR' and External Document No." value in structure
@@ -708,31 +708,27 @@ codeunit 144137 "ERM Norge SEPA CT"
         BankAccount: Record "Bank Account";
     begin
         LibraryERM.CreateBankAccount(BankAccount);
-        with BankAccount do begin
-            IBAN := 'SE6795000099604247929021';
-            "SWIFT Code" := 'NDEASESS';
-            "Payment Export Format" := BankExpImpSetup;
-            "Credit Transfer Msg. Nos." := LibraryERM.CreateNoSeriesCode();
-            Modify();
-            exit("No.");
-        end;
+        BankAccount.IBAN := 'SE6795000099604247929021';
+        BankAccount."SWIFT Code" := 'NDEASESS';
+        BankAccount."Payment Export Format" := BankExpImpSetup;
+        BankAccount."Credit Transfer Msg. Nos." := LibraryERM.CreateNoSeriesCode();
+        BankAccount.Modify();
+        exit(BankAccount."No.");
     end;
 
     local procedure CreateNorgeBankExportImportSetup(ThreshAmt: Decimal): Code[20]
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
     begin
-        with BankExportImportSetup do begin
-            Init();
-            Code := LibraryUtility.GenerateGUID();
-            Direction := Direction::Export;
-            "Processing Codeunit ID" := CODEUNIT::"Norge SEPA CC-Export File";
-            "Processing XMLport ID" := XMLPORT::"SEPA CT pain.001.001.03";
-            "Check Export Codeunit" := CODEUNIT::"SEPA CT-Check Line";
-            "Reg.Reporting Thresh.Amt (LCY)" := ThreshAmt;
-            Insert();
-            exit(Code);
-        end;
+        BankExportImportSetup.Init();
+        BankExportImportSetup.Code := LibraryUtility.GenerateGUID();
+        BankExportImportSetup.Direction := BankExportImportSetup.Direction::Export;
+        BankExportImportSetup."Processing Codeunit ID" := CODEUNIT::"Norge SEPA CC-Export File";
+        BankExportImportSetup."Processing XMLport ID" := XMLPORT::"SEPA CT pain.001.001.09";
+        BankExportImportSetup."Check Export Codeunit" := CODEUNIT::"SEPA CT-Check Line";
+        BankExportImportSetup."Reg.Reporting Thresh.Amt (LCY)" := ThreshAmt;
+        BankExportImportSetup.Insert();
+        exit(BankExportImportSetup.Code);
     end;
 
     local procedure CreateRegRepCode(): Code[10]
@@ -897,12 +893,10 @@ codeunit 144137 "ERM Norge SEPA CT"
 
     local procedure MockGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; GenJournalBatch: Record "Gen. Journal Batch"; BankExportImportSetupCode: Code[20])
     begin
-        with GenJournalLine do begin
-            "Journal Template Name" := GenJournalBatch."Journal Template Name";
-            "Journal Batch Name" := GenJournalBatch.Name;
-            "Bal. Account Type" := "Bal. Account Type"::"Bank Account";
-            "Bal. Account No." := CreateBankAccountWithExportSetup(BankExportImportSetupCode);
-        end;
+        GenJournalLine."Journal Template Name" := GenJournalBatch."Journal Template Name";
+        GenJournalLine."Journal Batch Name" := GenJournalBatch.Name;
+        GenJournalLine."Bal. Account Type" := GenJournalLine."Bal. Account Type"::"Bank Account";
+        GenJournalLine."Bal. Account No." := CreateBankAccountWithExportSetup(BankExportImportSetupCode);
     end;
 
     local procedure VerifyTagRgltryRptg(XMLParentNode: DotNet XmlNode; GenJnlLineRegRepCode: Record "Gen. Jnl. Line Reg. Rep. Code")

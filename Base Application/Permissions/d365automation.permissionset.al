@@ -118,7 +118,9 @@ using Microsoft.HumanResources.Setup;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.Entity;
+#if not CLEAN25
 using Microsoft.Integration.FieldService;
+#endif
 using Microsoft.Integration.Graph;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Integration.PowerBI;
@@ -289,6 +291,8 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Add-in" = imd,
                   tabledata "Aggregate Permission Set" = Rimd,
                   tabledata "All Profile" = imd,
+                  tabledata "All Profile Extension" = imd,
+                  tabledata "All Profile Page Metadata" = imd,
                   tabledata AllObj = imd,
                   tabledata AllObjWithCaption = Rimd,
                   tabledata Chart = imd,
@@ -296,19 +300,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "CodeUnit Metadata" = imd,
                   tabledata "Data Sensitivity" = RIMD,
                   tabledata Date = imd,
-                  tabledata "Designed Query" = R,
-                  tabledata "Designed Query Caption" = R,
-                  tabledata "Designed Query Category" = R,
-                  tabledata "Designed Query Column" = R,
-                  tabledata "Designed Query Column Filter" = R,
-                  tabledata "Designed Query Data Item" = R,
-                  tabledata "Designed Query Filter" = R,
-                  tabledata "Designed Query Group" = RIMD,
-                  tabledata "Designed Query Join" = R,
-                  tabledata "Designed Query Management" = RIMD,
-                  tabledata "Designed Query Obj" = Rimd,
-                  tabledata "Designed Query Order By" = R,
-                  tabledata "Designed Query Permission" = RIMD,
                   tabledata Device = Rimd,
                   tabledata "Document Service" = imd,
                   tabledata Drive = Rimd,
@@ -349,9 +340,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Table Information" = Rimd,
                   tabledata "Table Metadata" = imd,
                   tabledata "Table Synch. Setup" = Rimd,
-#pragma warning disable AL0432
                   tabledata "Tenant Profile" = imd,
-#pragma warning restore AL0432
                   tabledata "Tenant Profile Extension" = imd,
                   tabledata "Tenant Profile Page Metadata" = imd,
                   tabledata "Tenant Profile Setting" = imd,
@@ -529,9 +518,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "CDS Connection Setup" = RIMD,
                   tabledata "CDS Coupled Business Unit" = RIMD,
                   tabledata "CDS Environment" = RIMD,
-#if not CLEAN22
-                  tabledata "CDS Failed Option Mapping" = RIMD,
-#endif
                   tabledata "CDS Solution" = RIMD,
                   tabledata "CDS Teammembership" = RIMD,
                   tabledata "CDS Teamroles" = RIMD,
@@ -620,9 +606,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Cost Type" = RIMD,
                   tabledata "Country/Region" = RIMD,
                   tabledata "Country/Region Translation" = RIMD,
-#if not CLEAN22                  
-                  tabledata "Coupling Field Buffer" = RIMD,
-#endif
                   tabledata "Coupling Record Buffer" = RIMD,
                   tabledata "Credit Trans Re-export History" = RIMD,
                   tabledata "Credit Transfer Entry" = RIMD,
@@ -679,6 +662,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "CRM Transactioncurrency" = RIMD,
                   tabledata "CRM Uom" = RIMD,
                   tabledata "CRM Uomschedule" = RIMD,
+#if not CLEAN25
                   tabledata "FS Connection Setup" = RIMD,
                   tabledata "FS Bookable Resource" = RIMD,
                   tabledata "FS Bookable Resource Booking" = RIMD,
@@ -693,6 +677,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "FS Work Order Service" = RIMD,
                   tabledata "FS Work Order Substatus" = RIMD,
                   tabledata "FS Work Order Type" = RIMD,
+#endif
                   tabledata "CSV Buffer" = RIMD,
                   tabledata "Curr. Exch. Rate Update Setup" = RIMD,
                   tabledata Currency = RIMD,
@@ -982,13 +967,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Intermediate Data Import" = RIMD,
                   tabledata "Internal Movement Header" = RIMD,
                   tabledata "Internal Movement Line" = RIMD,
-#if not CLEAN22
-                  tabledata "Advanced Intrastat Checklist" = RIMD,
-                  tabledata "Intrastat Jnl. Batch" = RIMD,
-                  tabledata "Intrastat Jnl. Line" = RIMD,
-                  tabledata "Intrastat Jnl. Template" = RIMD,
-                  tabledata "Intrastat Setup" = RIMD,
-#endif
                   tabledata "Invalidated Dim Correction" = R,
                   tabledata "Inventory Adjmt. Entry (Order)" = Rimd,
                   tabledata "Inventory Adjustment Buffer" = Rimd,
@@ -1210,9 +1188,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Payable Employee Ledger Entry" = RIMD,
                   tabledata "Payable Vendor Ledger Entry" = RIMD,
                   tabledata "Payment Application Proposal" = RIMD,
-#if not CLEAN22
-                  tabledata "Payment Buffer" = RIMD,
-#endif
                   tabledata "Vendor Payment Buffer" = RIMD,
                   tabledata "Payment Export Data" = Rimd,
                   tabledata "Payment Export Remittance Text" = RIMD,
@@ -1282,9 +1257,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Posted Whse. Receipt Line" = RIMD,
                   tabledata "Posted Whse. Shipment Header" = RIMD,
                   tabledata "Posted Whse. Shipment Line" = RIMD,
-#if not CLEAN22
-                  tabledata "Power BI Service Status Setup" = RIMD,
-#endif
 #if not CLEAN23
                   tabledata "Power BI User Configuration" = RIMD,
                   tabledata "Power BI Report Configuration" = RIMD,
@@ -1394,6 +1366,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Relationship Mgmt. Cue" = RIMD,
                   tabledata Relative = RIMD,
                   tabledata "Reminder Attachment Text" = RIMD,
+                  tabledata "Reminder Attachment Text Line" = RIMD,
                   tabledata "Reminder Comment Line" = RIMD,
                   tabledata "Reminder Email Text" = RIMD,
                   tabledata "Reminder Header" = RIMD,
@@ -1679,13 +1652,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Unlinked Attachment" = RIMD,
                   tabledata "Unplanned Demand" = RIMD,
                   tabledata "Untracked Planning Element" = RIMD,
-#if not CLEAN22
-                  tabledata "User Group" = R,
-                  tabledata "User Group Access Control" = R,
-                  tabledata "User Group Member" = Rimd,
-                  tabledata "User Group Permission Set" = R,
-                  tabledata "User Group Plan" = Rimd,
-#endif
                   tabledata "User Preference" = RIMD,
                   tabledata "User Security Status" = RIMD,
                   tabledata "User Setup" = RIMD,

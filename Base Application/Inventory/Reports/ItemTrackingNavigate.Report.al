@@ -163,10 +163,12 @@ report 6529 "Item Tracking Navigate"
         PrintOnlyOnePerPage: Boolean;
         RecordCounter: Integer;
 
+#pragma warning disable AA0074
         Text001: Label 'Serial No. : ';
         Text002: Label 'Lot No. : ';
         Text003: Label 'Item No. : ';
         Text004: Label 'Variant Code. : ';
+#pragma warning restore AA0074
         ItemTrackingNavigateCaptionLbl: Label 'Item Tracking Navigate';
         CurrReportPageNoCaptionLbl: Label 'Page';
         NavigateFiltersCaptionLbl: Label 'Navigate Filters';

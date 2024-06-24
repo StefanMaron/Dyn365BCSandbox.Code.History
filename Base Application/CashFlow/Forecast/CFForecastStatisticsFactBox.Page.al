@@ -190,6 +190,10 @@ page 840 "CF Forecast Statistics FactBox"
         CashFlowForecastEntry: Record "Cash Flow Forecast Entry";
         CurrentDate: Date;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text1000: Label 'Liquid Funds at %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 }
 

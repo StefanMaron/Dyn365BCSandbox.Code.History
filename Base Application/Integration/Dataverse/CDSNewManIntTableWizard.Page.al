@@ -64,10 +64,12 @@ page 5384 "CDS New Man. Int. Table Wizard"
                         trigger OnValidate()
                         var
                             IntegrationTableMapping: Record "Integration Table Mapping";
+#pragma warning disable AA0470
                             IntegrationMappingNameExistErr: Label 'Integration table name %1 already exists. Please specify a different name';
+#pragma warning restore AA0470
                         begin
                             IntegrationTableMapping.SetRange(Name, IntegrationMappingName);
-                            If not IntegrationTableMapping.IsEmpty then
+                            if not IntegrationTableMapping.IsEmpty then
                                 Error(IntegrationMappingNameExistErr, IntegrationMappingName);
                         end;
                     }
@@ -220,9 +222,8 @@ page 5384 "CDS New Man. Int. Table Wizard"
                             FilterPageBuilder.AddTable(IntegrationMappingTableIdValue, IntegrationMappingTableId);
                             if TableFilter <> '' then
                                 FilterPageBuilder.SetView(IntegrationMappingTableIdValue, TableFilter);
-                            if FilterPageBuilder.RunModal() then begin
+                            if FilterPageBuilder.RunModal() then
                                 TableFilter := FilterPageBuilder.GetView(IntegrationMappingTableIdValue, false);
-                            end;
                         end;
                     }
                     field(IntegrationTableFilterValue; IntegrationTableFilter)
@@ -258,9 +259,8 @@ page 5384 "CDS New Man. Int. Table Wizard"
                             ConfigTemplateHeader: Record "Config. Template Header";
                         begin
                             ConfigTemplateHeader.SetRange("Table ID", IntegrationMappingTableId);
-                            if PAGE.RunModal(PAGE::"Config. Template List", ConfigTemplateHeader) = ACTION::LookupOK then begin
+                            if PAGE.RunModal(PAGE::"Config. Template List", ConfigTemplateHeader) = ACTION::LookupOK then
                                 TableConfigTemplateCode := ConfigTemplateHeader.Code;
-                            end;
                         end;
                     }
                     field(IntTableConfigTemplateCode; IntTableConfigTemplateCode)
@@ -273,9 +273,8 @@ page 5384 "CDS New Man. Int. Table Wizard"
                             ConfigTemplateHeader: Record "Config. Template Header";
                         begin
                             ConfigTemplateHeader.SetRange("Table ID", IntegrationMappingIntTableId);
-                            if PAGE.RunModal(PAGE::"Config. Template List", ConfigTemplateHeader) = ACTION::LookupOK then begin
+                            if PAGE.RunModal(PAGE::"Config. Template List", ConfigTemplateHeader) = ACTION::LookupOK then
                                 TableConfigTemplateCode := ConfigTemplateHeader.Code;
-                            end;
                         end;
                     }
                 }
@@ -538,19 +537,17 @@ page 5384 "CDS New Man. Int. Table Wizard"
     local procedure NextStep(Backwards: Boolean)
     begin
         if not (SetupExistingIntegrationMapping) and (not Backwards) then begin
-            if Step = Step::Start then begin
+            if Step = Step::Start then
                 if IntegrationMappingName = '' then
                     Error(FillinMandatoryFieldsLbl);
-            end;
 
-            if Step = Step::Step2 then begin
-                if (IntegrationMappingTableId = 0) OR
-                    (IntegrationMappingIntTableId = 0) OR
-                    (IntegrationTableUID = 0) OR
+            if Step = Step::Step2 then
+                if (IntegrationMappingTableId = 0) or
+                    (IntegrationMappingIntTableId = 0) or
+                    (IntegrationTableUID = 0) or
                     (IntTblModifiedOnId = 0)
                 then
                     Error(FillinMandatoryFieldsLbl);
-            end;
         end;
 
         if Backwards then

@@ -2507,14 +2507,12 @@ codeunit 136606 "ERM RS Wizard & Worksheet"
 
     local procedure CreateConfigSetup(var ConfigSetup: Record "Config. Setup")
     begin
-        with ConfigSetup do begin
-            if not Get() then begin
-                Init();
-                Insert();
-            end;
-            Name := LibraryUtility.GenerateGUID();
-            Modify();
+        if not ConfigSetup.Get() then begin
+            ConfigSetup.Init();
+            ConfigSetup.Insert();
         end;
+        ConfigSetup.Name := LibraryUtility.GenerateGUID();
+        ConfigSetup.Modify();
     end;
 
     local procedure CheckPage(TableID: Integer; PageID: Integer)

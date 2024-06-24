@@ -1386,6 +1386,7 @@ report 5606 "Fixed Asset - Book Value 02"
         AcquisitionDate: Date;
         DisposalDate: Date;
 
+#pragma warning disable AA0074
         Text000: Label 'Fixed Asset - Book Value 02';
         Text001: Label '(Budget Report)';
         Text002: Label 'Group Totals';
@@ -1393,7 +1394,10 @@ report 5606 "Fixed Asset - Book Value 02"
         Text004: Label 'Addition in Period';
         Text005: Label 'Disposal in Period';
         Text006: Label 'Group Total';
+#pragma warning disable AA0470
         Text007: Label '%1 has been modified in fixed asset %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         TotalCaptionLbl: Label 'Total';
 
