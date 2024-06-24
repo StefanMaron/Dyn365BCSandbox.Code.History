@@ -23,15 +23,21 @@ codeunit 8616 "Config. Management"
         ConfigPackageMgt: Codeunit "Config. Package Management";
         HideDialog: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'You must specify a company name.';
+#pragma warning disable AA0470
         Text001: Label 'Do you want to copy the data from the %1 table in %2?';
         Text002: Label 'Data from the %1 table in %2 has been copied successfully.';
         Text003: Label 'Do you want to copy the data from the selected tables in %1?';
         Text004: Label 'Data from the selected tables in %1 has been copied successfully.';
+#pragma warning restore AA0470
         Text006: Label 'The base company must not be the same as the current company.';
+#pragma warning disable AA0470
         Text007: Label 'The %1 table in %2 already contains data.\\You must delete the data from the table before you can use this function.';
         Text009: Label 'There is no data in the %1 table in %2.\\You must set up the table in %3 manually.';
+#pragma warning restore AA0470
         Text023: Label 'Processing tables';
+#pragma warning restore AA0074
 
     procedure CopyDataDialog(NewCompanyName: Text[30]; var ConfigLine: Record "Config. Line")
     var

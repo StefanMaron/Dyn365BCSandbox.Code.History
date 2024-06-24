@@ -26,16 +26,20 @@ codeunit 8 AccSchedManagement
     end;
 
     var
+#pragma warning disable AA0074
         Text000: Label 'DEFAULT';
         Text001: Label 'Default Schedule';
         Text002: Label 'Default Columns';
         Text012: Label 'You have entered an illegal value or a nonexistent row number.';
         Text013: Label 'You have entered an illegal value or a nonexistent column number.';
+#pragma warning restore AA0074
         Text016Err: Label '%1\\ %2 %3 %4.', Locked = true;
         Text017Txt: Label 'The error occurred when the program tried to calculate:\';
         Text018Txt: Label 'Acc. Sched. Line: Row No. = %1, Line No. = %2, Totaling = %3\', Comment = '%1 = Row No., %2= Line No., %3 = Totaling';
         Text019Txt: Label 'Acc. Sched. Column: Column No. = %1, Line No. = %2, Formula  = %3', Comment = '%1 = Column No., %2= Line No., %3 = Formula';
+#pragma warning disable AA0074
         Text020: Label 'Because of circular references, the program cannot calculate a formula.';
+#pragma warning restore AA0074
         AccSchedName: Record "Acc. Schedule Name";
         AccountScheduleLine: Record "Acc. Schedule Line";
         ColumnLayoutName: Record "Column Layout Name";
@@ -61,13 +65,17 @@ codeunit 8 AccSchedManagement
         OldColumnLayoutName: Code[10];
         OldCalcAddCurr: Boolean;
         GLSetupRead: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text021: Label 'Conversion of dimension totaling filter %1 results in a filter that becomes too long.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         BasePercentLine: array[50] of Integer;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text022: Label 'You cannot have more than %1 lines with %2 of %3.';
         Text023: Label 'Formulas ending with a percent sign require %2 %1 on a line before it.';
         Text024: Label 'The %1 %3 on the %2 must equal the %4 %6 on the %5 when any Dimension Totaling is used in any Column.';
-        NegativeAmounts: Option "Minus Sign",Parentheses,"Square Brackets","Angle Brackets",Braces,"None";
-        NegativePercents: Option "Minus Sign",Parentheses,"Square Brackets","Angle Brackets",Braces,"None";
         USText005: Label 'For the Period from %3 %4, %1 to %7 %8, %5';
         MonthText01: Label 'January';
         MonthText02: Label 'February';
@@ -81,9 +89,15 @@ codeunit 8 AccSchedManagement
         MonthText10: Label 'October';
         MonthText11: Label 'November';
         MonthText12: Label 'December';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+        NegativeAmounts: Option "Minus Sign",Parentheses,"Square Brackets","Angle Brackets",Braces,"None";
+        NegativePercents: Option "Minus Sign",Parentheses,"Square Brackets","Angle Brackets",Braces,"None";
+#pragma warning disable AA0470
         ColumnFormulaMsg: Label 'Column formula: %1.';
         RowFormulaMsg: Label 'Row formula: %1.';
         ColumnFormulaErrorMsg: Label 'Column formula: %1. \Error: %2.';
+#pragma warning restore AA0470
         Recalculate: Boolean;
         SystemGeneratedAccSchedQst: Label 'This account schedule may be automatically updated by the system, so any changes you make may be lost. Do you want to make a copy?';
 
@@ -1517,7 +1531,7 @@ codeunit 8 AccSchedManagement
                         ValueAsText := ValueAsText + '  ';
                 end;
             ValueAsText := ValueAsText + '%';
-        end else begin
+        end else
             if Value < 0 then
                 case NegativeAmounts of
                     NegativeAmounts::"Minus Sign":
@@ -1547,7 +1561,6 @@ codeunit 8 AccSchedManagement
                     NegativeAmounts::"Angle Brackets":
                         ValueAsText := ValueAsText + '  ';
                 end;
-        end;
 
         OnAfterFormatCellAsText(ColumnLayout2, ValueAsText, NegativeAmounts, Value);
     end;
@@ -2427,7 +2440,7 @@ codeunit 8 AccSchedManagement
                 GLAcc.FilterGroup(0);
                 PAGE.Run(PAGE::"Chart of Accounts (G/L)", GLAcc)
             end else begin
-                OnDrillDownOnGLAccountOnBeforeCopyFiltersWithAnalysisView(AccScheduleLine, TempColumnLayout, GLAcc);
+                OnDrillDownOnGLAccountOnBeforeCopyFiltersWithAnalysisView(AccScheduleLine, TempColumnLayout, GLAcc, GLAccAnalysisView);
                 GLAcc.CopyFilter("Date Filter", GLAccAnalysisView."Date Filter");
                 GLAcc.CopyFilter("Budget Filter", GLAccAnalysisView."Budget Filter");
                 GLAcc.CopyFilter("Business Unit Filter", GLAccAnalysisView."Business Unit Filter");
@@ -2838,7 +2851,7 @@ codeunit 8 AccSchedManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDrillDownOnGLAccountOnBeforeCopyFiltersWithAnalysisView(var AccScheduleLine: Record "Acc. Schedule Line"; var TempColumnLayout: Record "Column Layout"; var GLAcc: Record "G/L Account")
+    local procedure OnDrillDownOnGLAccountOnBeforeCopyFiltersWithAnalysisView(var AccScheduleLine: Record "Acc. Schedule Line"; var TempColumnLayout: Record "Column Layout"; var GLAcc: Record "G/L Account"; var GLAccAnalysisView: Record "G/L Account (Analysis View)")
     begin
     end;
 

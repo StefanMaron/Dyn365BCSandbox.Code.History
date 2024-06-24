@@ -1377,25 +1377,21 @@ codeunit 137019 "SCM Correct Invoice"
     var
         SalesLine: Record "Sales Line";
     begin
-        with SalesLine do begin
-            SetRange("Document Type", SalesHeader."Document Type");
-            SetRange("Document No.", SalesHeader."No.");
-            SetRange(Type, Type::"G/L Account");
-            SetRange("No.", LibrarySales.GetInvRoundingAccountOfCustPostGroup(SalesHeader."Customer Posting Group"));
-            Assert.RecordIsEmpty(SalesLine);
-        end;
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::"G/L Account");
+        SalesLine.SetRange("No.", LibrarySales.GetInvRoundingAccountOfCustPostGroup(SalesHeader."Customer Posting Group"));
+        Assert.RecordIsEmpty(SalesLine);
     end;
 
     local procedure VerifyInvRndLineExistsInSalesCrMemoHeader(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
     begin
-        with SalesCrMemoLine do begin
-            SetRange("Document No.", SalesCrMemoHeader."No.");
-            SetRange(Type, Type::"G/L Account");
-            SetRange("No.", LibrarySales.GetInvRoundingAccountOfCustPostGroup(SalesCrMemoHeader."Customer Posting Group"));
-            Assert.RecordIsNotEmpty(SalesCrMemoLine);
-        end;
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::"G/L Account");
+        SalesCrMemoLine.SetRange("No.", LibrarySales.GetInvRoundingAccountOfCustPostGroup(SalesCrMemoHeader."Customer Posting Group"));
+        Assert.RecordIsNotEmpty(SalesCrMemoLine);
     end;
 
     local procedure VerifyBlankLineDoesNotExist(SalesHeader: Record "Sales Header")

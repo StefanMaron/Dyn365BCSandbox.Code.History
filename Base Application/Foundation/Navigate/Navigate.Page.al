@@ -513,6 +513,7 @@ page 344 Navigate
     var
         [SecurityFiltering(SecurityFilter::Filtered)]
         BankAccount: Record "Bank Account";
+#pragma warning disable AA0074
         Text000: Label 'The business contact type was not specified.';
         Text001: Label 'There are no posted records with this external document number.';
         Text002: Label 'Counting records...';
@@ -522,6 +523,7 @@ page 344 Navigate
         Text014: Label 'There are no posted records with this combination of document number and posting date.';
         Text015: Label 'The search results in too many external documents. Specify a business contact no.';
         Text016: Label 'The search results in too many external documents. Use Navigate from the relevant ledger entries.';
+#pragma warning restore AA0074
         PostedSalesInvoiceTxt: Label 'Posted Sales Invoice';
         PostedSalesCreditMemoTxt: Label 'Posted Sales Credit Memo';
         PostedSalesShipmentTxt: Label 'Posted Sales Shipment';
@@ -675,7 +677,9 @@ page 344 Navigate
         BusinessContactVisible: Boolean;
         ItemReferenceVisible: Boolean;
         FilterSelectionChangedTxtVisible: Boolean;
+#pragma warning disable AA0470
         PageCaptionTxt: Label 'Selected - %1';
+#pragma warning restore AA0470
 
     protected var
         [SecurityFiltering(SecurityFilter::Filtered)]
@@ -870,9 +874,6 @@ page 344 Navigate
 
         if (DocNoFilter = '') and (ExtDocNo = '') and (PostingDateFilter = '') then
             exit;
-#if not CLEAN22
-        OnBeforeFindRecords(HideDialog);
-#endif
         if not HideDialog then
             Window.Open(Text002);
         Rec.Reset();
@@ -2631,14 +2632,6 @@ page 344 Navigate
     local procedure OnAfterSetSource(var SourceType2: Integer; var SourceType: Text[30]; SourceNo: Code[20]; var SourceName: Text[100]; var PostingDateFilter: Text)
     begin
     end;
-
-#if not CLEAN22
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by OnBeforeFindRecordsProcedure', '22.0')]
-    local procedure OnBeforeFindRecords(var HideDialog: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFindRecordsProcedure(DocumentEntry: Record "Document Entry"; var HideDialog: Boolean; var IsHandled: Boolean)

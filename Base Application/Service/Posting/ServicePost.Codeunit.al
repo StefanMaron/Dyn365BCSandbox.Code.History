@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Service.Posting;
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Service.Posting;
 
 using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Analysis;
@@ -66,12 +70,16 @@ codeunit 5980 "Service-Post"
         Ship: Boolean;
         Consume: Boolean;
         Invoice: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text002: Label 'Posting lines              #2######\';
         Text003: Label 'Posting serv. and VAT      #3######\';
         Text004: Label 'Posting to customers       #4######\';
         Text005: Label 'Posting to bal. account    #5######';
         Text006: Label 'Posting lines              #2######';
+#pragma warning restore AA0470
         Text007: Label 'is not within your range of allowed posting dates';
+#pragma warning restore AA0074
         WhseShip: Boolean;
         PreviewMode: Boolean;
         SuppressCommit: Boolean;
@@ -199,12 +207,11 @@ codeunit 5980 "Service-Post"
             OnAfterPostServiceDoc(ServiceHeader, ServShipmentNo, ServInvoiceNo, ServCrMemoNo, ServDocumentsMgt, SuppressCommit, PassedShip, PassedConsume, PassedInvoice, WhseShip);
 
             Window.Close();
-            if Invoice and ServDocumentsMgt.GetUseExternalTaxEngine() then begin
+            if Invoice and ServDocumentsMgt.GetUseExternalTaxEngine() then
                 if ServiceHeader."Document Type" in [ServiceHeader."Document Type"::Order, ServiceHeader."Document Type"::Invoice] then
                     SalesTaxCalculate.FinalizeExternalTaxCalcForDoc(DATABASE::"Service Invoice Header", ServiceHeader."Last Posting No.")
                 else
                     SalesTaxCalculate.FinalizeExternalTaxCalcForDoc(DATABASE::"Service Cr.Memo Header", ServiceHeader."Last Posting No.");
-            end;
             UpdateAnalysisView.UpdateAll(0, true);
             UpdateItemAnalysisView.UpdateAll(0, true);
 
@@ -252,10 +259,10 @@ codeunit 5980 "Service-Post"
 
     procedure CheckServiceDocument(var PassedServiceHeader: Record "Service Header"; var PassedServiceLine: Record "Service Line")
     var
-        ReportDistributionManagement: Codeunit "Report Distribution Management";
+        ServReportDistributionMgt: Codeunit "Serv. Report Distribution Mgt.";
     begin
         TestMandatoryFields(PassedServiceHeader, PassedServiceLine);
-        ReportDistributionManagement.RunDefaultCheckServiceElectronicDocument(PassedServiceHeader);
+        ServReportDistributionMgt.RunDefaultCheckServiceElectronicDocument(PassedServiceHeader);
         ServDocumentsMgt.CheckServiceDocument(PassedServiceHeader, PassedServiceLine);
     end;
 

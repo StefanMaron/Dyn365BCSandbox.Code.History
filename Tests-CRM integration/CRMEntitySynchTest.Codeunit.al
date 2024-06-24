@@ -2518,12 +2518,10 @@ codeunit 139180 "CRM Entity Synch Test"
     var
         CRMProductpricelevel: Record "CRM Productpricelevel";
     begin
-        with CRMProductpricelevel do begin
-            SetRange(ProductId, CRMProductId);
-            SetRange(PriceLevelId, CRMPriceLevelId);
-            FindFirst();
-            TestField(Amount, ExpectedAmount);
-        end;
+        CRMProductpricelevel.SetRange(ProductId, CRMProductId);
+        CRMProductpricelevel.SetRange(PriceLevelId, CRMPriceLevelId);
+        CRMProductpricelevel.FindFirst();
+        CRMProductpricelevel.TestField(Amount, ExpectedAmount);
     end;
 
     local procedure OneDayBefore(DateTime: DateTime): DateTime
@@ -2537,12 +2535,14 @@ codeunit 139180 "CRM Entity Synch Test"
         CDSConnectionSetup: Record "CDS Connection Setup";
         CRMSetupDefaults: Codeunit "CRM Setup Defaults";
         CDSSetupDefaults: Codeunit "CDS Setup Defaults";
+        ClientSecret: Text;
     begin
         CRMConnectionSetup.Get();
         CDSConnectionSetup.LoadConnectionStringElementsFromCRMConnectionSetup();
         CDSConnectionSetup."Ownership Model" := CDSConnectionSetup."Ownership Model"::Person;
         CDSConnectionSetup.Validate("Client Id", 'ClientId');
-        CDSConnectionSetup.SetClientSecret('ClientSecret');
+        ClientSecret := 'ClientSecret';
+        CDSConnectionSetup.SetClientSecret(ClientSecret);
         CDSConnectionSetup.Validate("Redirect URL", 'RedirectURL');
         CDSConnectionSetup.Modify();
         CDSSetupDefaults.ResetConfiguration(CDSConnectionSetup);

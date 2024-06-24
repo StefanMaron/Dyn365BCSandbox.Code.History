@@ -29,7 +29,7 @@ report 410 "Blanket Purchase Order"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = sorting("Document Type", "No.") WHERE("Document Type" = const("Blanket Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Blanket Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Blanket Purchase Order';
             column(No_PurchaseHdr; "No.")
@@ -103,7 +103,7 @@ report 410 "Blanket Purchase Order"
                 DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = sorting(Number) WHERE(Number = const(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(BlanketPurchOrderCopyText; StrSubstNo(Text002, CopyText))
                     {
                     }
@@ -254,7 +254,7 @@ report 410 "Blanket Purchase Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = sorting(Number) WHERE(Number = filter(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -348,7 +348,7 @@ report 410 "Blanket Purchase Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = sorting(Number) WHERE(Number = filter(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText1; DimText)
                             {
                             }
@@ -426,11 +426,11 @@ report 410 "Blanket Purchase Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnPreDataItem()
                         begin
@@ -440,7 +440,7 @@ report 410 "Blanket Purchase Order"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(SelltoCustNo_PurchaseHdr; "Purchase Header"."Sell-to Customer No.")
                         {
                         }
@@ -472,6 +472,9 @@ report 410 "Blanket Purchase Order"
                         {
                         }
                         column(SelltoCustNo_PurchaseHdrCaption; "Purchase Header".FieldCaption("Sell-to Customer No."))
+                        {
+                        }
+                        column(ShipToPhoneNo; "Purchase Header"."Ship-to Phone No.")
                         {
                         }
 
@@ -656,7 +659,9 @@ report 410 "Blanket Purchase Order"
         ArchiveDocument: Boolean;
         LogInteractionEnable: Boolean;
 
+#pragma warning disable AA0074
         Text002: Label 'Blanket Purchase Order %1', Comment = '%1 = Document No.';
+#pragma warning restore AA0074
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoVATRegistrationNoCaptionLbl: Label 'VAT Registration No.';
         CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';

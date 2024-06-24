@@ -446,7 +446,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         if TempInvoicePostingBuffer.Find('+') then
             repeat
                 LineCount := LineCount + 1;
-                if GuiAllowed and not HideProgressWindow then
+                if GuiAllowed() and not HideProgressWindow then
                     Window.Update(3, LineCount);
 
                 TempInvoicePostingBuffer.ApplyRoundingForFinalPosting();

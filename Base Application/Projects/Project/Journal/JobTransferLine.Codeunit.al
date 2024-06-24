@@ -30,7 +30,11 @@ codeunit 1004 "Job Transfer Line"
         Currency: Record Currency;
         LCYCurrency: Record Currency;
         CurrencyRoundingRead: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label '%1 %2 does not exist.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         JobPlanningLineNotFoundErr: Label 'Could not find any lines on the %1 page that are related to the %2 where the value in the %3 field is %4, and value in the %5 field is %6.', Comment = '%1=page caption, %2=table caption, %3,%5=field caption, %4,%6=field value';
         DuplicateJobplanningLinesErr: Label 'We found more than one %1s where the value in the %2 field is %3. The value in the %2 field must be unique.', Comment = '%1=table caption, %2=field caption, %3=field value';
 
@@ -178,6 +182,7 @@ codeunit 1004 "Job Transfer Line"
         JobJnlLine."Job No." := JobPlanningLine."Job No.";
         JobJnlLine."Job Task No." := JobPlanningLine."Job Task No.";
         JobJnlLine.Type := JobPlanningLine.Type;
+        JobTask.SetLoadFields("Job No.", "Job Task No.");
         JobTask.Get(JobPlanningLine."Job No.", JobPlanningLine."Job Task No.");
         JobJnlLine."Posting Date" := SalesHeader."Posting Date";
         JobJnlLine."Document Date" := SalesHeader."Document Date";
@@ -278,6 +283,7 @@ codeunit 1004 "Job Transfer Line"
             JobJnlLine."Line Type" := JobPlanningLine.ConvertToJobLineType();
         end;
 
+        JobTask.SetLoadFields("Job No.", "Job Task No.", "Job Posting Group");
         JobTask.Get(JobPlanningLine."Job No.", JobPlanningLine."Job Task No.");
         JobJnlLine."Posting Group" := JobTask."Job Posting Group";
         JobJnlLine."Posting Date" := PostingDate;
@@ -355,7 +361,7 @@ codeunit 1004 "Job Transfer Line"
 
         JobPlanningLine.SetLoadFields(
             "Job No.", "Job Task No.", "Usage Link", "Line No.", "Line Type", Type, "No.", "Gen. Bus. Posting Group", "Gen. Prod. Posting Group",
-            "Serial No.", "Lot No.", Description, "Description 2", "Unit of Measure Code", "Currency Code", "Currency Factor", "Resource Group No.",
+            "Serial No.", "Lot No.", "Package No.", Description, "Description 2", "Unit of Measure Code", "Currency Code", "Currency Factor", "Resource Group No.",
             "Location Code", "Work Type Code", "Customer Price Group", "Variant Code", "Bin Code", "Service Order No.", "Country/Region Code",
             "Qty. per Unit of Measure", "Direct Unit Cost (LCY)", "Unit Cost", "Unit Price", "Line Discount %", "Document No.", "Assemble to Order");
         JobPlanningLine.SetRange("Job No.", WarehouseActivityLine."Source No.");
@@ -390,6 +396,7 @@ codeunit 1004 "Job Transfer Line"
             JobJnlLine."Line Type" := JobPlanningLine.ConvertToJobLineType();
         end;
 
+        JobTask.SetLoadFields("Job No.", "Job Task No.", "Job Posting Group");
         JobTask.Get(JobPlanningLine."Job No.", JobPlanningLine."Job Task No.");
         JobJnlLine."Posting Group" := JobTask."Job Posting Group";
         JobJnlLine."Posting Date" := PostingDate;
@@ -448,6 +455,7 @@ codeunit 1004 "Job Transfer Line"
 
         JobJnlLine."Job No." := GenJnlLine."Job No.";
         JobJnlLine."Job Task No." := GenJnlLine."Job Task No.";
+        JobTask.SetLoadFields("Job No.", "Job Task No.");
         JobTask.Get(GenJnlLine."Job No.", GenJnlLine."Job Task No.");
 
         JobJnlLine."Posting Date" := GenJnlLine."Posting Date";
@@ -466,6 +474,7 @@ codeunit 1004 "Job Transfer Line"
         JobJnlLine."Gen. Prod. Posting Group" := GenJnlLine."Gen. Prod. Posting Group";
         JobJnlLine."Source Code" := GenJnlLine."Source Code";
         JobJnlLine."Reason Code" := GenJnlLine."Reason Code";
+        Job.SetLoadFields("Customer Price Group");
         Job.Get(JobJnlLine."Job No.");
         JobJnlLine."Customer Price Group" := Job."Customer Price Group";
         JobJnlLine."External Document No." := GenJnlLine."External Document No.";
@@ -611,6 +620,7 @@ codeunit 1004 "Job Transfer Line"
         JobJnlLine.DontCheckStdCost();
         JobJnlLine.Validate("Job No.", PurchLine."Job No.");
         JobJnlLine.Validate("Job Task No.", PurchLine."Job Task No.");
+        JobTask.SetLoadFields("Job No.", "Job Task No.");
         JobTask.Get(PurchLine."Job No.", PurchLine."Job Task No.");
         JobJnlLine.Validate("Posting Date", PurchHeader."Posting Date");
         JobJournalLineValidateType(JobJnlLine, PurchLine);

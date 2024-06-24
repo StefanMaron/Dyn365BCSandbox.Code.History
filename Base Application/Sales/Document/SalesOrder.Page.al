@@ -346,6 +346,11 @@ page 42 "Sales Order"
                     ApplicationArea = RelationshipMgmt;
                     Importance = Additional;
                     ToolTip = 'Specifies the number of the campaign that the document is linked to.';
+                    trigger OnValidate()
+                    begin
+                        if Rec."Campaign No." <> xRec."Campaign No." then
+                            CurrPage.Update();
+                    end;
                 }
                 field("Opportunity No."; Rec."Opportunity No.")
                 {
@@ -753,6 +758,12 @@ page 42 "Sales Order"
                                 Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                 ToolTip = 'Specifies a UPS Zone code for this document if UPS is used for shipments.';
                             }
+                        }
+                        field("Ship-to Phone No."; Rec."Ship-to Phone No.")
+                        {
+                            ApplicationArea = Basic, Suite;
+                            Caption = 'Phone No.';
+                            ToolTip = 'Specifies the telephone number of the company''s shipping address.';
                         }
                         field("Ship-to Contact"; Rec."Ship-to Contact")
                         {
@@ -1220,10 +1231,23 @@ page 42 "Sales Order"
                 SubPageLink = "No." = field("No."),
                               "Document Type" = field("Document Type");
             }
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
                               "Document Type" = field("Document Type");
@@ -1737,6 +1761,7 @@ page 42 "Sales Order"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Re&lease';
+                    Enabled = Rec.Status <> Rec.Status::Released;
                     Image = ReleaseDoc;
                     ShortCutKey = 'Ctrl+F9';
                     ToolTip = 'Release the document to the next stage of processing. You must reopen the document before you can make changes to it.';
@@ -2029,7 +2054,7 @@ page 42 "Sales Order"
                         DemandOverview: Page "Demand Overview";
                     begin
                         DemandOverview.SetCalculationParameter(true);
-                        DemandOverview.Initialize(0D, 1, Rec."No.", '', '');
+                        DemandOverview.SetParameters(0D, Microsoft.Inventory.Requisition."Demand Order Source Type"::"Sales Demand", Rec."No.", '', '');
                         DemandOverview.RunModal();
                     end;
                 }
@@ -2096,37 +2121,10 @@ page 42 "Sales Order"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-#if not CLEAN22
-                        Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
-#else
                         Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
-#endif
                         CustomActionType = FlowTemplateGallery;
                         FlowTemplateCategoryName = 'd365bc_approval_salesOrder';
                     }
-#if not CLEAN22
-                    action(CreateFlow)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
-                        Image = Flow;
-                        ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-                        Visible = IsSaas and not PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
-                        ObsoleteReason = 'This action will be handled by platform as part of the CreateFlowFromTemplate customaction';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '22.0';
-
-                        trigger OnAction()
-                        var
-                            FlowServiceManagement: Codeunit "Flow Service Management";
-                            FlowTemplateSelector: Page "Flow Template Selector";
-                        begin
-                            // Opens page 6400 where the user can use filtered templates to create new flows.
-                            FlowTemplateSelector.SetSearchText(FlowServiceManagement.GetSalesTemplateFilter());
-                            FlowTemplateSelector.Run();
-                        end;
-                    }
-#endif
                 }
             }
             group(Action3)
@@ -2761,9 +2759,6 @@ page 42 "Sales Order"
         JobQueuesUsed := SalesSetup.JobQueueActive();
         SetExtDocNoMandatoryCondition();
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
-#if not CLEAN22
-        InitPowerAutomateTemplateVisibility();
-#endif
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
@@ -2863,8 +2858,12 @@ page 42 "Sales Order"
         ChangeExchangeRate: Page "Change Exchange Rate";
         Usage: Option "Order Confirmation","Work Order","Pick Instruction";
         JobQueueVisible: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'Do you want to change %1 in all related records in the warehouse?';
+#pragma warning restore AA0470
         Text002: Label 'The update has been interrupted to respect the warning.';
+#pragma warning restore AA0074
         HasIncomingDocument: Boolean;
         DocNoVisible: Boolean;
         ExternalDocNoMandatory: Boolean;
@@ -3155,22 +3154,6 @@ page 42 "Sales Order"
         end;
         exit(false);
     end;
-
-#if not CLEAN22
-    var
-        PowerAutomateTemplatesEnabled: Boolean;
-        PowerAutomateTemplatesFeatureLbl: Label 'PowerAutomateTemplates', Locked = true;
-
-    local procedure InitPowerAutomateTemplateVisibility()
-    var
-        FeatureKey: Record "Feature Key";
-    begin
-        PowerAutomateTemplatesEnabled := true;
-        if FeatureKey.Get(PowerAutomateTemplatesFeatureLbl) then
-            if FeatureKey.Enabled <> FeatureKey.Enabled::"All Users" then
-                PowerAutomateTemplatesEnabled := false;
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShippingOptions(var SalesHeader: Record "Sales Header"; ShipToOptions: Option "Default (Sell-to Address)","Alternate Shipping Address","Custom Address")

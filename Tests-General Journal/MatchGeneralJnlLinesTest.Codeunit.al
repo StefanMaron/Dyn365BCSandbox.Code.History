@@ -1197,22 +1197,20 @@ codeunit 134251 "Match General Jnl Lines Test"
         GLAccount: Record "G/L Account";
         LastLineNo: Integer;
     begin
-        with TextToAccMapping do begin
-            if FindLast() then
-                LastLineNo := "Line No.";
+        if TextToAccMapping.FindLast() then
+            LastLineNo := TextToAccMapping."Line No.";
 
-            Init();
-            Validate("Line No.", LastLineNo + 1);
-            Validate("Mapping Text", Keyword);
-            LibraryERM.CreateGLAccount(GLAccount);
-            Validate("Debit Acc. No.", GLAccount."No.");
-            LibraryERM.CreateGLAccount(GLAccount);
-            Validate("Credit Acc. No.", GLAccount."No.");
-            Validate("Bal. Source Type", BalSourceType);
-            Validate("Bal. Source No.", BalSourceNo);
-            Validate("Vendor No.", VendorNo);
-            Insert(true);
-        end;
+        TextToAccMapping.Init();
+        TextToAccMapping.Validate("Line No.", LastLineNo + 1);
+        TextToAccMapping.Validate("Mapping Text", Keyword);
+        LibraryERM.CreateGLAccount(GLAccount);
+        TextToAccMapping.Validate("Debit Acc. No.", GLAccount."No.");
+        LibraryERM.CreateGLAccount(GLAccount);
+        TextToAccMapping.Validate("Credit Acc. No.", GLAccount."No.");
+        TextToAccMapping.Validate("Bal. Source Type", BalSourceType);
+        TextToAccMapping.Validate("Bal. Source No.", BalSourceNo);
+        TextToAccMapping.Validate("Vendor No.", VendorNo);
+        TextToAccMapping.Insert(true);
     end;
 
     local procedure SetupGeneralJournal(var GenJournalLine2: Record "Gen. Journal Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; Amount: Decimal)

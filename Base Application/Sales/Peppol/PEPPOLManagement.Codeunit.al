@@ -41,7 +41,9 @@ codeunit 1605 "PEPPOL Management"
         PaymentMeansFundsTransferCodeTxt: Label '31', Locked = true;
         GTINTxt: Label '0160', Locked = true;
         UoMforPieceINUNECERec20ListIDTxt: Label 'C62', Locked = true;
+#pragma warning disable AA0470
         NoUnitOfMeasureErr: Label 'The %1 %2 contains lines on which the %3 field is empty.', Comment = '1: document type, 2: document no 3 Unit of Measure Code';
+#pragma warning restore AA0470
         ExportPathGreaterThan250Err: Label 'The export path is longer than 250 characters.';
         PeppolTelemetryTok: Label 'PEPPOL', Locked = true;
 
@@ -330,7 +332,10 @@ codeunit 1605 "PEPPOL Management"
         CustPartyTaxSchemeCompanyID :=
           FormatVATRegistrationNo(
             SalesHeader.GetCustomerVATRegistrationNumber(), SalesHeader."Bill-to Country/Region Code", IsBISBilling, true);
-        CustPartyTaxSchemeCompIDSchID := GetVATSchemeByFormat(SalesHeader."Bill-to Country/Region Code", IsBISBilling);
+        if IsBISBilling then
+            CustPartyTaxSchemeCompIDSchID := ''
+        else
+            CustPartyTaxSchemeCompIDSchID := GetVATSchemeByFormat(SalesHeader."Bill-to Country/Region Code", false);
         CustTaxSchemeID := VATTxt;
     end;
 
@@ -1089,7 +1094,7 @@ codeunit 1605 "PEPPOL Management"
 
     local procedure GetVATSchemeByFormat(CountryRegionCode: Code[10]; IsBISBilling: Boolean): Text
     begin
-        if IsBISBilling then
+        if IsBISBilling and not UseVATSchemeID(CountryRegionCode) then
             exit('');
         exit(GetVATScheme(CountryRegionCode));
     end;
@@ -1142,13 +1147,23 @@ codeunit 1605 "PEPPOL Management"
         if IsBISBilling then begin
             VATRegistrationNo := DelChr(VATRegistrationNo);
 
-            if IsPartyTaxScheme then
+            if IsPartyTaxScheme or (UseVATSchemeID(CountryCode)) then
                 if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
                     if StrPos(VATRegistrationNo, CountryRegion."ISO Code") <> 1 then
                         VATRegistrationNo := CountryRegion."ISO Code" + VATRegistrationNo;
         end;
 
         exit(VATRegistrationNo);
+    end;
+
+    local procedure UseVATSchemeID(CountryCode: Code[10]): Boolean
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        if not CountryRegion.Get(CountryCode) then
+            exit(false);
+        // Use ISO 3166 Country Codes
+        exit(CountryRegion."ISO Code" = 'DK');
     end;
 
     [Scope('OnPrem')]

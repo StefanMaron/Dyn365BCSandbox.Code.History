@@ -1032,12 +1032,28 @@ table 5940 "Service Item"
         {
             Caption = 'Shipment Type';
         }
+        field(211; "Ship-to E-Mail"; Text[80])
+        {
+            CalcFormula = lookup("Ship-to Address"."E-Mail" where("Customer No." = field("Customer No."), Code = field("Ship-to Code")));
+            Caption = 'Ship-to Email';
+            ExtendedDatatype = EMail;
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(721; "Coupled to Dataverse"; Boolean)
         {
             FieldClass = FlowField;
             Caption = 'Coupled to Dynamics 365 Sales';
             Editable = false;
             CalcFormula = exist("CRM Integration Record" where("Integration ID" = field(SystemId), "Table ID" = const(Database::"Service Item")));
+            ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+#if not CLEAN25
+            ObsoleteState = Pending;
+            ObsoleteTag = '25.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '28.0';
+#endif
         }
     }
 
@@ -1177,14 +1193,22 @@ table 5940 "Service Item"
         CancelResSkillChanges: Boolean;
         CancelResSkillAssignment: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot delete %1 %2,because it is attached to a service order.';
         Text001: Label 'You cannot delete %1 %2, because it is used as %3 for %1 %4.';
         Text002: Label 'You cannot delete %1 %2, because it belongs to one or more contracts.';
         Text003: Label '%1 %2 already exists in %3 %4.';
         Text004: Label 'You cannot change %1 %2 because the %3 %4 belongs to one or more contracts.';
         Text007: Label '%1 cannot be later than %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         FieldUpdateConfirmQst: Label 'You have changed %1 on the service item, but it has not been changed on the associated service orders/quotes.\You must update them manually.', Comment = '%1 = field name';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text017: Label 'Service ledger entries exist for this %1\\ Do you want to change the %2?';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ChgCustomerErr: Label 'You cannot change the %1 in the service item because of the following outstanding service order line:\\ Order %2, line %3, service item number %4, serial number %5, customer %6, ship-to code %7.', Comment = '%1 - Field Caption; %2 - Service Order No.;%3 - Serice Line No.;%4 - Service Item No.;%5 - Serial No.;%6 - Customer No.;%7 - Ship to Code.';
         ChangeItemQst: Label 'Changing the %1 will delete the existing %2 on the %2 list.\\Do you want to change the %1?', Comment = '%1 - Field Caption, %2 - Field Caption';
 

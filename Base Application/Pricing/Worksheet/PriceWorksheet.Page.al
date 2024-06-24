@@ -478,8 +478,8 @@ page 7022 "Price Worksheet"
                         EditinExcel: Codeunit "Edit in Excel";
                         EditinExcelFilters: Codeunit "Edit in Excel Filters";
                     begin
-                        EditinExcelFilters.AddField('Price_Type', Enum::"Edit in Excel Filter Type"::Equal, format(Rec."Price Type"), Enum::"Edit in Excel Edm Type"::"Edm.String");
-                        EditinExcelFilters.AddField('Source_Group', Enum::"Edit in Excel Filter Type"::Equal, format(Rec."Source Group"), Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddFieldV2('Price_Type', Enum::"Edit in Excel Filter Type"::Equal, format(Rec."Price Type"), Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddFieldV2('Source_Group', Enum::"Edit in Excel Filter Type"::Equal, format(Rec."Source Group"), Enum::"Edit in Excel Edm Type"::"Edm.String");
                         EditinExcel.EditPageInExcel(CopyStr(CurrPage.Caption, 1, 240), Page::"Price Worksheet", EditinExcelFilters);
                     end;
                 }
@@ -503,15 +503,6 @@ page 7022 "Price Worksheet"
                 actionref(OpenPriceList_Promoted; OpenPriceList)
                 {
                 }
-#if not CLEAN22
-                actionref(EditInExcel_Promoted; EditInExcel)
-                {
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action is being demoted based on overall low usage.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
             }
             group(Category_Category4)
             {

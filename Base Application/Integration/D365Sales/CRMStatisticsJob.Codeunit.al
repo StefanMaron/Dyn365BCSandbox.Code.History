@@ -10,7 +10,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
-using Microsoft.Service.Document;
 using System.Threading;
 
 codeunit 5350 "CRM Statistics Job"
@@ -182,7 +181,6 @@ codeunit 5350 "CRM Statistics Job"
     local procedure AddCustomersWithLinesActivity(StartDateTime: DateTime; var CustomerNumbers: List of [Code[20]]);
     var
         SalesLine: Record "Sales Line";
-        ServiceLine: Record "Service Line";
     begin
         if StartDateTime = 0DT then
             exit;
@@ -194,12 +192,7 @@ codeunit 5350 "CRM Statistics Job"
                     CustomerNumbers.Add(SalesLine."Sell-to Customer No.");
             until SalesLine.Next() = 0;
 
-        ServiceLine.SetFilter(SystemModifiedAt, '>' + Format(StartDateTime));
-        if ServiceLine.FindSet() then
-            repeat
-                if not CustomerNumbers.Contains(ServiceLine."Customer No.") then
-                    CustomerNumbers.Add(ServiceLine."Customer No.");
-            until ServiceLine.Next() = 0;
+        OnAfterAddCustomersWithLinesActivity(StartDateTime, CustomerNumbers);
     end;
 
     local procedure UpdateInvoices(JobLogEntryNo: Integer)
@@ -470,6 +463,11 @@ codeunit 5350 "CRM Statistics Job"
         CRMAccountStatistics.SetRange("Customer No", CustomerNo);
         if CRMAccountStatistics.FindFirst() then
             CRMAccountStatistics.Delete();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAddCustomersWithLinesActivity(StartDateTime: DateTime; var CustomerNumbers: List of [Code[20]])
+    begin
     end;
 }
 

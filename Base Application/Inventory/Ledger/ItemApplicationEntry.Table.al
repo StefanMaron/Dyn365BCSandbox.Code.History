@@ -130,7 +130,11 @@ table 339 "Item Application Entry"
         TrackChain: Boolean;
         MaxValuationDate: Date;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text001: Label 'You have to run the %1 batch job, before you can revalue %2 %3.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     procedure AppliedOutbndEntryExists(InbndItemLedgEntryNo: Integer; IsCostApplication: Boolean; FilterOnOnlyCostNotAdjusted: Boolean): Boolean
     begin

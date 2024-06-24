@@ -204,10 +204,22 @@ page 5971 "Posted Service Credit Memos"
         }
         area(factboxes)
         {
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::"Service Cr.Memo Header"),
+                              "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = Service;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::"Service Cr.Memo Header"),
                               "No." = field("No.");
             }
@@ -280,12 +292,11 @@ page 5971 "Posted Service Credit Memos"
                     begin
                         CurrPage.SetSelectionFilter(ServiceCrMemoHeader);
                         ProgressWindow.Open(ProcessingInvoiceMsg);
-                        if ServiceCrMemoHeader.FindSet() then begin
+                        if ServiceCrMemoHeader.FindSet() then
                             repeat
                                 ServiceCrMemoHeader.RequestStampEDocument();
                                 ProgressWindow.Update(1, ServiceCrMemoHeader."No.");
                             until ServiceCrMemoHeader.Next() = 0;
-                        end;
                         ProgressWindow.Close();
                     end;
                 }
@@ -324,12 +335,11 @@ page 5971 "Posted Service Credit Memos"
                     begin
                         CurrPage.SetSelectionFilter(ServiceCrMemoHeader);
                         ProgressWindow.Open(ProcessingInvoiceMsg);
-                        if ServiceCrMemoHeader.FindSet() then begin
+                        if ServiceCrMemoHeader.FindSet() then
                             repeat
                                 ServiceCrMemoHeader.CancelEDocument();
                                 ProgressWindow.Update(1, ServiceCrMemoHeader."No.");
                             until ServiceCrMemoHeader.Next() = 0;
-                        end;
                         ProgressWindow.Close();
                     end;
                 }

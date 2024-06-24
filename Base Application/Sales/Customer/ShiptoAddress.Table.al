@@ -6,7 +6,6 @@ using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Inventory.Location;
-using Microsoft.Service.Setup;
 using Microsoft.Utilities;
 using System.Email;
 using Microsoft.eServices.EDocument;
@@ -234,11 +233,6 @@ table 222 "Ship-to Address"
             Caption = 'Shipping Agent Service Code';
             TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
-        field(5900; "Service Zone Code"; Code[10])
-        {
-            Caption = 'Service Zone Code';
-            TableRelation = "Service Zone";
-        }
         field(10004; "UPS Zone"; Code[2])
         {
             Caption = 'UPS Zone';
@@ -293,7 +287,9 @@ table 222 "Ship-to Address"
         Cust: Record Customer;
         PostCode: Record "Post Code";
 
+#pragma warning disable AA0074
         Text000: Label 'untitled';
+#pragma warning restore AA0074
 
     procedure Caption(): Text
     begin

@@ -128,6 +128,10 @@ table 7014 "Purchase Line Discount"
 
     var
         Vend: Record Vendor;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 cannot be after %2';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 }
 

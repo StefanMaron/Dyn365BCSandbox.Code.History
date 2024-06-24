@@ -121,16 +121,14 @@
     begin
         // [SCENARIO] The Event Subscription table has no errors.
         LibraryLowerPermissions.SetO365Basic();
-        with EventSubscription do begin
-            SetFilter("Error Information", '<>%1', '');
-            ErrorEventsCounter := Count;
-            if FindSet() then
-                repeat
-                    SubscribersWithError += StrSubstNo(' %1.%2="%3"', "Subscriber Codeunit ID", "Subscriber Function", "Error Information");
-                until Next() = 0;
-            if ErrorEventsCounter > 0 then
-                Error(ErrorEventSuscriptionErr, ErrorEventsCounter, SubscribersWithError);
-        end;
+        EventSubscription.SetFilter("Error Information", '<>%1', '');
+        ErrorEventsCounter := EventSubscription.Count;
+        if EventSubscription.FindSet() then
+            repeat
+                SubscribersWithError += StrSubstNo(' %1.%2="%3"', EventSubscription."Subscriber Codeunit ID", EventSubscription."Subscriber Function", EventSubscription."Error Information");
+            until EventSubscription.Next() = 0;
+        if ErrorEventsCounter > 0 then
+            Error(ErrorEventSuscriptionErr, ErrorEventsCounter, SubscribersWithError);
     end;
 
     [Test]

@@ -30,7 +30,6 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.Service.Document;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Structure;
 using System.Reflection;
@@ -300,7 +299,7 @@ table 246 "Requisition Line"
                     then
                         Validate(
                           "Ending Date",
-                          LeadTimeMgt.PlannedEndingDate("No.", "Location Code", "Variant Code", "Due Date", '', "Ref. Order Type"))
+                          LeadTimeMgt.GetPlannedEndingDate("No.", "Location Code", "Variant Code", "Due Date", '', "Ref. Order Type"))
                     else
                         Validate("Ending Date", "Due Date");
 
@@ -1432,20 +1431,16 @@ table 246 "Requisition Line"
                     LookupRefOrderNo();
             end;
         }
-        field(99000905; "Ref. Order Type"; Option)
+        field(99000905; "Ref. Order Type"; Enum "Requisition Ref. Order Type")
         {
             Caption = 'Ref. Order Type';
             Editable = false;
-            OptionCaption = ' ,Purchase,Prod. Order,Transfer,Assembly';
-            OptionMembers = " ",Purchase,"Prod. Order",Transfer,Assembly;
         }
-        field(99000906; "Ref. Order Status"; Option)
+        field(99000906; "Ref. Order Status"; Enum "Production Order Status")
         {
             BlankZero = true;
             Caption = 'Ref. Order Status';
             Editable = false;
-            OptionCaption = ',Planned,Firm Planned,Released';
-            OptionMembers = ,Planned,"Firm Planned",Released;
         }
         field(99000907; "Ref. Line No."; Integer)
         {
@@ -1698,11 +1693,15 @@ table 246 "Requisition Line"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text004: Label 'You cannot rename a %1.';
         Text005: Label '%1 %2 does not exist.';
         Text006: Label 'You cannot change %1 when %2 is %3.';
         Text007: Label 'There is no %1 for this line.';
+#pragma warning restore AA0470
         Text008: Label 'There is no replenishment order for this line.';
+#pragma warning restore AA0074
         ReqWkshTmpl: Record "Req. Wksh. Template";
         ReqWkshName: Record "Requisition Wksh. Name";
         ReqLine: Record "Requisition Line";
@@ -1722,15 +1721,21 @@ table 246 "Requisition Line"
         PlanningLineMgt: Codeunit "Planning Line Management";
         WMSManagement: Codeunit "WMS Management";
         BlockReservation: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text028: Label 'The %1 on this %2 must match the %1 on the sales order line it is associated with.';
         Text029: Label 'Line %1 has a %2 that exceeds the %3.';
+#pragma warning restore AA0470
         Text030: Label 'You cannot reserve components with status Planned.';
+#pragma warning disable AA0470
         Text031: Label '%1 %2 is blocked.';
         Text032: Label '%1 %2 has no %3 defined.';
         Text033: Label '%1 %2 %3 is not certified.';
         Text034: Label '%1 %2 %3 %4 %5 is not certified.';
         Text037: Label 'The currency exchange rate for the %1 %2 that vendor %3 uses on the order date %4, does not have an %5 specified.';
         Text038: Label 'The currency exchange rate for the %1 %2 that vendor %3 uses on the order date %4, does not exist.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ReplenishmentErr: Label 'Requisition Worksheet cannot be used to create Prod. Order replenishment.';
         ConfirmDeleteAllLinesQst: Label 'Go ahead and delete all lines?';
         BlockedErr: Label 'You cannot choose %1 %2 because the %3 check box is selected on its %1 card.', Comment = '%1 - Table Caption (item/variant), %2 - Item No./Variant Code, %3 - Field Caption';
@@ -1893,7 +1898,7 @@ table 246 "Requisition Line"
             else
                 if "Due Date" <> 0D then begin
                     "Ending Date" :=
-                      LeadTimeMgt.PlannedEndingDate(
+                      LeadTimeMgt.GetPlannedEndingDate(
                         "No.", "Location Code", "Variant Code", "Due Date", '', "Ref. Order Type");
                     CalcStartingDate(Format(LeadTimeCalc));
                 end;
@@ -2236,9 +2241,9 @@ table 246 "Requisition Line"
         ReqWkshName.Get("Worksheet Template Name", "Journal Batch Name");
         ReqLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ReqLine.SetRange("Journal Batch Name", "Journal Batch Name");
-        if ReqLine.Find('-') then begin
-            "Order Date" := LastReqLine."Order Date";
-        end else
+        if ReqLine.Find('-') then
+            "Order Date" := LastReqLine."Order Date"
+        else
             "Order Date" := WorkDate();
 
         "Recurring Method" := LastReqLine."Recurring Method";
@@ -2269,7 +2274,7 @@ table 246 "Requisition Line"
            ("Planning Level" = 0)
         then
             "Due Date" :=
-              LeadTimeMgt.PlannedDueDate("No.", "Location Code", "Variant Code", "Ending Date", '', "Ref. Order Type")
+              LeadTimeMgt.GetPlannedDueDate("No.", "Location Code", "Variant Code", "Ending Date", '', "Ref. Order Type")
         else
             "Due Date" := "Ending Date";
 
@@ -2464,7 +2469,15 @@ table 246 "Requisition Line"
         exit(not ReservEntry.IsEmpty);
     end;
 
+#if not CLEAN24
+    [Obsolete('Replaced by procedure SetRefOrderFilters', '25.0')]
     procedure SetRefFilter(RefOrderType: Option; RefOrderStatus: Option; RefOrderNo: Code[20]; RefLineNo: Integer)
+    begin
+        SetRefOrderFilters("Requisition Ref. Order Type".FromInteger(RefOrderType), RefOrderStatus, RefOrderNo, RefLineNo);
+    end;
+#endif
+
+    procedure SetRefOrderFilters(RefOrderType: Enum "Requisition Ref. Order Type"; RefOrderStatus: Option; RefOrderNo: Code[20]; RefLineNo: Integer)
     begin
         SetCurrentKey("Ref. Order Type", "Ref. Order Status", "Ref. Order No.", "Ref. Line No.");
         SetRange("Ref. Order Type", RefOrderType);
@@ -2524,7 +2537,7 @@ table 246 "Requisition Line"
         "Planning Flexibility" := ProdOrderLine."Planning Flexibility";
         "Ref. Order No." := ProdOrderLine."Prod. Order No.";
         "Ref. Order Type" := "Ref. Order Type"::"Prod. Order";
-        "Ref. Order Status" := ProdOrderLine.Status.AsInteger();
+        "Ref. Order Status" := ProdOrderLine.Status;
         "Ref. Line No." := ProdOrderLine."Line No.";
 
         OnAfterTransferFromProdOrderLine(Rec, ProdOrderLine);
@@ -2621,7 +2634,7 @@ table 246 "Requisition Line"
         "MPS Order" := AsmHeader."MPS Order";
         "Planning Flexibility" := AsmHeader."Planning Flexibility";
         "Ref. Order Type" := "Ref. Order Type"::Assembly;
-        "Ref. Order Status" := AsmHeader."Document Type".AsInteger();
+        "Ref. Order Status" := AsmHeader."Document Type";
         "Ref. Order No." := AsmHeader."No.";
         "Ref. Line No." := 0;
 
@@ -2741,7 +2754,7 @@ table 246 "Requisition Line"
             Database::"Requisition Line",
             Database::"Assembly Header":
                 "Ending Date" :=
-                  LeadTimeMgt.PlannedEndingDate(
+                  LeadTimeMgt.GetPlannedEndingDate(
                     ReservEntry."Item No.", ReservEntry."Location Code", ReservEntry."Variant Code",
                     "Due Date", "Vendor No.", "Ref. Order Type");
         end;
@@ -2887,7 +2900,7 @@ table 246 "Requisition Line"
         end;
 
         "Ending Date" :=
-          LeadTimeMgt.PlannedEndingDate(
+          LeadTimeMgt.GetPlannedEndingDate(
             "No.", "Location Code", "Variant Code", "Vendor No.", LeadTime, "Ref. Order Type", "Starting Date");
 
         OnAfterCalcEndingDate(Rec, LeadTime);
@@ -2919,7 +2932,7 @@ table 246 "Requisition Line"
         end;
 
         "Starting Date" :=
-          LeadTimeMgt.PlannedStartingDate(
+          LeadTimeMgt.GetPlannedStartingDate(
             "No.", "Location Code", "Variant Code", "Vendor No.", LeadTime, "Ref. Order Type", "Ending Date");
 
         IsHandled := false;
@@ -2991,19 +3004,7 @@ table 246 "Requisition Line"
         "Unit Of Measure Code (Demand)" := UnplannedDemand."Unit of Measure Code";
         "Qty. per UOM (Demand)" := UnplannedDemand."Qty. per Unit of Measure";
         Reserve := UnplannedDemand.Reserve;
-
-        case UnplannedDemand."Demand Type" of
-            UnplannedDemand."Demand Type"::Sales:
-                "Demand Type" := Database::"Sales Line";
-            UnplannedDemand."Demand Type"::Production:
-                "Demand Type" := Database::"Prod. Order Component";
-            UnplannedDemand."Demand Type"::Service:
-                "Demand Type" := Database::"Service Line";
-            UnplannedDemand."Demand Type"::Job:
-                "Demand Type" := Database::"Job Planning Line";
-            UnplannedDemand."Demand Type"::Assembly:
-                "Demand Type" := Database::"Assembly Line";
-        end;
+        SetDemandTypeFromUnplannedDemand(UnplannedDemand);
         "Demand Subtype" := UnplannedDemand."Demand SubType";
         "Demand Order No." := UnplannedDemand."Demand Order No.";
         "Demand Line No." := UnplannedDemand."Demand Line No.";
@@ -3048,7 +3049,7 @@ table 246 "Requisition Line"
         if "Planning Level" = 0 then begin
             Validate(
               "Ending Date",
-              LeadTimeMgt.PlannedEndingDate(
+              LeadTimeMgt.GetPlannedEndingDate(
                 "No.", "Location Code", "Variant Code", "Due Date", '', "Ref. Order Type"));
             if ("Replenishment System" = "Replenishment System"::"Prod. Order") and ("Starting Time" = 0T) then begin
                 ManufacturingSetup.Get();
@@ -3092,6 +3093,11 @@ table 246 "Requisition Line"
     procedure SetResiliencyError(TheError: Text[250]; TheTableID: Integer; TheTablePosition: Text[250])
     begin
         TempPlanningErrorLog.SetError(TheError, TheTableID, TheTablePosition);
+    end;
+
+    procedure SetDemandTypeFromUnplannedDemand(UnplannedDemand: Record "Unplanned Demand")
+    begin
+        OnSetDemandTypeFromUnplannedDemand(Rec, UnplannedDemand);
     end;
 
     local procedure CheckExchRate(Currency: Record Currency)
@@ -3577,7 +3583,7 @@ table 246 "Requisition Line"
         Item.TestField("Base Unit of Measure");
         if "Ref. Order No." = '' then begin
             "Ref. Order Type" := "Ref. Order Type"::Assembly;
-            "Ref. Order Status" := AssemblyHeader."Document Type"::Order.AsInteger();
+            "Ref. Order Status" := AssemblyHeader."Document Type"::Order;
         end;
         Validate("Vendor No.", '');
         Validate("Production BOM No.", '');
@@ -3726,6 +3732,11 @@ table 246 "Requisition Line"
             ItemVariant.SetLoadFields("Blocked");
             ItemVariant.Get(Rec."No.", Rec."Variant Code");
         end;
+    end;
+
+    procedure ReserveBindingOrder(TrackingSpecification: Record "Tracking Specification"; SourceDescription: Text[100]; ExpectedDate: Date; ReservQty: Decimal; ReservQtyBase: Decimal; UpdateReserve: Boolean)
+    begin
+        OnReserveBindingOrder(Rec, TrackingSpecification, SourceDescription, ExpectedDate, ReservQty, ReservQtyBase, UpdateReserve);
     end;
 
     local procedure ErrorIfItemVariantIsBlocked()
@@ -4286,6 +4297,16 @@ table 246 "Requisition Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateNoOnAfterAssignFieldsForNo(var RequisitionLine: Record "Requisition Line"; xRequisitionLine: Record "Requisition Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetDemandTypeFromUnplannedDemand(var RequisitionLine: Record "Requisition Line"; UnplannedDemand: Record "Unplanned Demand")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReserveBindingOrder(var RequisitionLine: Record "Requisition Line"; TrackingSpecification: Record "Tracking Specification"; SourceDescription: Text[100]; ExpectedDate: Date; ReservQty: Decimal; ReservQtyBase: Decimal; UpdateReserve: Boolean)
     begin
     end;
 }

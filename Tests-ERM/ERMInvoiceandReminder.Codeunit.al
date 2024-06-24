@@ -1134,18 +1134,16 @@ codeunit 134907 "ERM Invoice and Reminder"
     var
         LastEntryNo: Integer;
     begin
-        with CustLedgerEntry do begin
-            if FindLast() then
-                LastEntryNo := "Entry No.";
-            Init();
-            "Entry No." := LastEntryNo + 1;
-            "Customer No." := CustomerNo;
-            "Posting Date" := WorkDate();
-            "Document Type" := DocumentType;
-            "Document No." := CustomerNo;
-            "Last Issued Reminder Level" := LastIssuedReminderLevel;
-            Insert();
-        end;
+        if CustLedgerEntry.FindLast() then
+            LastEntryNo := CustLedgerEntry."Entry No.";
+        CustLedgerEntry.Init();
+        CustLedgerEntry."Entry No." := LastEntryNo + 1;
+        CustLedgerEntry."Customer No." := CustomerNo;
+        CustLedgerEntry."Posting Date" := WorkDate();
+        CustLedgerEntry."Document Type" := DocumentType;
+        CustLedgerEntry."Document No." := CustomerNo;
+        CustLedgerEntry."Last Issued Reminder Level" := LastIssuedReminderLevel;
+        CustLedgerEntry.Insert();
     end;
 
     procedure FindBankAccountDefaultForCurrency(var BankAccount: Record "Bank Account")
