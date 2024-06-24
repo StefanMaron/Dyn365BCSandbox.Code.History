@@ -127,7 +127,11 @@ table 7012 "Purchase Price"
 
     var
         Vend: Record Vendor;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 cannot be after %2';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
 #if not CLEAN23
     procedure CopyPurchPriceToVendorsPurchPrice(var PurchPrice: Record "Purchase Price"; VendNo: Code[20])

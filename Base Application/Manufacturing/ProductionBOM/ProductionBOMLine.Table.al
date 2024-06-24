@@ -342,7 +342,11 @@ table 99000772 "Production BOM Line"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 must be later than %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         Item: Record Item;
         ProdBOMHeader: Record "Production BOM Header";
         ItemVariant: Record "Item Variant";

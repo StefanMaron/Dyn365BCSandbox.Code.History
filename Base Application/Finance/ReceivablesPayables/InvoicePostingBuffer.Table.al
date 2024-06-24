@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.Finance.AutomaticAccounts;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
@@ -23,9 +22,6 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
 using Microsoft.Service.Document;
 using Microsoft.Service.Setup;
-#if not CLEAN22
-using System.Environment.Configuration;
-#endif
 
 table 55 "Invoice Posting Buffer"
 {
@@ -326,15 +322,9 @@ table 55 "Invoice Posting Buffer"
         {
             Caption = 'Auto. Acc. Group';
             DataClassification = SystemMetadata;
-            TableRelation = "Automatic Acc. Header";
             ObsoleteReason = 'Moved to Automatic Account Codes app.';
-#if not CLEAN22
-            ObsoleteState = Pending;
-            ObsoleteTag = '22.0';
-#else
-			ObsoleteState = Removed;
+            ObsoleteState = Removed;
             ObsoleteTag = '25.0';
-#endif
         }
     }
 
@@ -354,9 +344,6 @@ table 55 "Invoice Posting Buffer"
         TempInvoicePostingBufferRounding: Record "Invoice Posting Buffer" temporary;
         DimMgt: Codeunit DimensionManagement;
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
-#if not CLEAN22
-        FeatureKeyManagement: Codeunit "Feature Key Management";
-#endif
 
     procedure PrepareSales(var SalesLine: Record "Sales Line")
     begin
@@ -400,10 +387,7 @@ table 55 "Invoice Posting Buffer"
         end;
 
         "Journal Templ. Name" := SalesLine.GetJnlTemplateName();
-#if not CLEAN22
-        if not FeatureKeyManagement.IsAutomaticAccountCodesEnabled() then
-            "Auto. Acc. Group" := SalesLine."Auto. Acc. Group";
-#endif
+
         OnAfterPrepareSales(SalesLine, Rec);
     end;
 
@@ -760,7 +744,7 @@ table 55 "Invoice Posting Buffer"
             PurchSetup."Copy Line Descr. to G/L Entry",
             PurchaseLine."Line No.",
             PurchaseLine.Description,
-            PurchaseHeader."Posting Description");
+            PurchaseHeader."Posting Description", true);
     end;
 
     local procedure UpdateEntryDescriptionFromSalesLine(SalesLine: Record "Sales Line")
@@ -774,7 +758,7 @@ table 55 "Invoice Posting Buffer"
             SalesSetup."Copy Line Descr. to G/L Entry",
             SalesLine."Line No.",
             SalesLine.Description,
-            SalesHeader."Posting Description");
+            SalesHeader."Posting Description", SalesSetup."Copy Line Descr. to G/L Entry");
     end;
 
     local procedure UpdateEntryDescriptionFromServiceLine(ServiceLine: Record "Service Line")
@@ -788,16 +772,18 @@ table 55 "Invoice Posting Buffer"
             ServiceSetup."Copy Line Descr. to G/L Entry",
             ServiceLine."Line No.",
             ServiceLine.Description,
-            ServiceHeader."Posting Description");
+            ServiceHeader."Posting Description", false);
     end;
 
-    local procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100])
+    local procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100]; SetLineNo: Boolean)
     begin
-        if CopyLineDescrToGLEntry and (Type = type::"G/L Account") then begin
-            "Entry Description" := LineDescription;
-            "Fixed Asset Line No." := LineNo;
-        end else
-            "Entry Description" := HeaderDescription;
+        "Entry Description" := HeaderDescription;
+        if Type in [Type::"G/L Account", Type::"Fixed Asset"] then begin
+            if CopyLineDescrToGLEntry then
+                "Entry Description" := LineDescription;
+            if SetLineNo then
+                "Fixed Asset Line No." := LineNo;
+        end;
     end;
 
     local procedure AdjustRoundingForUpdate()
@@ -873,10 +859,7 @@ table 55 "Invoice Posting Buffer"
         GenJnlLine."VAT Difference" := Rec."VAT Difference";
         GenJnlLine."VAT Base Before Pmt. Disc." := Rec."VAT Base Before Pmt. Disc.";
         NonDeductibleVAT.Copy(GenJnlLine, Rec);
-#if not CLEAN22
-        if not FeatureKeyManagement.IsAutomaticAccountCodesEnabled() then
-            GenJnlLine."Auto. Acc. Group" := Rec."Auto. Acc. Group";
-#endif
+
         OnAfterCopyToGenJnlLine(GenJnlLine, Rec);
     end;
 

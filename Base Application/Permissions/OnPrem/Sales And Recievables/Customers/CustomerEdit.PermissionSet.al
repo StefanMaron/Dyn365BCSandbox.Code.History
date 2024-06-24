@@ -155,6 +155,7 @@ permissionset 9221 "Customer - Edit"
                   tabledata "Purchase Header Archive" = r,
                   tabledata "Registered Whse. Activity Line" = rm,
                   tabledata "Reminder Attachment Text" = R,
+                  tabledata "Reminder Attachment Text Line" = R,
                   tabledata "Reminder Email Text" = R,
                   tabledata "Reminder Level" = R,
                   tabledata "Reminder Terms" = R,

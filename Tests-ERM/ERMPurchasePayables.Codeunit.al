@@ -38,7 +38,6 @@
         AmountErr: Label '%1 must be %2 in %3.', Comment = '%1=Field;%2=Value;%3=Table';
         FilterMsg: Label 'There should be record within the filter.';
         NoFilterMsg: Label 'There should be no record within the filter.';
-        PurchaseLineFactBoxErr: Label 'Type must be equal to ''%1''  in Purchase Line: Document Type=%2, Document No.=%3, Line No.=%4. Current value is ''%5''.', Comment = '%1=Type;%2=Document Type;%3=Document No.;%4= Line No.;%5=Current value.';
         PurchOrderArchiveRespCenterErr: Label 'Purchase Order Archives displays documents for Responisbility Center that should not be shown for current user';
 #if not CLEAN23
         MultipleVendorsSelectedErr: Label 'More than one vendor uses these purchase prices. To copy prices, the Vendor No. Filter field must contain one vendor only.';
@@ -2754,9 +2753,7 @@
         asserterror OpenPurchaseLinefactBox(PurchaseHeader2);
 
         // Verify: Verify Error when open purchase line fact box with created G/L Line purchase document.
-        Assert.ExpectedError(StrSubstNo(PurchaseLineFactBoxErr, PurchaseLine2.Type::Item, PurchaseLine."Document Type",
-            PurchaseLine2."Document No.", PurchaseLine2."Line No.",
-            PurchaseLine2.Type::"G/L Account"));
+        Assert.ExpectedTestFieldError(PurchaseLine2.FieldCaption(Type), Format(PurchaseLine2.Type::Item));
     end;
 
     local procedure UpdateGeneralLedgerSetup(VATDifferenceAllowed: Decimal): Decimal
@@ -3819,3 +3816,4 @@
         ChangeLogEntries.OK().Invoke();
     end;
 }
+

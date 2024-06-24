@@ -354,7 +354,9 @@ table 5718 "Nonstock Item"
     end;
 
     var
+#pragma warning disable AA0074
         Text001: Label 'Modification not allowed, item record already exists.';
+#pragma warning restore AA0074
         NonStockItem: Record "Nonstock Item";
         NonStockItemSetup: Record "Nonstock Item Setup";
         InvtSetup: Record "Inventory Setup";
@@ -362,7 +364,11 @@ table 5718 "Nonstock Item"
         TempItemNo: Code[20];
         MfrLength: Integer;
         VenLength: Integer;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text002: Label 'No.=<%1> and Vendor Item No.=<%2> already exists.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         HasInvtSetup: Boolean;
 
     protected var

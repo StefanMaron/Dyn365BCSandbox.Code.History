@@ -241,14 +241,18 @@ codeunit 5051 SegManagement
             InteractionLogEntry.InsertRecord();
             NextInteractLogEntryNo := InteractionLogEntry."Entry No.";
         end else begin
-            InteractionLogEntry.Get(SegmentLine."Line No.");
-            OnLogInteractionOnAfterGetInteractLogEntryFromSegmentLine(InteractionLogEntry, SegmentLine, Postponed);
-            InteractionLogEntry.CopyFromSegment(SegmentLine);
-            InteractionLogEntry.Postponed := Postponed;
-            OnLogInteractionOnBeforeInteractionLogEntryModify(InteractionLogEntry);
-            InteractionLogEntry.Modify();
-            InterLogEntryCommentLine.SetRange("Entry No.", InteractionLogEntry."Entry No.");
-            InterLogEntryCommentLine.DeleteAll();
+            IsHandled := false;
+            OnLogInteractionOnBeforeInteractLogEntryGet(NextInteractLogEntryNo, SegmentLine, Postponed, IsHandled);
+            if not IsHandled then begin
+                InteractionLogEntry.Get(SegmentLine."Line No.");
+                OnLogInteractionOnAfterGetInteractLogEntryFromSegmentLine(InteractionLogEntry, SegmentLine, Postponed);
+                InteractionLogEntry.CopyFromSegment(SegmentLine);
+                InteractionLogEntry.Postponed := Postponed;
+                OnLogInteractionOnBeforeInteractionLogEntryModify(InteractionLogEntry);
+                InteractionLogEntry.Modify();
+                InterLogEntryCommentLine.SetRange("Entry No.", InteractionLogEntry."Entry No.");
+                InterLogEntryCommentLine.DeleteAll();
+            end;
         end;
 
         if TempInterLogEntryCommentLine.FindSet() then
@@ -259,6 +263,8 @@ codeunit 5051 SegManagement
                 OnLogInteractionOnBeforeInterLogEntryCommentLineInsert(InterLogEntryCommentLine);
                 InterLogEntryCommentLine.Insert();
             until TempInterLogEntryCommentLine.Next() = 0;
+
+        OnLogInteractionOnAfterInterLogEntryCommentLineInsert(InterLogEntryCommentLine, SegmentLine, NextInteractLogEntryNo);
 
         if Deliver and (SegmentLine."Correspondence Type".AsInteger() <> 0) and (not Postponed) then begin
             InteractionLogEntry."Delivery Status" := InteractionLogEntry."Delivery Status"::"In Progress";
@@ -412,16 +418,6 @@ codeunit 5051 SegManagement
         end;
     end;
 
-#if not CLEAN22
-#pragma warning disable AS0072
-    [Obsolete('Use FindInteractionTemplateCode(DocumentType: Enum "Interaction Log Entry Document Type") instead.', '22.0')]
-    procedure FindInteractTmplCode(DocumentType: Integer) InteractTmplCode: Code[10]
-    begin
-        exit(FindInteractionTemplateCode("Interaction Log Entry Document Type".FromInteger(DocumentType)));
-    end;
-#pragma warning restore AS0072
-#endif
-
     procedure FindInteractionTemplateCode(DocumentType: Enum "Interaction Log Entry Document Type") InteractTmplCode: Code[10]
     begin
         if not InteractionTemplateSetup.ReadPermission then
@@ -482,9 +478,6 @@ codeunit 5051 SegManagement
                     InteractTmplCode := InteractionTemplateSetup."Sales Draft Invoices";
             end;
 
-#if not CLEAN22
-        OnAfterFindInteractTmplCode(DocumentType.AsInteger(), InteractionTemplateSetup, InteractTmplCode);
-#endif
         OnAfterFindInteractTemplateCode(DocumentType, InteractionTemplateSetup, InteractTmplCode);
 
         exit(InteractTmplCode);
@@ -761,14 +754,6 @@ codeunit 5051 SegManagement
         exit(CampaignEntry."Entry No.");
     end;
 
-#if not CLEAN22
-    [Obsolete('Replaed by event OnAfterFindInteractTemplateCode with enum parameter.', '22.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFindInteractTmplCode(DocumentType: Integer; InteractionTemplateSetup: Record "Interaction Template Setup"; var InteractionTemplateCode: Code[10])
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterFindInteractTemplateCode(DocumentType: Enum "Interaction Log Entry Document Type"; InteractionTemplateSetup: Record "Interaction Template Setup"; var InteractionTemplateCode: Code[10])
     begin
@@ -956,6 +941,16 @@ codeunit 5051 SegManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyFieldsToCampaignEntry(var CampaignEntry: Record "Campaign Entry"; var SegmentLine: Record "Segment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogInteractionOnAfterInterLogEntryCommentLineInsert(var InterLogEntryCommentLine: Record "Inter. Log Entry Comment Line"; SegmentLine: Record "Segment Line"; NextInteractLogEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogInteractionOnBeforeInteractLogEntryGet(var NextInteractLogEntryNo: Integer; SegmentLine: Record "Segment Line"; Postponed: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

@@ -230,6 +230,9 @@ report 1308 "Standard Sales - Shipment"
             column(ShipToAddress8; ShipToAddr[8])
             {
             }
+            column(ShipToPhoneNo; Header."Ship-to Phone No.")
+            {
+            }
             column(SellToContactPhoneNoLbl; SellToContactPhoneNoLbl)
             {
             }
@@ -559,6 +562,8 @@ report 1308 "Standard Sales - Shipment"
 
                     OnBeforeLineOnAfterGetRecord(Header, Line);
 
+                    if FormatDocument.HideDocumentLine(HideLinesWithZeroQuantity, Line, FieldNo(Quantity)) then
+                        CurrReport.Skip();
                     if FirstLineHasBeenOutput then
                         Clear(DummyCompanyInfo.Picture);
                     FirstLineHasBeenOutput := true;
@@ -798,6 +803,12 @@ report 1308 "Standard Sales - Shipment"
                         Caption = 'Show Serial/Lot Number Appendix';
                         ToolTip = 'Specifies if you want to print an appendix to the sales shipment report showing the lot and serial numbers in the shipment.';
                     }
+                    field(HideLinesWithZeroQuantityControl; HideLinesWithZeroQuantity)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies if the lines with zero quantity are printed.';
+                        Caption = 'Hide lines with zero quantity';
+                    }
                 }
             }
         }
@@ -988,6 +999,7 @@ report 1308 "Standard Sales - Shipment"
         CompanyAddr: array[8] of Text[100];
         SalesPersonText: Text[50];
         ShowCustAddr: Boolean;
+        HideLinesWithZeroQuantity: Boolean;
 
     local procedure InitLogInteraction()
     begin

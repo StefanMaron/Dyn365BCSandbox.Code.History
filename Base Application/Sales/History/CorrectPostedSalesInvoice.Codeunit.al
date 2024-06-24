@@ -100,9 +100,11 @@ codeunit 1303 "Correct Posted Sales Invoice"
         InventoryPostClosedCorrectErr: Label 'You cannot correct this posted sales invoice because the posting inventory period is already closed.';
         InventoryPostClosedCancelErr: Label 'You cannot cancel this posted sales invoice because the posting inventory period is already closed.';
         FixedAssetNotPossibleToCreateCreditMemoErr: Label 'You cannot cancel this posted sales invoice because it contains lines of type Fixed Asset.\\Use the Cancel Entries function in the FA Ledger Entries window instead.';
+#pragma warning disable AA0470
         PostingCreditMemoFailedOpenPostedCMQst: Label 'Canceling the invoice failed because of the following error: \\%1\\A credit memo is posted. Do you want to open the posted credit memo?';
         PostingCreditMemoFailedOpenCMQst: Label 'Canceling the invoice failed because of the following error: \\%1\\A credit memo is created but not posted. Do you want to open the credit memo?';
         CreatingCreditMemoFailedNothingCreatedErr: Label 'Canceling the invoice failed because of the following error: \\%1.';
+#pragma warning restore AA0470
         WrongDocumentTypeForCopyDocumentErr: Label 'You cannot correct or cancel this type of document.';
         CheckPrepaymentErr: Label 'You cannot correct or cancel a posted sales prepayment invoice.\\Open the related sales order and choose the Post Prepayment Credit Memo.';
         InvoicePartiallyPaidMsg: Label 'Invoice %1 is partially paid or credited. The corrective credit memo may not be fully closed by the invoice.', Comment = '%1 - invoice no.';
@@ -258,6 +260,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
         FromJobPlanningLine.FindFirst();
 
         ToJobPlanningLine.InitFromJobPlanningLine(FromJobPlanningLine, -SalesLine.Quantity);
+        OnCreateJobPlanningLineOnAfterInitFromJobPlanningLine(ToJobPlanningLine, FromJobPlanningLine, SalesLine);
         JobPlanningLineInvoice.InitFromJobPlanningLine(ToJobPlanningLine);
         JobPlanningLineInvoice.InitFromSales(SalesHeader, SalesHeader."Posting Date", SalesLine."Line No.");
         JobPlanningLineInvoice.Insert();
@@ -995,7 +998,13 @@ codeunit 1303 "Correct Posted Sales Invoice"
         SalesLine: Record "Sales Line";
         SalesInvoiceLine: Record "Sales Invoice Line";
         UndoPostingManagement: Codeunit "Undo Posting Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateSalesOrderLinesFromCancelledInvoice(SalesInvoiceHeaderNo, IsHandled);
+        if IsHandled then
+            exit;
+
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeaderNo);
         if SalesInvoiceLine.FindSet() then
             repeat
@@ -1302,6 +1311,16 @@ codeunit 1303 "Correct Posted Sales Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnTestGenPostingSetupOnBeforeTestTypeItem(SalesInvoiceLine: Record "Sales Invoice Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateSalesOrderLinesFromCancelledInvoice(SalesInvoiceHeaderNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateJobPlanningLineOnAfterInitFromJobPlanningLine(var ToJobPlanningLine: Record "Job Planning Line"; FromJobPlanningLine: Record "Job Planning Line"; SalesLine: Record "Sales Line")
     begin
     end;
 }

@@ -217,19 +217,6 @@ page 17 "G/L Account Card"
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies accounts that you often enter in the Bal. Account No. field on intercompany journal or document lines.';
                 }
-#if not CLEAN22
-                field("Auto. Acc. Group"; Rec."Auto. Acc. Group")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the code of the automatic account group on the general ledger account.';
-                    Visible = not IsAutomaticAccountCodesEnabled;
-                    Enabled = not IsAutomaticAccountCodesEnabled;
-
-                    ObsoleteReason = 'Moved to Automatic Account Codes app.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 field("Default Deferral Template Code"; Rec."Default Deferral Template Code")
                 {
                     ApplicationArea = Suite;
@@ -756,9 +743,6 @@ page 17 "G/L Account Card"
     end;
 
     var
-#if not CLEAN22
-        IsAutomaticAccountCodesEnabled: Boolean;
-#endif
         ExtendedPriceEnabled: Boolean;
 #if not CLEAN24
         SourceCurrencyVisible: Boolean;
@@ -779,9 +763,6 @@ page 17 "G/L Account Card"
 #endif
     begin
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
-#if not CLEAN22
-        IsAutomaticAccountCodesEnabled := FeatureKeyManagement.IsAutomaticAccountCodesEnabled();
-#endif
 #if not CLEAN24
         SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
 #endif

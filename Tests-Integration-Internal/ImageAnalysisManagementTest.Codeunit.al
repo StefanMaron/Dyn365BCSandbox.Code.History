@@ -183,7 +183,8 @@ codeunit 135206 "Image Analysis Management Test"
     [Scope('OnPrem')]
     procedure CheckTagsColorsFacesEmpty(ImageAnalysisResult: Codeunit "Image Analysis Result")
     var
-        AzureAIUsage: Record "Azure AI Usage";
+        AzureAIUsageCodeunit: Codeunit "Azure AI Usage";
+        AzureAIService: Enum "Azure AI Service";
     begin
         // [THEN] No error is raised if wrong tag number is used
         Assert.AreEqual('', ImageAnalysisResult.TagName(5), 'Wrong tag name returned.');
@@ -206,7 +207,7 @@ codeunit 135206 "Image Analysis Management Test"
 
         // [THEN] The usage count is incremented
         Assert.AreEqual(
-          1, AzureAIUsage.GetTotalProcessingTime(AzureAIUsage.Service::"Computer Vision"),
+          1, AzureAIUsageCodeunit.GetTotalProcessingTime(AzureAIService::"Computer Vision"),
           'Number of calls not incremented.');
     end;
 
@@ -216,9 +217,10 @@ codeunit 135206 "Image Analysis Management Test"
     var
         Item: Record Item;
         ImageAnalysisSetup: Record "Image Analysis Setup";
-        AzureAIUsage: Record "Azure AI Usage";
         ImageAnalysisManagement: Codeunit "Image Analysis Management";
         ImageAnalysisResult: Codeunit "Image Analysis Result";
+        AzureAIUsageCodeunit: Codeunit "Azure AI Usage";
+        AzureAIService: Enum "Azure AI Service";
         Result: Boolean;
         MessageTxt: Text;
         IsUsageLimitError: Boolean;
@@ -273,7 +275,7 @@ codeunit 135206 "Image Analysis Management Test"
 
         // [THEN] The usage count is incremented
         Assert.AreEqual(
-          1, AzureAIUsage.GetTotalProcessingTime(AzureAIUsage.Service::"Computer Vision"),
+          1, AzureAIUsageCodeunit.GetTotalProcessingTime(AzureAIService::"Computer Vision"),
           'Number of calls not incremented.');
     end;
 

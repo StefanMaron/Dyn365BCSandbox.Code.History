@@ -48,7 +48,11 @@ codeunit 5971 "Service Header Apply"
         BilToCustNo: Code[20];
         OK: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You must specify %1 or %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnAfterSetCustLedgEntryFilters(var CustLedgEntry: Record "Cust. Ledger Entry"; ServiceHeader: Record "Service Header")

@@ -216,8 +216,10 @@ report 357 "Copy Company"
         ProgressWindow: Dialog;
         BreakReport: Boolean;
         NewCompanyName: Text[30];
+#pragma warning disable AA0470
         ProgressMsg: Label 'Creating new company %1.', Comment = 'Creating new company Contoso Corporation.';
         CopySuccessMsg: Label 'Company %1 has been copied successfully.', Comment = 'Company CRONUS International Ltd. has been copied successfully.';
+#pragma warning restore AA0470
         ReadMoreSandboxLbl: Label 'Read more about sandboxes';
         ReadMoreDataBackupLbl: Label 'Read more about data backup';
         ConfirmCopyWarning: Boolean;
