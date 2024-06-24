@@ -492,6 +492,51 @@ codeunit 139769 "Bank Deposit Posting Tests"
 
     [Test]
     [HandlerFunctions('GeneralJournalBatchesPageHandler,ConfirmHandler')]
+    procedure PostLumpSumNegativeLineWithSameAmountAsTotalDeposit()
+    var
+        GLAccount: Record "G/L Account";
+        BankDepositHeader: Record "Bank Deposit Header";
+        GenJournalBatch: Record "Gen. Journal Batch";
+        GenJournalLine: Record "Gen. Journal Line";
+        GenJournalTemplate: Record "Gen. Journal Template";
+        PostedBankDepositLine: Record "Posted Bank Deposit Line";
+        GenJournalDocumentType: Enum "Gen. Journal Document Type";
+        TotalAmount: Decimal;
+    begin
+        // [SCENARIO 538420] A Bank deposit is posted with lump sum and a negative line that equals the total amount of the deposit. The lines should be transferred to the Posted Bank Deposit Lines.
+        // [GIVEN] A Bank deposit with lump sum and a negative line that equals the total amount.
+        Initialize();
+        LibraryERM.CreateGLAccount(GLAccount);
+        CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Type::"Bank Deposits");
+        CreateBankDepositHeaderWithBankAccount(BankDepositHeader, GenJournalBatch);
+        TotalAmount := 500;
+        BankDepositHeader."Post as Lump Sum" := true;
+        BankDepositHeader."Total Deposit Amount" := TotalAmount;
+        BankDepositHeader."Posting Date" := WorkDate();
+        BankDepositHeader."Document Date" := WorkDate();
+        BankDepositHeader.Modify();
+        LibraryERM.CreateGeneralJnlLine(
+          GenJournalLine, BankDepositHeader."Journal Template Name", BankDepositHeader."Journal Batch Name", GenJournalDocumentType::" ",
+          GenJournalLine."Account Type"::"G/L Account", GLAccount."No.", -2 * TotalAmount);
+        GenJournalLine."Posting Date" := WorkDate();
+        GenJournalLine."Document No." := BankDepositHeader."No.";
+        GenJournalLine.Modify();
+        LibraryERM.CreateGeneralJnlLine(
+          GenJournalLine, BankDepositHeader."Journal Template Name", BankDepositHeader."Journal Batch Name", GenJournalDocumentType::" ",
+          GenJournalLine."Account Type"::"G/L Account", GLAccount."No.", TotalAmount);
+        GenJournalLine."Posting Date" := WorkDate();
+        GenJournalLine."Document No." := BankDepositHeader."No.";
+        GenJournalLine.Modify();
+        Commit();
+        // [WHEN] Posting the bank deposit.
+        PostBankDeposit(BankDepositHeader);
+        // [THEN] Both lines should be transferred.
+        PostedBankDepositLine.SetRange("Bank Deposit No.", BankDepositHeader."No.");
+        Assert.AreEqual(2, PostedBankDepositLine.Count(), 'The same number of lines posted should be transferred as part of the bank deposit.');
+    end;
+
+    [Test]
+    [HandlerFunctions('GeneralJournalBatchesPageHandler,ConfirmHandler')]
     procedure NavigatePageOfAPostedBankDepositShowsRelatedEntries()
     var
         BankDepositHeader: Record "Bank Deposit Header";
