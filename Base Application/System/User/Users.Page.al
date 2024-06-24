@@ -117,6 +117,14 @@ page 9800 Users
                     ToolTip = 'Specifies the Microsoft account that this user signs into Microsoft 365 or SharePoint Online with.';
                     Visible = IsSaaS;
                 }
+                field("User Telemetry ID"; TelemetryUserId)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Telemetry ID';
+                    ToolTip = 'Specifies a telemetry ID which can be used for troubleshooting purposes.';
+                    Editable = false;
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
@@ -140,18 +148,6 @@ page 9800 Users
                 SubPageLink = "User Security ID" = field("User Security ID");
                 Visible = CanManageUsersOnTenant or IsOwnUser;
             }
-#if not CLEAN22
-            part("User Group Memberships"; "User Group Memberships FactBox")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'User Group Memberships';
-                SubPageLink = "User Security ID" = field("User Security ID");
-                Visible = LegacyUserGroupsVisible and (CanManageUsersOnTenant or IsOwnUser);
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced by the User Security Groups part.';
-                ObsoleteTag = '22.0';
-            }
-#endif
             part(Plans; "User Plans FactBox")
             {
                 Caption = 'Licenses';
@@ -219,20 +215,6 @@ page 9800 Users
             group("User Groups")
             {
                 Caption = 'Groups';
-#if not CLEAN22
-                action(Action15)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'User Groups';
-                    Image = Users;
-                    RunObject = Page "User Groups";
-                    ToolTip = 'Set up or modify user groups as a fast way of giving users access to the functionality that is relevant to their work.';
-                    Visible = LegacyUserGroupsVisible;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the Security Groups action.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 action("User Details")
                 {
                     ApplicationArea = Basic, Suite;
@@ -292,20 +274,6 @@ page 9800 Users
                     RunObject = Page "Permission Set by User";
                     ToolTip = 'View or edit the available permission sets and apply permission sets to existing users.';
                 }
-#if not CLEAN22
-                action("Permission Set by User Group")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Permission Set by User Group';
-                    Image = Permission;
-                    RunObject = Page "Permission Set by User Group";
-                    ToolTip = 'View or edit the available permission sets and apply permission sets to existing user groups.';
-                    Visible = LegacyUserGroupsVisible;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the Permission Set By Security Group action.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 action("Permission Set By Security Group")
                 {
                     ApplicationArea = Basic, Suite;
@@ -517,14 +485,6 @@ page 9800 Users
                 actionref("Security Groups_Promoted"; "Security Groups")
                 {
                 }
-#if not CLEAN22
-                actionref(Action15_Promoted; Action15)
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'User groups functionality is deprecated.';
-                    ObsoleteTag = '22.0';
-                }
-#endif
                 actionref("User Task Groups_Promoted"; "User Task Groups")
                 {
                 }
@@ -583,14 +543,14 @@ page 9800 Users
         NoUserExists: Boolean;
         CreateQst: Label 'Do you want to create %1 as super user?', Comment = '%1=user name, e.g. europe\myaccountname';
         CanSendEmail: Boolean;
+#pragma warning disable AA0470
         RestoreUserGroupsToDefaultQst: Label 'Do you want to restore the default permissions for user %1?', Comment = 'Do you want to restore the default permissions for user Annie?';
+#pragma warning restore AA0470
         CanManageUsersOnTenant: Boolean;
         HasSuperForAllCompanies: Boolean;
         IsSaaS: Boolean;
         IsOwnUser: Boolean;
-#if not CLEAN22
-        LegacyUserGroupsVisible: Boolean;
-#endif
+        TelemetryUserId: Guid;
 
     trigger OnAfterGetCurrRecord()
     var
@@ -602,9 +562,15 @@ page 9800 Users
     end;
 
     trigger OnAfterGetRecord()
+    var
+        UserProperty: Record "User Property";
     begin
         WindowsUserName := IdentityManagement.UserName(Rec."Windows Security ID");
         NoUserExists := false;
+        if UserProperty.Get(Rec."User Security ID") then
+            TelemetryUserId := UserProperty."Telemetry User ID"
+        else
+            Clear(TelemetryUserId);
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -649,16 +615,10 @@ page 9800 Users
         UserManagement: Codeunit "User Management";
         EnvironmentInfo: Codeunit "Environment Information";
 #endif
-#if not CLEAN22
-        LegacyUserGroups: Codeunit "Legacy User Groups";
-#endif
 #if not CLEAN23
         NavTenantSettingsHelper: DotNet NavTenantSettingsHelper;
 #endif
     begin
-#if not CLEAN22
-        LegacyUserGroupsVisible := LegacyUserGroups.UiElementsVisible();
-#endif
         NoUserExists := Rec.IsEmpty();
         UserSelection.HideExternalUsers(Rec);
 

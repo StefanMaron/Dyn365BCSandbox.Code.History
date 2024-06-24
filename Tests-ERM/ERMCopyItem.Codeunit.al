@@ -1730,14 +1730,12 @@ codeunit 134462 "ERM Copy Item"
     var
         ItemTranslation: Record "Item Translation";
     begin
-        with ItemTranslation do begin
-            Init();
-            Validate("Item No.", ItemNo);
-            Validate("Language Code", LanguageCode);
-            Validate(Description, ItemNo + LanguageCode);
-            Insert(true);
-            exit(Description);
-        end;
+        ItemTranslation.Init();
+        ItemTranslation.Validate("Item No.", ItemNo);
+        ItemTranslation.Validate("Language Code", LanguageCode);
+        ItemTranslation.Validate(Description, ItemNo + LanguageCode);
+        ItemTranslation.Insert(true);
+        exit(ItemTranslation.Description);
     end;
 
     local procedure CreateItemWithCommentLine(var Item: Record Item) Comment: Text[80]

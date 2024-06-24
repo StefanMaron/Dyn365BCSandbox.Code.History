@@ -78,6 +78,7 @@ codeunit 137096 "SCM Kitting - ATO"
         ChangeOption: Option Quantity,"Quantity to Assemble","Location Code","Variant Code",UOM,"Due Date";
         DeleteOption: Option "Zero Quantity on SOL","Delete SOL","Delete SO";
         FieldMustBeEmptyErr: Label '%1 must be empty', Comment = '%1 - Field Caption';
+        ATOLinkShouldNotBeFoundErr: Label 'Assemble-to-Order Link should not be found.';
 
     local procedure Initialize()
     var
@@ -141,16 +142,14 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         AssemblySetup: Record "Assembly Setup";
     begin
-        with AssemblySetup do begin
-            Get();
-            Validate("Assembly Order Nos.", LibraryUtility.GetGlobalNoSeriesCode());
-            Validate("Posted Assembly Order Nos.", LibraryUtility.GetGlobalNoSeriesCode());
-            Validate("Assembly Quote Nos.", LibraryUtility.GetGlobalNoSeriesCode());
-            Validate("Blanket Assembly Order Nos.", LibraryUtility.GetGlobalNoSeriesCode());
-            Validate("Default Location for Orders", DefaultLocationCode);
-            Validate("Stockout Warning", true);
-            Modify(true);
-        end;
+        AssemblySetup.Get();
+        AssemblySetup.Validate("Assembly Order Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        AssemblySetup.Validate("Posted Assembly Order Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        AssemblySetup.Validate("Assembly Quote Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        AssemblySetup.Validate("Blanket Assembly Order Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        AssemblySetup.Validate("Default Location for Orders", DefaultLocationCode);
+        AssemblySetup.Validate("Stockout Warning", true);
+        AssemblySetup.Modify(true);
     end;
 
     local procedure SetupBinLocationInAssemblySetup(): Code[10]
@@ -213,12 +212,10 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         InventorySetup: Record "Inventory Setup";
     begin
-        with InventorySetup do begin
-            Get();
-            OldAutomaticCostPosting := "Automatic Cost Posting";
-            Validate("Automatic Cost Posting", NewAutomaticCostPosting);
-            Modify(true);
-        end;
+        InventorySetup.Get();
+        OldAutomaticCostPosting := InventorySetup."Automatic Cost Posting";
+        InventorySetup.Validate("Automatic Cost Posting", NewAutomaticCostPosting);
+        InventorySetup.Modify(true);
     end;
 
     local procedure ClearJournal(ItemJournalTemplate: Record "Item Journal Template"; ItemJournalBatch: Record "Item Journal Batch")
@@ -514,20 +511,18 @@ codeunit 137096 "SCM Kitting - ATO"
     begin
         Price := 0;
 
-        with AssemblyLine do begin
-            SetRange("Document Type", AssemblyHeader."Document Type");
-            SetRange("Document No.", AssemblyHeader."No.");
-            FindSet();
+        AssemblyLine.SetRange("Document Type", AssemblyHeader."Document Type");
+        AssemblyLine.SetRange("Document No.", AssemblyHeader."No.");
+        AssemblyLine.FindSet();
 
-            repeat
-                case Type of
-                    Type::Item:
-                        Price += Quantity * GetSalesPrice("No.", "Variant Code");
-                    Type::Resource:
-                        Price += Quantity * GetResourcePrice("No.");
-                end;
-            until Next() = 0;
-        end;
+        repeat
+            case AssemblyLine.Type of
+                AssemblyLine.Type::Item:
+                    Price += AssemblyLine.Quantity * GetSalesPrice(AssemblyLine."No.", AssemblyLine."Variant Code");
+                AssemblyLine.Type::Resource:
+                    Price += AssemblyLine.Quantity * GetResourcePrice(AssemblyLine."No.");
+            end;
+        until AssemblyLine.Next() = 0;
     end;
 #endif
 
@@ -715,12 +710,10 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         ItemTrackingCode: Record "Item Tracking Code";
     begin
-        with ItemTrackingCode do begin
-            SetRange("SN Specific Tracking", true);
-            SetRange("Man. Expir. Date Entry Reqd.", false);
-            FindFirst();
-            exit(Code);
-        end;
+        ItemTrackingCode.SetRange("SN Specific Tracking", true);
+        ItemTrackingCode.SetRange("Man. Expir. Date Entry Reqd.", false);
+        ItemTrackingCode.FindFirst();
+        exit(ItemTrackingCode.Code);
     end;
 
     local procedure FindAssemblyHeader(var AssemblyHeader: Record "Assembly Header"; DocumentType: Enum "Assembly Document Type"; Item: Record Item; VariantCode: Code[10]; LocationCode: Code[10]; DueDate: Date; UOM: Code[10]; Qty: Decimal)
@@ -776,20 +769,18 @@ codeunit 137096 "SCM Kitting - ATO"
         BOMComponent: Record "BOM Component";
         ItemTrackingCode: Code[10];
     begin
-        with BOMComponent do begin
-            SetRange("Parent Item No.", ParentItemNo);
-            SetRange(Type, Type::Item);
-            FindSet();
-            ItemTrackingCode := FindItemTrackingLikeSNALL();
-            repeat
-                Item.Get("No.");
-                Item.Validate("Item Tracking Code", ItemTrackingCode);
-                Item.Validate("Serial Nos.", LibraryUtility.GetGlobalNoSeriesCode());
-                Item.Modify(true);
-                ItemBuf := Item;
-                ItemBuf.Insert();
-            until Next() = 0;
-        end;
+        BOMComponent.SetRange("Parent Item No.", ParentItemNo);
+        BOMComponent.SetRange(Type, BOMComponent.Type::Item);
+        BOMComponent.FindSet();
+        ItemTrackingCode := FindItemTrackingLikeSNALL();
+        repeat
+            Item.Get(BOMComponent."No.");
+            Item.Validate("Item Tracking Code", ItemTrackingCode);
+            Item.Validate("Serial Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+            Item.Modify(true);
+            ItemBuf := Item;
+            ItemBuf.Insert();
+        until BOMComponent.Next() = 0;
     end;
 
     local procedure AssertAssemblyLinesDefaultBOM(AssemblyHeader: Record "Assembly Header"; BOMComponent: Record "BOM Component"; LocationCode: Code[20]; NoOfLines: Integer)
@@ -1453,13 +1444,12 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
     begin
-        if WithEntries then
-            with InvtAdjmtEntryOrder do begin
-                Init();
-                "Order Type" := "Order Type"::Assembly;
-                "Order No." := AssemblyOrderNo;
-                Insert();
-            end;
+        if WithEntries then begin
+            InvtAdjmtEntryOrder.Init();
+            InvtAdjmtEntryOrder."Order Type" := InvtAdjmtEntryOrder."Order Type"::Assembly;
+            InvtAdjmtEntryOrder."Order No." := AssemblyOrderNo;
+            InvtAdjmtEntryOrder.Insert();
+        end;
     end;
 
     [Test]
@@ -1884,9 +1874,8 @@ codeunit 137096 "SCM Kitting - ATO"
 
         // Assert that after switch assembly order is created when ATS to ATO switch is done
         // And new ATO is deleted from ATO to ATS switch
-        if StartwithATO then begin
-            Assert.AreEqual(NoOfAssemblyOrders, CountAssemblyOrders(GetAsmTypeForSalesType(SalesDocumentType)), OneAsmOrderDeleteMsg);
-        end
+        if StartwithATO then
+            Assert.AreEqual(NoOfAssemblyOrders, CountAssemblyOrders(GetAsmTypeForSalesType(SalesDocumentType)), OneAsmOrderDeleteMsg)
         else begin
             Assert.AreEqual(NoOfAssemblyOrders + 1, CountAssemblyOrders(GetAsmTypeForSalesType(SalesDocumentType)), OneAsmOrderCreateMsg);
             AssertAsmOrderForDefaultBOM(AssemblyHeader, GetAsmTypeForSalesType(SalesDocumentType), ItemATO, '', LocationCode, DueDate,
@@ -3832,15 +3821,13 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         SalesLine: Record "Sales Line";
     begin
-        with SalesLine do begin
-            SetRange("Document Type", SalesHeader."Document Type");
-            SetRange("Document No.", SalesHeader."No.");
-            SetRange("No.", ItemNo);
-            FindFirst();
-            Validate("Qty. to Ship", Quantity div Divider);
-            Modify(true);
-            exit("Qty. to Ship");
-        end;
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange("No.", ItemNo);
+        SalesLine.FindFirst();
+        SalesLine.Validate("Qty. to Ship", SalesLine.Quantity div Divider);
+        SalesLine.Modify(true);
+        exit(SalesLine."Qty. to Ship");
     end;
 
     local procedure FindAsmHeaderFromSalesOrder(SalesOrderNo: Code[20]; Item: Record Item; var SalesLine: Record "Sales Line"; var AssemblyHeader: Record "Assembly Header")
@@ -3894,38 +3881,34 @@ codeunit 137096 "SCM Kitting - ATO"
         AssemblyHeader: Record "Assembly Header";
         AssemblyLine: Record "Assembly Line";
     begin
-        with AssemblyHeader do begin
-            SetRange("Document Type", DocumentType);
-            SetRange("Item No.", ItemNo);
-            FindLast();
-            Assert.AreEqual(AssembledQty, "Assembled Quantity", FieldName("Assembled Quantity"));
-            Assert.AreEqual(
-              AssembledQty * "Qty. per Unit of Measure",
-              "Assembled Quantity (Base)", FieldName("Assembled Quantity (Base)"));
-            Assert.AreEqual(
-              Quantity - AssembledQty, "Remaining Quantity", FieldName("Remaining Quantity"));
-            Assert.AreEqual(
-              "Quantity (Base)" - "Assembled Quantity (Base)",
-              "Remaining Quantity (Base)", FieldName("Remaining Quantity (Base)"));
-        end;
+        AssemblyHeader.SetRange("Document Type", DocumentType);
+        AssemblyHeader.SetRange("Item No.", ItemNo);
+        AssemblyHeader.FindLast();
+        Assert.AreEqual(AssembledQty, AssemblyHeader."Assembled Quantity", AssemblyHeader.FieldName("Assembled Quantity"));
+        Assert.AreEqual(
+          AssembledQty * AssemblyHeader."Qty. per Unit of Measure",
+          AssemblyHeader."Assembled Quantity (Base)", AssemblyHeader.FieldName("Assembled Quantity (Base)"));
+        Assert.AreEqual(
+          AssemblyHeader.Quantity - AssembledQty, AssemblyHeader."Remaining Quantity", AssemblyHeader.FieldName("Remaining Quantity"));
+        Assert.AreEqual(
+          AssemblyHeader."Quantity (Base)" - AssemblyHeader."Assembled Quantity (Base)",
+          AssemblyHeader."Remaining Quantity (Base)", AssemblyHeader.FieldName("Remaining Quantity (Base)"));
 
-        with AssemblyLine do begin
-            SetRange("Document Type", AssemblyHeader."Document Type");
-            SetRange("Document No.", AssemblyHeader."No.");
-            FindSet();
-            repeat
-                Assert.AreEqual(
-                  AssembledQty * "Quantity per", "Consumed Quantity", FieldName("Consumed Quantity"));
-                Assert.AreEqual(
-                  "Consumed Quantity" * "Qty. per Unit of Measure",
-                  "Consumed Quantity (Base)", FieldName("Consumed Quantity (Base)"));
-                Assert.AreEqual(
-                  Quantity - "Quantity per" * AssembledQty, "Remaining Quantity", FieldName("Remaining Quantity"));
-                Assert.AreEqual(
-                  "Quantity (Base)" - "Consumed Quantity (Base)",
-                  "Remaining Quantity (Base)", FieldName("Remaining Quantity (Base)"));
-            until Next() = 0;
-        end;
+        AssemblyLine.SetRange("Document Type", AssemblyHeader."Document Type");
+        AssemblyLine.SetRange("Document No.", AssemblyHeader."No.");
+        AssemblyLine.FindSet();
+        repeat
+            Assert.AreEqual(
+              AssembledQty * AssemblyLine."Quantity per", AssemblyLine."Consumed Quantity", AssemblyLine.FieldName("Consumed Quantity"));
+            Assert.AreEqual(
+              AssemblyLine."Consumed Quantity" * AssemblyLine."Qty. per Unit of Measure",
+              AssemblyLine."Consumed Quantity (Base)", AssemblyLine.FieldName("Consumed Quantity (Base)"));
+            Assert.AreEqual(
+              AssemblyLine.Quantity - AssemblyLine."Quantity per" * AssembledQty, AssemblyLine."Remaining Quantity", AssemblyLine.FieldName("Remaining Quantity"));
+            Assert.AreEqual(
+              AssemblyLine."Quantity (Base)" - AssemblyLine."Consumed Quantity (Base)",
+              AssemblyLine."Remaining Quantity (Base)", AssemblyLine.FieldName("Remaining Quantity (Base)"));
+        until AssemblyLine.Next() = 0;
     end;
 
     [Test]
@@ -4322,19 +4305,17 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         SalesLine: Record "Sales Line";
     begin
-        with SalesLine do begin
-            Init();
-            Validate("Document Type", SalesHeader."Document Type");
-            Validate("Document No.", SalesHeader."No.");
-            Validate("Line No.", LineNo);
-            Insert(true);
+        SalesLine.Init();
+        SalesLine.Validate("Document Type", SalesHeader."Document Type");
+        SalesLine.Validate("Document No.", SalesHeader."No.");
+        SalesLine.Validate("Line No.", LineNo);
+        SalesLine.Insert(true);
 
-            Validate(Type, Type::Item);
-            Validate("No.", ItemNo);
-            Validate(Quantity, LibraryRandom.RandInt(10));
-            Validate("Qty. to Assemble to Order", Quantity);
-            Modify(true);
-        end;
+        SalesLine.Validate(Type, SalesLine.Type::Item);
+        SalesLine.Validate("No.", ItemNo);
+        SalesLine.Validate(Quantity, LibraryRandom.RandInt(10));
+        SalesLine.Validate("Qty. to Assemble to Order", SalesLine.Quantity);
+        SalesLine.Modify(true);
     end;
 
     local procedure PostShippedSalesOrderAsInvoice(AutomaticCostPosting: Boolean)
@@ -4765,11 +4746,9 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         Location: Record Location;
     begin
-        with Location do begin
-            Get(LocationCode);
-            "To-Assembly Bin Code" := BinCode;
-            Modify();
-        end;
+        Location.Get(LocationCode);
+        Location."To-Assembly Bin Code" := BinCode;
+        Location.Modify();
     end;
 
     local procedure SetupBinsForLocation(LocationCode: Code[10]; var BinCodes: array[3] of Code[20])
@@ -4788,18 +4767,16 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         Location: Record Location;
     begin
-        with Location do begin
-            Get(LocationCode);
-            Validate("Require Receive", true);
-            Validate("Require Shipment", true);
-            Validate("Require Put-away", true);
-            Validate("Require Pick", true);
-            Validate("Prod. Consump. Whse. Handling", "Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)");
-            Validate("Prod. Output Whse. Handling", "Prod. Output Whse. Handling"::"Inventory Put-away");
-            Validate("Job Consump. Whse. Handling", "Job Consump. Whse. Handling"::"Warehouse Pick (mandatory)");
-            Validate("Asm. Consump. Whse. Handling", "Asm. Consump. Whse. Handling"::"Warehouse Pick (mandatory)");
-            Modify();
-        end;
+        Location.Get(LocationCode);
+        Location.Validate("Require Receive", true);
+        Location.Validate("Require Shipment", true);
+        Location.Validate("Require Put-away", true);
+        Location.Validate("Require Pick", true);
+        Location.Validate("Prod. Consump. Whse. Handling", Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)");
+        Location.Validate("Prod. Output Whse. Handling", Location."Prod. Output Whse. Handling"::"Inventory Put-away");
+        Location.Validate("Job Consump. Whse. Handling", Location."Job Consump. Whse. Handling"::"Warehouse Pick (mandatory)");
+        Location.Validate("Asm. Consump. Whse. Handling", Location."Asm. Consump. Whse. Handling"::"Warehouse Pick (mandatory)");
+        Location.Modify();
     end;
 
     local procedure PlaceComponentsToBins(ParentItemNo: Code[20]; LocationCode: Code[10]; BinCodes: array[3] of Code[20]; FromBinIndex: Integer; ToBinIndex: Integer; Qty: Decimal)
@@ -4808,12 +4785,10 @@ codeunit 137096 "SCM Kitting - ATO"
         ItemNo: Code[20];
         Counter: Integer;
     begin
-        with BOMComponent do begin
-            SetRange("Parent Item No.", ParentItemNo);
-            SetRange(Type, Type::Item);
-            FindFirst();
-            ItemNo := "No.";
-        end;
+        BOMComponent.SetRange("Parent Item No.", ParentItemNo);
+        BOMComponent.SetRange(Type, BOMComponent.Type::Item);
+        BOMComponent.FindFirst();
+        ItemNo := BOMComponent."No.";
 
         for Counter := FromBinIndex to ToBinIndex do
             PostPositiveAdjmtOnBin(ItemNo, LocationCode, BinCodes[Counter], Qty);
@@ -4823,14 +4798,12 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
-        with WarehouseActivityLine do begin
-            SetRange("Action Type", "Action Type"::Take);
-            SetRange("Source Type", DATABASE::"Assembly Line");
-            SetRange("Source Subtype", AssemblyType);
-            SetRange("Source No.", AssemblyNo);
-            FindFirst();
-            exit("Bin Code");
-        end;
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Take);
+        WarehouseActivityLine.SetRange("Source Type", DATABASE::"Assembly Line");
+        WarehouseActivityLine.SetRange("Source Subtype", AssemblyType);
+        WarehouseActivityLine.SetRange("Source No.", AssemblyNo);
+        WarehouseActivityLine.FindFirst();
+        exit(WarehouseActivityLine."Bin Code");
     end;
 
     local procedure CreateSalesOrderAndAssemblyAndPick(var AssemblyHeader: Record "Assembly Header"; ExpectedIndex: Integer; AssembledItemNo: Code[20]; OrderQty: Decimal; LocationCode: Code[10])
@@ -4848,20 +4821,16 @@ codeunit 137096 "SCM Kitting - ATO"
         SalesLine: Record "Sales Line";
     begin
         DaysBack := LibraryRandom.RandIntInRange(10, 20);
-        with SalesHeader do begin
-            LibrarySales.CreateSalesHeader(SalesHeader, "Document Type"::Order, '');
-            Validate("Location Code", LocationBlue.Code);
-            Validate("Requested Delivery Date", WorkDate() - DaysBack);
-            Validate("Promised Delivery Date", WorkDate() - DaysBack);
-            Modify(true);
-        end;
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, '');
+        SalesHeader.Validate("Location Code", LocationBlue.Code);
+        SalesHeader.Validate("Requested Delivery Date", WorkDate() - DaysBack);
+        SalesHeader.Validate("Promised Delivery Date", WorkDate() - DaysBack);
+        SalesHeader.Modify(true);
 
-        with SalesLine do begin
-            LibrarySales.CreateSalesLineWithShipmentDate(
-              SalesLine, SalesHeader, Type::Item, ItemNo, WorkDate() - (DaysBack - 1),
-              LibraryRandom.RandIntInRange(100, 1000));
-            SetQtyToAssembleToOrder(SalesLine, Quantity);
-        end;
+        LibrarySales.CreateSalesLineWithShipmentDate(
+          SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, WorkDate() - (DaysBack - 1),
+          LibraryRandom.RandIntInRange(100, 1000));
+        SetQtyToAssembleToOrder(SalesLine, SalesLine.Quantity);
         DaysBack += 1;
     end;
 
@@ -4897,19 +4866,17 @@ codeunit 137096 "SCM Kitting - ATO"
         ResourcePrice: Record "Resource Price";
         PriceListLine: Record "Price List Line";
     begin
-        with BOMComponent do begin
-            SetRange("Parent Item No.", ItemNo);
-            FindSet();
+        BOMComponent.SetRange("Parent Item No.", ItemNo);
+        BOMComponent.FindSet();
 
-            repeat
-                case Type of
-                    Type::Item:
-                        CreateSalesPrice("No.");
-                    Type::Resource:
-                        CreateResourcePrice("No.");
-                end;
-            until Next() = 0;
-        end;
+        repeat
+            case BOMComponent.Type of
+                BOMComponent.Type::Item:
+                    CreateSalesPrice(BOMComponent."No.");
+                BOMComponent.Type::Resource:
+                    CreateResourcePrice(BOMComponent."No.");
+            end;
+        until BOMComponent.Next() = 0;
         CopyFromToPriceListLine.CopyFrom(SalesPrice, PriceListLine);
         CopyFromToPriceListLine.CopyFrom(ResourcePrice, PriceListLine);
     end;
@@ -4994,12 +4961,10 @@ codeunit 137096 "SCM Kitting - ATO"
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        with ItemLedgerEntry do begin
-            SetRange("Item No.", Item."No.");
-            SetRange("Order No.", OrderNo);
-            FindFirst();
-            TestField("Item Category Code", Item."Item Category Code");
-        end;
+        ItemLedgerEntry.SetRange("Item No.", Item."No.");
+        ItemLedgerEntry.SetRange("Order No.", OrderNo);
+        ItemLedgerEntry.FindFirst();
+        ItemLedgerEntry.TestField("Item Category Code", Item."Item Category Code");
     end;
 
     local procedure VerifyWhseEntriesOfAssembly(AssemblyOrderNo: Code[20]; OrderQty: Decimal)
@@ -5051,15 +5016,14 @@ codeunit 137096 "SCM Kitting - ATO"
 
         Assert.AreEqual(TempQuoteAssemblyLine.Count, AssemblyLine.Count, DifferentNumberAsmLinesInOrderAndQuoteErr);
         TempQuoteAssemblyLine.FindSet();
-        with AssemblyLine do
-            repeat
-                TestField("Line No.", TempQuoteAssemblyLine."Line No.");
-                TestField(Type, TempQuoteAssemblyLine.Type);
-                TestField("No.", TempQuoteAssemblyLine."No.");
-                TestField("Quantity per", TempQuoteAssemblyLine."Quantity per");
-                TestField(Quantity, TempQuoteAssemblyLine.Quantity);
-                TestField("Remaining Quantity", TempQuoteAssemblyLine."Remaining Quantity");
-            until (Next() = 0) and (TempQuoteAssemblyLine.Next() = 0);
+        repeat
+            AssemblyLine.TestField("Line No.", TempQuoteAssemblyLine."Line No.");
+            AssemblyLine.TestField(Type, TempQuoteAssemblyLine.Type);
+            AssemblyLine.TestField("No.", TempQuoteAssemblyLine."No.");
+            AssemblyLine.TestField("Quantity per", TempQuoteAssemblyLine."Quantity per");
+            AssemblyLine.TestField(Quantity, TempQuoteAssemblyLine.Quantity);
+            AssemblyLine.TestField("Remaining Quantity", TempQuoteAssemblyLine."Remaining Quantity");
+        until (AssemblyLine.Next() = 0) and (TempQuoteAssemblyLine.Next() = 0);
     end;
 
     [ConfirmHandler]
@@ -5439,6 +5403,68 @@ codeunit 137096 "SCM Kitting - ATO"
         VerifyAssembleToOrderLinesPageOpened(ToSalesHeader, OrderQty);
     end;
 
+    [Test]
+    [HandlerFunctions('MsgHandlerPostedAOs')]
+    [Scope('OnPrem')]
+    procedure AssembleToOrderLinkIsDeletedWhenQtyToAssembleToOrderIsSetToZeroInSOAfterPartialShipment()
+    var
+        Item, Item2, Item3 : Record Item;
+        Customer: Record Customer;
+        ItemJournalLine: Record "Item Journal Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        BOMComponent, BOMComponent2 : Record "BOM Component";
+        AssembleToOrderLink: Record "Assemble-to-Order Link";
+    begin
+        // [SCENARIO 537255] Assemble-to-Order Link is deleted when Qty. to Assemble to Order is set to 0 in Sales Order after partial shipment.
+        Initialize();
+
+        // [GIVEN] Create Item and Validate Replenishment System and Assembly Policy.
+        LibraryInventory.CreateItem(Item);
+        Item.Validate("Replenishment System", Item."Replenishment System"::Assembly);
+        Item.Validate("Assembly Policy", Item."Assembly Policy"::"Assemble-to-Order");
+        Item.Modify(true);
+
+        // [GIVEN] Create Item 2.
+        LibraryInventory.CreateItem(Item2);
+
+        // [GIVEN] Create Item 3.
+        LibraryInventory.CreateItem(Item3);
+
+        // [GIVEN] Create BOM Component.
+        LibraryManufacturing.CreateBOMComponent(BOMComponent, Item."No.", BOMComponent.Type::Item, Item2."No.", LibraryRandom.RandInt(0), Item."Base Unit of Measure");
+
+        // [GIVEN] Create BOM Component 2.
+        LibraryManufacturing.CreateBOMComponent(BOMComponent2, Item."No.", BOMComponent2.Type::Item, Item3."No.", LibraryRandom.RandIntInRange(2, 2), Item."Base Unit of Measure");
+
+        // [GIVEN] Create and Post Item Journal Line.
+        CreateAndPostItemJournalLine(ItemJournalLine, Item2, Item3);
+
+        // [GIVEN] Create Customer.
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Create Sales Header.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+
+        // [GIVEN] Create Sales Line and Validate Qty. to Assemble to Order and Qty. to Ship.
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(2, 2));
+        SalesLine.Validate("Qty. to Assemble to Order", LibraryRandom.RandIntInRange(2, 2));
+        SalesLine.Validate("Qty. to Ship", LibraryRandom.RandInt(0));
+        SalesLine.Modify(true);
+
+        // [GIVEN] Post Sales Shipment.
+        LibrarySales.PostSalesDocument(SalesHeader, true, false);
+
+        // [GIVEN] Validate Qty. to Assemble to Order in Sales Line.
+        SalesLine.Validate("Qty. to Assemble to Order", 0);
+
+        // [WHEN] Find Assemble-to-Order Link.
+        AssembleToOrderLink.SetRange("Document No.", SalesHeader."No.");
+
+        // [THEN] Assemble-to-Order Link is deleted.
+        Assert.IsTrue(AssembleToOrderLink.IsEmpty(), ATOLinkShouldNotBeFoundErr);
+    end;
+
     local procedure VerifyAssembleToOrderLinesPageOpened(SalesHeader: Record "Sales Header"; QtyAssembleToOrder: Decimal)
     var
         SalesQuote: TestPage "Sales Quote";
@@ -5477,6 +5503,27 @@ codeunit 137096 "SCM Kitting - ATO"
         CopySalesDoc.SetSalesHeader(NewSalesHeader);
         CopySalesDoc.UseRequestPage(UseRequestPage);
         CopySalesDoc.RunModal();
+    end;
+
+    local procedure CreateAndPostItemJournalLine(var ItemJournalLine: Record "Item Journal Line"; var Item: Record Item; var Item2: Record Item)
+    begin
+        LibraryInventory.CreateItemJournalLine(
+            ItemJournalLine,
+            ItemJournalBatch."Journal Template Name",
+            ItemJournalBatch.Name,
+            ItemJournalLine."Entry Type"::Purchase,
+            Item."No.",
+            LibraryRandom.RandIntInRange(100, 100));
+
+        LibraryInventory.CreateItemJournalLine(
+            ItemJournalLine,
+            ItemJournalBatch."Journal Template Name",
+            ItemJournalBatch.Name,
+            ItemJournalLine."Entry Type"::Purchase,
+            Item2."No.",
+            LibraryRandom.RandIntInRange(100, 100));
+
+        LibraryInventory.PostItemJournalLine(ItemJournalTemplate.Name, ItemJournalBatch.Name);
     end;
 
     [ModalPageHandler]

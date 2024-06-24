@@ -238,7 +238,9 @@ report 99000753 "Quantity Explosion of BOM"
     }
 
     var
+#pragma warning disable AA0074
         Text000: Label 'As of ';
+#pragma warning restore AA0074
         ProdBOM: Record "Production BOM Header";
         CompItem: Record Item;
         UOMMgt: Codeunit "Unit of Measure Management";
@@ -260,7 +262,9 @@ report 99000753 "Quantity Explosion of BOM"
         LevelCaptLbl: Label 'Level';
         BomCompLevelUOMCodeCaptLbl: Label 'Unit of Measure Code';
         NoListType: array[99] of Option " ",Item,"Production BOM";
+#pragma warning disable AA0470
         ProdBomErr: Label 'The maximum number of BOM levels, %1, was exceeded. The process stopped at item number %2, BOM header number %3, BOM level %4.';
+#pragma warning restore AA0470
 
     protected var
         BomComponent: array[99] of Record "Production BOM Line";

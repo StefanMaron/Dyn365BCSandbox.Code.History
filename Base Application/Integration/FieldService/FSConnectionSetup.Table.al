@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.FieldService;
 
+#if not CLEAN25
 using Microsoft.CRM.Outlook;
 using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
@@ -17,6 +18,7 @@ using System.Environment.Configuration;
 using System.Security.Encryption;
 using System.Threading;
 using Microsoft.Projects.Resources.Resource;
+#endif
 
 table 6418 "FS Connection Setup"
 {
@@ -26,6 +28,14 @@ table 6418 "FS Connection Setup"
     InherentPermissions = rX;
     DataClassification = CustomerContent;
     ReplicateData = true;
+    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
+#if not CLEAN25
+    ObsoleteState = Pending;
+    ObsoleteTag = '25.0';
+#else
+    ObsoleteState = Removed;
+    ObsoleteTag = '28.0';
+#endif
 
     fields
     {
@@ -38,7 +48,7 @@ table 6418 "FS Connection Setup"
         {
             DataClassification = OrganizationIdentifiableInformation;
             Caption = 'Field Service URL';
-
+#if not CLEAN25
             trigger OnValidate()
             var
                 EnvironmentInfo: Codeunit "Environment Information";
@@ -52,12 +62,13 @@ table 6418 "FS Connection Setup"
                         "Authentication Type" := "Authentication Type"::AD;
                 UpdateConnectionString();
             end;
+#endif
         }
         field(3; "User Name"; Text[250])
         {
             Caption = 'User Name';
             DataClassification = EndUserIdentifiableInformation;
-
+#if not CLEAN25
             trigger OnValidate()
             begin
                 "User Name" := DelChr("User Name", '<>');
@@ -65,18 +76,20 @@ table 6418 "FS Connection Setup"
                 UpdateDomainName();
                 UpdateConnectionString();
             end;
+#endif
         }
         field(4; "User Password Key"; Guid)
         {
             Caption = 'User Password Key';
             DataClassification = EndUserPseudonymousIdentifiers;
-
+#if not CLEAN25
             trigger OnValidate()
             begin
                 if not IsTemporary() then
                     if "User Password Key" <> xRec."User Password Key" then
                         xRec.DeletePassword();
             end;
+#endif
         }
         field(59; "Restore Connection"; Boolean)
         {
@@ -87,7 +100,7 @@ table 6418 "FS Connection Setup"
         {
             DataClassification = SystemMetadata;
             Caption = 'Is Enabled';
-
+#if not CLEAN25
             trigger OnValidate()
             var
                 CRMConnectionSetup: Record "CRM Connection Setup";
@@ -113,6 +126,7 @@ table 6418 "FS Connection Setup"
                 end else
                     Session.LogMessage('0000MAU', CRMConnDisabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
             end;
+#endif
         }
         field(63; "FS Version"; Text[30])
         {
@@ -128,11 +142,12 @@ table 6418 "FS Connection Setup"
         {
             Caption = 'Proxy Version';
             DataClassification = SystemMetadata;
-
+#if not CLEAN25
             trigger OnValidate()
             begin
                 UpdateProxyVersionInConnectionString();
             end;
+#endif
         }
         field(118; CurrencyDecimalPrecision; Integer)
         {
@@ -145,7 +160,9 @@ table 6418 "FS Connection Setup"
             DataClassification = SystemMetadata;
             Caption = 'Currency';
             Description = 'Unique identifier of the base currency of the organization.';
+#if not CLEAN25
             TableRelation = "CRM Transactioncurrency".TransactionCurrencyId;
+#endif
         }
         field(133; BaseCurrencyPrecision; Integer)
         {
@@ -167,7 +184,7 @@ table 6418 "FS Connection Setup"
             Caption = 'Authentication Type';
             OptionCaption = 'OAuth 2.0,AD,IFD,OAuth';
             OptionMembers = Office365,AD,IFD,OAuth;
-
+#if not CLEAN25
             trigger OnValidate()
             begin
                 case "Authentication Type" of
@@ -178,6 +195,7 @@ table 6418 "FS Connection Setup"
                 end;
                 UpdateConnectionString();
             end;
+#endif
         }
         field(136; "Connection String"; Text[250])
         {
@@ -204,19 +222,25 @@ table 6418 "FS Connection Setup"
         {
             DataClassification = SystemMetadata;
             Caption = 'Project Journal Template';
+#if not CLEAN25
             TableRelation = "Job Journal Template";
+#endif
         }
         field(201; "Job Journal Batch"; Code[10])
         {
             DataClassification = SystemMetadata;
             Caption = 'Project Journal Batch';
+#if not CLEAN25
             TableRelation = "Job Journal Batch".Name where("Journal Template Name" = field("Job Journal Template"));
+#endif
         }
         field(202; "Hour Unit of Measure"; Code[10])
         {
             DataClassification = SystemMetadata;
             Caption = 'Hour Unit of Measure';
+#if not CLEAN25
             TableRelation = "Unit of Measure";
+#endif
         }
         field(203; "Line Synch. Rule"; Enum "FS Work Order Line Synch. Rule")
         {
@@ -241,7 +265,7 @@ table 6418 "FS Connection Setup"
     fieldgroups
     {
     }
-
+#if not CLEAN25
     trigger OnModify()
     begin
         if IsTemporary() then
@@ -262,7 +286,7 @@ table 6418 "FS Connection Setup"
         CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
         CRMProductName: Codeunit "CRM Product Name";
         IsolatedStorageManagement: Codeunit "Isolated Storage Management";
-        TempUserPassword: Text;
+        TempUserPassword: SecretText;
         ConnectionErr: Label 'The connection setup cannot be validated. Verify the settings and try again.\Detailed error description: %1.', Comment = '%1 Error message from the provider (.NET exception message)';
         ConnectionStringFormatTok: Label 'Url=%1; UserName=%2; Password=%3; ProxyVersion=%4; %5', Locked = true;
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
@@ -295,7 +319,8 @@ table 6418 "FS Connection Setup"
         ShowDataverseConnectionSetupLbl: Label 'Show Dataverse Connection Setup';
         ShowCRMConnectionSetupLbl: Label 'Show Microsoft Dynamics 365 Connection Setup';
         DeploySucceedMsg: Label 'The solution, user roles, and entities have been deployed.';
-        DeployFailedMsg: Label 'The deployment of the solution, user roles, and entities failed.';
+        DeployFailedMsg: Label 'The deployment of the solution succeeded, but the deployment of user roles failed.';
+        DeploySolutionFailedMsg: Label 'The deployment of the solution failed.';
         CategoryTok: Label 'AL Field Service Integration', Locked = true;
         CRMConnDisabledTxt: Label 'Field Service connection has been disabled.', Locked = true;
         CRMConnEnabledTxt: Label 'Field Service connection has been enabled.', Locked = true;
@@ -383,14 +408,14 @@ table 6418 "FS Connection Setup"
         CDSConnectionNotEnabledError();
     end;
 
-    [NonDebuggable]
     internal procedure DeployFSSolution(ForceRedeploy: Boolean);
     var
         DummyCRMConnectionSetup: Record "CRM Connection Setup";
         AdminEmail: Text;
-        AdminPassword: Text;
-        AccessToken: Text;
+        AdminPassword: SecretText;
+        AccessToken: SecretText;
         AdminADDomain: Text;
+        ImportSolutionFailed: Boolean;
     begin
         if not ForceRedeploy and CRMIntegrationManagement.IsFSSolutionInstalled() then
             exit;
@@ -407,10 +432,13 @@ table 6418 "FS Connection Setup"
                     exit;
         end;
 
-        if CRMIntegrationManagement.ImportFSSolution("Server Address", "User Name", AdminEmail, AdminPassword, AccessToken, AdminADDomain, GetProxyVersion(), ForceRedeploy) then
+        if CRMIntegrationManagement.ImportFSSolution("Server Address", "User Name", AdminEmail, AdminPassword, AccessToken, AdminADDomain, GetProxyVersion(), ForceRedeploy, ImportSolutionFailed) then
             Message(DeploySucceedMsg)
         else
-            Message(DeployFailedMsg);
+            if ImportSolutionFailed then
+                Message(DeploySolutionFailedMsg)
+            else
+                Message(DeployFailedMsg);
     end;
 
     internal procedure CountCRMJobQueueEntries(var ActiveJobs: Integer; var TotalJobs: Integer)
@@ -432,14 +460,12 @@ table 6418 "FS Connection Setup"
         end;
     end;
 
-    [NonDebuggable]
     internal procedure HasPassword(): Boolean
     begin
-        exit(GetPassword() <> '');
+        exit(not GetPassword().IsEmpty());
     end;
 
-    [NonDebuggable]
-    internal procedure SetPassword(PasswordText: Text)
+    internal procedure SetPassword(PasswordText: SecretText)
     begin
         if IsTemporary() then begin
             TempUserPassword := PasswordText;
@@ -470,9 +496,10 @@ table 6418 "FS Connection Setup"
             RegisterConnectionWithName("Primary Key");
     end;
 
+    [NonDebuggable]
     internal procedure RegisterConnectionWithName(ConnectionName: Text)
     begin
-        RegisterTableConnection(TABLECONNECTIONTYPE::CRM, ConnectionName, GetConnectionStringWithCredentials());
+        RegisterTableConnection(TABLECONNECTIONTYPE::CRM, ConnectionName, GetConnectionStringWithCredentials().Unwrap());
         SetDefaultTableConnection(TABLECONNECTIONTYPE::CRM, GetDefaultFSConnection(ConnectionName));
     end;
 
@@ -488,38 +515,41 @@ table 6418 "FS Connection Setup"
     end;
 
     [NonDebuggable]
-    internal procedure GetConnectionStringWithCredentials() ConnectionString: Text
+    internal procedure GetConnectionStringWithCredentials() ConnectionString: SecretText
     var
+        ConnectionStringWithPlaceholders: Text;
         PasswordPlaceHolderPos: Integer;
     begin
-        ConnectionString := GetConnectionString();
+        ConnectionStringWithPlaceholders := GetConnectionStringAsStoredInSetup();
 
         // if the setup record is temporary and connection string contains access token, this is a temp setup record constructed for the admin log-on
         // in this case just use the connection string
-        if IsTemporary() and ConnectionString.Contains(AccessTokenTok) then
-            exit(ConnectionString);
+        if IsTemporary() and ConnectionStringWithPlaceholders.Contains(AccessTokenTok) then
+            exit(ConnectionStringWithPlaceholders);
 
-        if ConnectionString = '' then
-            ConnectionString := UpdateConnectionString();
+        if ConnectionStringWithPlaceholders = '' then
+            ConnectionStringWithPlaceholders := UpdateConnectionString();
 
         // if auth type is Office365 and connection string contains {ClientSecret} token
         // then we will connect via OAuth client credentials grant flow, and construct the connection string accordingly, with the actual client secret
         if "Authentication Type" = "Authentication Type"::Office365 then begin
-            if ConnectionString.Contains(ClientSecretTok) then begin
-                ConnectionString := StrSubstNo(ClientSecretConnectionStringFormatTxt, ClientSecretAuthTxt, "Server Address", CDSIntegrationImpl.GetCDSConnectionClientId(), CDSIntegrationImpl.GetCDSConnectionClientSecret(), GetProxyVersion());
+            if ConnectionStringWithPlaceholders.Contains(ClientSecretTok) then begin
+                ConnectionStringWithPlaceholders := StrSubstNo(ClientSecretConnectionStringFormatTxt, ClientSecretAuthTxt, "Server Address", CDSIntegrationImpl.GetCDSConnectionClientId(), '%1', GetProxyVersion());
+                ConnectionString := SecretStrSubstNo(ConnectionStringWithPlaceholders, CDSIntegrationImpl.GetCDSConnectionClientSecret());
                 exit(ConnectionString);
             end;
 
-            if ConnectionString.Contains(CertificateTok) then begin
+            if ConnectionStringWithPlaceholders.Contains(CertificateTok) then begin
                 ConnectionString := StrSubstNo(CertificateConnectionStringFormatTxt, CertificateAuthTxt, "Server Address", CDSIntegrationImpl.GetCDSConnectionFirstPartyAppId(), CDSIntegrationImpl.GetCDSConnectionFirstPartyAppCertificate(), GetProxyVersion());
                 exit(ConnectionString);
             end;
         end;
 
-        PasswordPlaceHolderPos := StrPos(ConnectionString, MissingPasswordTok);
-        ConnectionString :=
-          CopyStr(ConnectionString, 1, PasswordPlaceHolderPos - 1) + GetPassword() +
-          CopyStr(ConnectionString, PasswordPlaceHolderPos + StrLen(MissingPasswordTok));
+        PasswordPlaceHolderPos := StrPos(ConnectionStringWithPlaceholders, MissingPasswordTok);
+        ConnectionStringWithPlaceholders :=
+          CopyStr(ConnectionStringWithPlaceholders, 1, PasswordPlaceHolderPos - 1) + '%1' +
+          CopyStr(ConnectionStringWithPlaceholders, PasswordPlaceHolderPos + StrLen(MissingPasswordTok));
+        ConnectionString := SecretStrSubstNo(ConnectionStringWithPlaceholders, GetPassword());
     end;
 
     internal procedure GetIntegrationUserID() IntegrationUserID: Guid
@@ -536,9 +566,9 @@ table 6418 "FS Connection Setup"
     end;
 
     [NonDebuggable]
-    internal procedure GetPassword(): Text
+    internal procedure GetPassword(): SecretText
     var
-        Value: Text;
+        Value: SecretText;
     begin
         if IsTemporary() then
             exit(TempUserPassword);
@@ -679,8 +709,7 @@ table 6418 "FS Connection Setup"
             exit;
     end;
 
-    [NonDebuggable]
-    internal procedure UpdateFromWizard(var SourceFSConnectionSetup: Record "FS Connection Setup"; PasswordText: Text)
+    internal procedure UpdateFromWizard(var SourceFSConnectionSetup: Record "FS Connection Setup"; PasswordText: SecretText)
     begin
         if not Get() then begin
             Init();
@@ -733,13 +762,13 @@ table 6418 "FS Connection Setup"
         end;
     end;
 
-    [NonDebuggable]
     local procedure InstallIntegrationSolution()
     var
         AdminEmail: Text;
-        AdminPassword: Text;
-        AccessToken: Text;
+        AdminPassword: SecretText;
+        AccessToken: SecretText;
         AdminADDomain: Text;
+        ImportSolutionFailed: Boolean;
     begin
         if CRMIntegrationManagement.IsFSSolutionInstalled() then
             exit;
@@ -756,7 +785,7 @@ table 6418 "FS Connection Setup"
         end;
 
         CRMIntegrationManagement.ImportFSSolution(
-            "Server Address", "User Name", AdminEmail, AdminPassword, AccessToken, AdminADDomain, GetProxyVersion(), false);
+            "Server Address", "User Name", AdminEmail, AdminPassword, AccessToken, AdminADDomain, GetProxyVersion(), false, ImportSolutionFailed);
     end;
 
     local procedure EnableIntegrationTables()
@@ -809,7 +838,7 @@ table 6418 "FS Connection Setup"
     end;
 
     [NonDebuggable]
-    internal procedure PromptForCredentials(var AdminEmail: Text; var AdminPassword: Text): Boolean
+    internal procedure PromptForCredentials(var AdminEmail: Text; var AdminPassword: SecretText): Boolean
     var
         TempOfficeAdminCredentials: Record "Office Admin. Credentials" temporary;
     begin
@@ -833,7 +862,7 @@ table 6418 "FS Connection Setup"
     end;
 
     [NonDebuggable]
-    internal procedure PromptForCredentials(var AdminEmail: Text; var AdminPassword: Text; var AdminADDomain: Text): Boolean
+    internal procedure PromptForCredentials(var AdminEmail: Text; var AdminPassword: SecretText; var AdminADDomain: Text): Boolean
     var
         TempOfficeAdminCredentials: Record "Office Admin. Credentials" temporary;
         BackslashPos: Integer;
@@ -923,7 +952,7 @@ table 6418 "FS Connection Setup"
         IndexOfProxyVersion: Integer;
     begin
         ProxyVersionTok := 'ProxyVersion=';
-        ConnectionString := GetConnectionString();
+        ConnectionString := GetConnectionStringAsStoredInSetup();
 
         // if the connection string is empty, just initialize it the standard way
         if ConnectionString = '' then begin
@@ -1021,7 +1050,7 @@ table 6418 "FS Connection Setup"
             until IntegrationTableMapping.Next() = 0;
     end;
 
-    internal procedure GetConnectionString() ConnectionString: Text
+    internal procedure GetConnectionStringAsStoredInSetup() ConnectionString: Text
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
         InStream: InStream;
@@ -1107,5 +1136,6 @@ table 6418 "FS Connection Setup"
     local procedure OnBeforeVerifyBaseCurrencyMatchesLCY(var IsHandled: Boolean)
     begin
     end;
+#endif
 }
 

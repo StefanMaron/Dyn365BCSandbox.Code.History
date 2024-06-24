@@ -15,7 +15,6 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
-using Microsoft.Service.Document;
 
 table 846 "Cash Flow Worksheet Line"
 {
@@ -164,8 +163,6 @@ table 846 "Cash Flow Worksheet Line"
             if ("Source Type" = const("Sales Orders")) "Sales Header"."No." where("Document Type" = const(Order))
             else
             if ("Source Type" = const("Purchase Orders")) "Purchase Header"."No." where("Document Type" = const(Order))
-            else
-            if ("Source Type" = const("Service Orders")) "Service Header"."No." where("Document Type" = const(Order))
             else
             if ("Source Type" = const("Cash Flow Manual Expense")) "Cash Flow Manual Expense"
             else

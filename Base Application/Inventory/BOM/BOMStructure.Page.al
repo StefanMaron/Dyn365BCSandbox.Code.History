@@ -170,7 +170,7 @@ page 5870 "BOM Structure"
 
                     trigger OnAction()
                     begin
-                        ItemAvail(ItemAvailFormsMgt.ByEvent());
+                        ItemAvail("Item Availability Type"::"Event");
                     end;
                 }
                 action(Period)
@@ -182,7 +182,7 @@ page 5870 "BOM Structure"
 
                     trigger OnAction()
                     begin
-                        ItemAvail(ItemAvailFormsMgt.ByPeriod());
+                        ItemAvail("Item Availability Type"::Period);
                     end;
                 }
                 action(Variant)
@@ -194,7 +194,7 @@ page 5870 "BOM Structure"
 
                     trigger OnAction()
                     begin
-                        ItemAvail(ItemAvailFormsMgt.ByVariant());
+                        ItemAvail("Item Availability Type"::Variant);
                     end;
                 }
                 action(Location)
@@ -207,7 +207,7 @@ page 5870 "BOM Structure"
 
                     trigger OnAction()
                     begin
-                        ItemAvail(ItemAvailFormsMgt.ByLocation());
+                        ItemAvail("Item Availability Type"::Location);
                     end;
                 }
                 action(Lot)
@@ -230,7 +230,7 @@ page 5870 "BOM Structure"
 
                     trigger OnAction()
                     begin
-                        ItemAvail(ItemAvailFormsMgt.ByBOM());
+                        ItemAvail("Item Availability Type"::BOM);
                     end;
                 }
             }
@@ -316,7 +316,9 @@ page 5870 "BOM Structure"
         HasWarning: Boolean;
 
         CouldNotFindBOMLevelsErr: Label 'Could not find items with BOM levels.';
+#pragma warning disable AA0074
         Text001: Label 'There are no warnings.';
+#pragma warning restore AA0074
 
     protected var
         ItemFilter: Code[250];
@@ -401,7 +403,7 @@ page 5870 "BOM Structure"
             PAGE.RunModal(PAGE::"BOM Warning Log", TempBOMWarningLog);
     end;
 
-    local procedure ItemAvail(AvailType: Option)
+    local procedure ItemAvail(AvailType: Enum "Item Availability Type")
     var
         Item: Record Item;
     begin
@@ -414,7 +416,7 @@ page 5870 "BOM Structure"
         if ShowBy <> ShowBy::Item then
             Item.SetFilter("Location Filter", Rec."Location Code");
 
-        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, AvailType);
+        ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Item, AvailType);
     end;
 
     [IntegrationEvent(false, false)]

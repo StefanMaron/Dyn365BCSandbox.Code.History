@@ -297,6 +297,12 @@ page 6072 "Filed Service Contract"
                         ApplicationArea = Service;
                         Caption = 'Country/Region';
                     }
+                    field("Ship-to Phone No."; Rec."Ship-to Phone No.")
+                    {
+                        ApplicationArea = Service;
+                        Caption = 'Phone No.';
+                        ToolTip = 'Specifies the telephone number of the company''s shipping address.';
+                    }
                 }
             }
             group(Service)

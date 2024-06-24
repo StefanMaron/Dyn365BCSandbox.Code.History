@@ -559,6 +559,11 @@ table 114 "Sales Cr.Memo Header"
             Caption = 'Work Description';
             DataClassification = CustomerContent;
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -953,15 +958,19 @@ table 114 "Sales Cr.Memo Header"
         exit(FieldCaption("VAT Registration No."));
     end;
 
+#if not CLEAN25
+    [Obsolete('The procedure is not used and will be obsoleted.', '25.0')]
     procedure GetCustomerGlobalLocationNumber(): Text
     begin
         exit('');
     end;
 
+    [Obsolete('The procedure is not used and will be obsoleted.', '25.0')]
     procedure GetCustomerGlobalLocationNumberLbl(): Text
     begin
         exit('');
     end;
+#endif
 
 #if not CLEAN23
     [Obsolete('The procedure will be replaced by W1 version, the functionality is moved to SE Core extension "Sales & Receivables Setup" table extension and renamed to GetLegalStatementLabel', '23.0')]

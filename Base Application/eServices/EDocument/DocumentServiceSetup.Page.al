@@ -577,6 +577,7 @@ page 9553 "Document Service Setup"
 
     local procedure ShowIntroStep()
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
         DocumentServiceScenario: Record "Document Service Scenario";
     begin
         IntroStepVisible := true;

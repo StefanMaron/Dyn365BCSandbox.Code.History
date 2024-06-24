@@ -1220,11 +1220,9 @@ codeunit 137025 "SCM Purchase Correct Invoice"
         CopyDocMgt: Codeunit "Copy Document Mgt.";
         InvNo: Code[20];
     begin
-        with PurchHeader do begin
-            Init();
-            Validate("Document Type", "Document Type"::"Credit Memo");
-            Insert(true);
-        end;
+        PurchHeader.Init();
+        PurchHeader.Validate("Document Type", PurchHeader."Document Type"::"Credit Memo");
+        PurchHeader.Insert(true);
         CopyDocMgt.SetProperties(
           true, false, false, false, false, false, false);
         CopyDocMgt.CopyPurchDoc("Purchase Document Type From"::"Posted Invoice", PurchInvHeader."No.", PurchHeader);
@@ -1272,25 +1270,21 @@ codeunit 137025 "SCM Purchase Correct Invoice"
     var
         PurchLine: Record "Purchase Line";
     begin
-        with PurchLine do begin
-            SetRange("Document Type", PurchHeader."Document Type");
-            SetRange("Document No.", PurchHeader."No.");
-            SetRange(Type, Type::"G/L Account");
-            SetRange("No.", LibraryPurchase.GetInvRoundingAccountOfVendPostGroup(PurchHeader."Vendor Posting Group"));
-            Assert.RecordIsEmpty(PurchLine);
-        end;
+        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+        PurchLine.SetRange("Document No.", PurchHeader."No.");
+        PurchLine.SetRange(Type, PurchLine.Type::"G/L Account");
+        PurchLine.SetRange("No.", LibraryPurchase.GetInvRoundingAccountOfVendPostGroup(PurchHeader."Vendor Posting Group"));
+        Assert.RecordIsEmpty(PurchLine);
     end;
 
     local procedure VerifyInvRndLineExistsInPurchCrMemoHeader(PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.")
     var
         PurchCrMemoLine: Record "Purch. Cr. Memo Line";
     begin
-        with PurchCrMemoLine do begin
-            SetRange("Document No.", PurchCrMemoHdr."No.");
-            SetRange(Type, Type::"G/L Account");
-            SetRange("No.", LibraryPurchase.GetInvRoundingAccountOfVendPostGroup(PurchCrMemoHdr."Vendor Posting Group"));
-            Assert.RecordIsNotEmpty(PurchCrMemoLine);
-        end;
+        PurchCrMemoLine.SetRange("Document No.", PurchCrMemoHdr."No.");
+        PurchCrMemoLine.SetRange(Type, PurchCrMemoLine.Type::"G/L Account");
+        PurchCrMemoLine.SetRange("No.", LibraryPurchase.GetInvRoundingAccountOfVendPostGroup(PurchCrMemoHdr."Vendor Posting Group"));
+        Assert.RecordIsNotEmpty(PurchCrMemoLine);
     end;
 
     local procedure VerifyBlankLineDoesNotExist(PurchHeader: Record "Purchase Header")

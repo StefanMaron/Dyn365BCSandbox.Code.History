@@ -340,13 +340,13 @@ page 1384 "Item Templ. Card"
                     field("Routing No."; Rec."Routing No.")
                     {
                         ApplicationArea = Manufacturing;
-                        ToolTip = 'Specifies the number of the production routing that the item is used in.';
+                        ToolTip = 'Specifies the production route that contains the operations needed to manufacture this item.';
                         Visible = false;
                     }
                     field("Production BOM No."; Rec."Production BOM No.")
                     {
                         ApplicationArea = Manufacturing;
-                        ToolTip = 'Specifies the number of the production BOM that the item represents.';
+                        ToolTip = 'Specifies the production BOM that is used to manufacture this item.';
                         Visible = false;
                     }
                     field("Rounding Precision"; Rec."Rounding Precision")
