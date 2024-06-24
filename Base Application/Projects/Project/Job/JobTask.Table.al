@@ -1328,6 +1328,8 @@ table 1001 "Job Task"
     var
         JobPlanningLine: Record "Job Planning Line";
         ConfirmManagement: Codeunit "Confirm Management";
+        ConfirmResult: Boolean;
+        IsHandled: Boolean;
     begin
         JobPlanningLine.SetRange("Job No.", JobTask."Job No.");
         JobPlanningLine.SetRange("Job Task No.", JobTask."Job Task No.");
@@ -1336,7 +1338,11 @@ table 1001 "Job Task"
         if JobPlanningLine.IsEmpty() then
             exit;
 
-        if not ConfirmManagement.GetResponseOrDefault(UpdateCostPricesOnRelatedLinesQst, true) then
+        IsHandled := false;
+        OnUpdateCostPricesOnRelatedJobPlanningLinesOnBeforeConfirmUpdate(JobTask, ConfirmResult, IsHandled);
+        if not IsHandled then
+            ConfirmResult := ConfirmManagement.GetResponseOrDefault(UpdateCostPricesOnRelatedLinesQst, true);
+        if not ConfirmResult then
             exit;
 
         JobTask.Modify(true);
@@ -1814,6 +1820,11 @@ table 1001 "Job Task"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSyncShipToWithSellTo(var JobTask: Record "Job Task")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateCostPricesOnRelatedJobPlanningLinesOnBeforeConfirmUpdate(var JobTask: Record "Job Task"; var ConfirmResult: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
