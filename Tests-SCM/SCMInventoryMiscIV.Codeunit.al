@@ -34,7 +34,6 @@ codeunit 137296 "SCM Inventory Misc. IV"
 #endif
         isInitialized: Boolean;
         AmountError: Label 'Amount must be equal.';
-        ItemVariantExistError: Label 'The Item Variant does not exist. Identification fields and values: Item No.=''%1'',Code=''%2''';
         ItemVariantError: Label 'You cannot delete item variant %1 because there is at least one %2 that includes this Variant Code.';
         UpdateAutomaticCostMessage: Label 'The field Automatic Cost Posting should not be set to Yes if field Use Legacy G/L Entry Locking in General Ledger Setup table is set to No because of possibility of deadlocks.';
         UpdateExpCostConfMessage: Label 'If you enable the Expected Cost Posting to G/L, the program must update table Post Value Entry to G/L.This can take several hours.';
@@ -65,7 +64,7 @@ codeunit 137296 "SCM Inventory Misc. IV"
         asserterror ItemVariant.Get(ItemNo, VariantCode);
 
         // [THEN] Verify existence of deleted Item Variant.
-        Assert.ExpectedError(StrSubstNo(ItemVariantExistError, ItemNo, VariantCode));
+        Assert.ExpectedErrorCannotFind(Database::"Item Variant");
     end;
 
     [Test]
@@ -2108,7 +2107,7 @@ codeunit 137296 "SCM Inventory Misc. IV"
     var
         AvailabilityMgt: Codeunit AvailabilityManagement;
     begin
-        AvailabilityMgt.SetSalesHeader(OrderPromisingLine, SalesHeader);
+        AvailabilityMgt.SetSourceRecord(OrderPromisingLine, SalesHeader);
         AvailabilityMgt.CalcCapableToPromise(OrderPromisingLine, SalesHeader."No.");
     end;
 
@@ -2579,11 +2578,9 @@ codeunit 137296 "SCM Inventory Misc. IV"
 
     local procedure UpdatePhysInvCountingPeriodOnItem(var Item: Record Item; CountFrequency: Integer)
     begin
-        with Item do begin
-            Get(CreateItem());
-            Validate("Phys Invt Counting Period Code", CreatePhysInvtCountingPeriod(CountFrequency));
-            Modify(true);
-        end;
+        Item.Get(CreateItem());
+        Item.Validate("Phys Invt Counting Period Code", CreatePhysInvtCountingPeriod(CountFrequency));
+        Item.Modify(true);
     end;
 
     local procedure UpdatePurchLineQtyForPartialPost(var PurchaseLine: Record "Purchase Line")
@@ -2627,13 +2624,11 @@ codeunit 137296 "SCM Inventory Misc. IV"
     var
         RequisitionLine: Record "Requisition Line";
     begin
-        with RequisitionLine do begin
-            SetRange(Type, Type::Item);
-            SetRange("No.", ItemNo);
-            FindFirst();
-            TestField(Description, Desc);
-            TestField("Description 2", Desc2);
-        end;
+        RequisitionLine.SetRange(Type, RequisitionLine.Type::Item);
+        RequisitionLine.SetRange("No.", ItemNo);
+        RequisitionLine.FindFirst();
+        RequisitionLine.TestField(Description, Desc);
+        RequisitionLine.TestField("Description 2", Desc2);
     end;
 
     local procedure VerifyGLEntry(DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Amount: Decimal; GenPostingType: Enum "General Posting Type")

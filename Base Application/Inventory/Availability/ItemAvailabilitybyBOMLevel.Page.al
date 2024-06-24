@@ -301,7 +301,7 @@ page 5871 "Item Availability by BOM Level"
 
                         trigger OnAction()
                         begin
-                            ItemAvail(ItemAvailFormsMgt.ByEvent());
+                            ItemAvail("Item Availability Type"::"Event");
                         end;
                     }
                     action(Period)
@@ -313,7 +313,7 @@ page 5871 "Item Availability by BOM Level"
 
                         trigger OnAction()
                         begin
-                            ItemAvail(ItemAvailFormsMgt.ByPeriod());
+                            ItemAvail("Item Availability Type"::Period);
                         end;
                     }
                     action(Variant)
@@ -325,7 +325,7 @@ page 5871 "Item Availability by BOM Level"
 
                         trigger OnAction()
                         begin
-                            ItemAvail(ItemAvailFormsMgt.ByVariant());
+                            ItemAvail("Item Availability Type"::Variant);
                         end;
                     }
                     action(Location)
@@ -338,7 +338,7 @@ page 5871 "Item Availability by BOM Level"
 
                         trigger OnAction()
                         begin
-                            ItemAvail(ItemAvailFormsMgt.ByLocation());
+                            ItemAvail("Item Availability Type"::Location);
                         end;
                     }
                 }
@@ -469,8 +469,10 @@ page 5871 "Item Availability by BOM Level"
         DemandDate: Date;
         IsCalculated: Boolean;
         ShowTotalAvailability: Boolean;
+#pragma warning disable AA0074
         Text000: Label 'Could not find items with BOM levels.';
         Text001: Label 'There are no warnings.';
+#pragma warning restore AA0074
         HasWarning: Boolean;
 
     protected var
@@ -550,7 +552,7 @@ page 5871 "Item Availability by BOM Level"
         exit(DemandDate);
     end;
 
-    local procedure ItemAvail(AvailType: Option)
+    local procedure ItemAvail(AvailType: Enum "Item Availability Type")
     var
         Item: Record Item;
     begin
@@ -566,7 +568,7 @@ page 5871 "Item Availability by BOM Level"
         if Rec.Indentation = 0 then
             Item.SetFilter("Variant Filter", VariantFilter);
 
-        ItemAvailFormsMgt.ShowItemAvailFromItem(Item, AvailType);
+        ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Item, AvailType);
     end;
 
     local procedure ShowAbleToMakeTimeline()

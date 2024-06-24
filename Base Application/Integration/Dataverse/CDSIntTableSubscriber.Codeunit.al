@@ -187,8 +187,8 @@ codeunit 7205 "CDS Int. Table. Subscriber"
         CDSConnectionSetup: Record "CDS Connection Setup";
         CrmHelper: DotNet CrmHelper;
         AdminUser: Text;
-        AdminPassword: Text;
-        AccessToken: Text;
+        AdminPassword: SecretText;
+        AccessToken: SecretText;
         AdminADDomain: Text;
     begin
         if not CDSIntegrationImpl.IsIntegrationEnabled() then
@@ -204,7 +204,7 @@ codeunit 7205 "CDS Int. Table. Subscriber"
             exit;
 
         if CDSIntegrationImpl.SignInCDSAdminUser(CDSConnectionSetup, CrmHelper, AdminUser, AdminPassword, AccessToken, AdminADDomain, true) then
-            if AccessToken <> '' then
+            if not AccessToken.IsEmpty() then
                 CDSIntegrationImpl.AddUsersToDefaultOwningTeam(CDSConnectionSetup, CrmHelper, CRMSystemuser);
     end;
 
@@ -1103,6 +1103,7 @@ codeunit 7205 "CDS Int. Table. Subscriber"
         Vendor: Record Vendor;
         Contact: Record Contact;
         CRMContact: Record "CRM Contact";
+        CRMAccount: Record "CRM Account";
         IntegrationTableMapping: Record "Integration Table Mapping";
         CRMIntegrationRecord: Record "CRM Integration Record";
         IntegrationRecSynchInvoke: Codeunit "Integration Rec. Synch. Invoke";
@@ -1121,7 +1122,7 @@ codeunit 7205 "CDS Int. Table. Subscriber"
         if FindCustomerByAccountId(CRMContact.ParentCustomerId, Customer) then
             if Customer."Primary Contact No." = '' then
                 if IntegrationTableMapping.FindMapping(Database::Customer, Database::"CRM Account") then
-                    if IntegrationTableMapping.Direction in [IntegrationTableMapping.Direction::Bidirectional, IntegrationTableMapping.Direction::FromIntegrationTable] then begin
+                    if IntegrationTableMapping.IsFieldMappingEnabled(Customer.FieldNo("Primary Contact No."), CRMAccount.FieldNo(PrimaryContactId), IntegrationTableMapping.Direction::FromIntegrationTable) then begin
                         RecRef.GetTable(Customer);
                         RecordModifiedAfterLastSync := IntegrationRecSynchInvoke.WasModifiedAfterLastSynch(IntegrationTableMapping, RecRef);
                         Customer."Primary Contact No." := Contact."No.";
@@ -1141,7 +1142,7 @@ codeunit 7205 "CDS Int. Table. Subscriber"
         if FindVendorByAccountId(CRMContact.ParentCustomerId, Vendor) then
             if Vendor."Primary Contact No." = '' then
                 if IntegrationTableMapping.FindMapping(Database::Vendor, Database::"CRM Account") then
-                    if IntegrationTableMapping.Direction in [IntegrationTableMapping.Direction::Bidirectional, IntegrationTableMapping.Direction::FromIntegrationTable] then begin
+                    if IntegrationTableMapping.IsFieldMappingEnabled(Vendor.FieldNo("Primary Contact No."), CRMAccount.FieldNo(PrimaryContactId), IntegrationTableMapping.Direction::FromIntegrationTable) then begin
                         RecRef.GetTable(Vendor);
                         RecordModifiedAfterLastSync := IntegrationRecSynchInvoke.WasModifiedAfterLastSynch(IntegrationTableMapping, RecRef);
                         Vendor."Primary Contact No." := Contact."No.";

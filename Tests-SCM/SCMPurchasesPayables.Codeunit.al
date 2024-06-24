@@ -48,6 +48,7 @@ codeunit 137061 "SCM Purchases & Payables"
         ReceiveConfirmQst: Label 'Do you want to post the receipt?';
         ReceiveInvoiceConfirmQst: Label 'Do you want to post the receipt and invoice?';
         CannotPostInvoiceErr: Label 'You cannot post the invoice';
+        ReadyToPostQst: Label 'The number of orders that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
         CalcRemainingInvValueErr: Label 'Calculation of the remaining inventory value must include only one value entry';
 
     [Test]
@@ -670,8 +671,7 @@ codeunit 137061 "SCM Purchases & Payables"
         PurchaseLine.Validate("Unit Cost (LCY)", PurchaseLine."Direct Unit Cost" + LibraryRandom.RandIntInRange(20, 50));
 
         // [THEN] "Indirect Cost %" = (15 - 10) / 10 * 100 = 50
-        with PurchaseLine do
-            IndirectCostPercent := Round(("Unit Cost (LCY)" - "Direct Unit Cost") / "Direct Unit Cost" * 100, 0.00001);
+        IndirectCostPercent := Round((PurchaseLine."Unit Cost (LCY)" - PurchaseLine."Direct Unit Cost") / PurchaseLine."Direct Unit Cost" * 100, 0.00001);
         PurchaseLine.TestField("Indirect Cost %", IndirectCostPercent);
     end;
 
@@ -770,6 +770,65 @@ codeunit 137061 "SCM Purchases & Payables"
         PostPurchaseDocument(PurchaseHeader);
 
         PurchaseLine.SetRecFilter();
+        Assert.RecordIsEmpty(PurchaseLine);
+
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    procedure ReceivingInvoicingSeveralPurchaseOrderWithPostingPolicyFromList()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Qty: Decimal;
+        i: Integer;
+        OrderCount: Integer;
+        NoFilter: Text;
+    begin
+        // [FEATURE] [Posting Selection] [Order] [Invoice Posting Policy]
+        // [SCENARIO 537525] Purchase order posting form PO list should respect User setting Purchase invoice Posting Policy
+        Initialize(false);
+
+        // [GIVEN] Several Purchase Orders with random quantity.
+        OrderCount := Random(5) + 1;
+        for i := 1 to OrderCount do begin
+            Qty := LibraryRandom.RandInt(10);
+            LibraryPurchase.CreatePurchaseDocumentWithItem(
+              PurchaseHeader, PurchaseLine, PurchaseHeader."Document Type"::Order, '',
+              LibraryInventory.CreateItemNo(), Qty, '', WorkDate());
+            NoFilter += '|' + PurchaseHeader."No.";
+        end;
+
+        NoFilter := DelChr(NoFilter, '<>', '|');
+        LibraryVariableStorage.Enqueue(StrSubstNo(ReadyToPostQst, OrderCount));
+
+        // [GIVEN] User setting Purchase invoice Posting Policy = "Prohibited"
+        CreateUserSetupWithPostingPolicy("Invoice Posting Policy"::Prohibited);
+
+        // [WHEN] Post Purchase Orders
+        PurchaseHeader.Reset();
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
+        PurchaseHeader.SetFilter("No.", NoFilter);
+        PurchaseHeader.FindSet();
+        PostPurchaseDocuments(PurchaseHeader);
+
+        // [THEN] Verify that Purchase Lines are only received and not invoiced    
+        FilterPurchaseLines(PurchaseLine, PurchaseLine."Document Type"::Order, NoFilter);
+        PurchaseLine.FindSet();
+        repeat
+            VerifyQtyOnPurchaseOrderLine(PurchaseLine, PurchaseLine.Quantity, 0);
+        until PurchaseLine.Next() = 0;
+
+        // [GIVEN] User setting Purchase invoice Posting Policy = "Mandatory"
+        CreateUserSetupWithPostingPolicy("Invoice Posting Policy"::Allowed);
+        LibraryVariableStorage.Enqueue(StrSubstNo(ReadyToPostQst, OrderCount));
+
+        // [WHEN] Post Purchase Orders
+        PostPurchaseDocuments(PurchaseHeader);
+
+        // [THEN] Verify that Purchase Lines are received and invoiced - not exist anymore
+        FilterPurchaseLines(PurchaseLine, PurchaseLine."Document Type"::Order, NoFilter);
         Assert.RecordIsEmpty(PurchaseLine);
 
         LibraryVariableStorage.AssertEmpty();
@@ -1108,6 +1167,25 @@ codeunit 137061 "SCM Purchases & Payables"
         Customer.Modify(true);
     end;
 
+    local procedure PostPurchaseDocuments(var PurchaseHeader: Record "Purchase Header")
+    var
+        PurchaseBatchPostMgt: Codeunit "Purchase Batch Post Mgt.";
+        BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
+        LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
+    begin
+        LinesInstructionMgt.PurchaseCheckAllLinesHaveQuantityAssigned(PurchaseHeader);
+        BatchProcessingMgt.SetParametersForPageID(Page::"Purchase Order List");
+        PurchaseBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
+        PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, PurchaseHeader.Count(), ReadyToPostQst);
+    end;
+
+    local procedure FilterPurchaseLines(var PurchaseLine: Record "Purchase Line"; DocumentType: Enum "Purchase Document Type"; DocumentNoFilter: Text)
+    begin
+        PurchaseLine.Reset();
+        PurchaseLine.SetRange("Document Type", DocumentType);
+        PurchaseLine.SetFilter("Document No.", DocumentNoFilter);
+    end;
+
     local procedure CreateExternalDocumentNo(var ExternalDocNo: Code[35]; var ExternalDocNo2: Code[35]; var ExternalDocNo3: Code[35]; var ExternalDocNo4: Code[35])
     var
         ItemJournalLine: Record "Item Journal Line";
@@ -1317,13 +1395,11 @@ codeunit 137061 "SCM Purchases & Payables"
 
     local procedure FindPurchaseLine(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; ItemNo: Code[20])
     begin
-        with PurchaseLine do begin
-            SetRange("Document Type", PurchaseHeader."Document Type");
-            SetRange("Document No.", PurchaseHeader."No.");
-            SetRange(Type, Type::Item);
-            SetRange("No.", ItemNo);
-            FindFirst();
-        end;
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+        PurchaseLine.SetRange("No.", ItemNo);
+        PurchaseLine.FindFirst();
     end;
 
     local procedure PostPurchaseDocument(var PurchaseHeader: Record "Purchase Header")
@@ -1437,13 +1513,11 @@ codeunit 137061 "SCM Purchases & Payables"
     var
         ValueEntry: Record "Value Entry";
     begin
-        with ValueEntry do begin
-            SetRange("Document No.", DocumentNo);
-            SetRange("Item No.", ItemNo);
-            SetRange("Entry Type", EntryType);
-            FindFirst();
-            TestField("Cost Amount (Actual)", CostAmt);
-        end;
+        ValueEntry.SetRange("Document No.", DocumentNo);
+        ValueEntry.SetRange("Item No.", ItemNo);
+        ValueEntry.SetRange("Entry Type", EntryType);
+        ValueEntry.FindFirst();
+        ValueEntry.TestField("Cost Amount (Actual)", CostAmt);
     end;
 
     [MessageHandler]

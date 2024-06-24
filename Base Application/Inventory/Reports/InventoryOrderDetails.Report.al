@@ -175,7 +175,11 @@ report 708 "Inventory Order Details"
         ItemFilter: Text;
         SalesLineFilter: Text;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Sales Order Line: %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         InvntryOrderDetailCaptLbl: Label 'Inventory Order Details';
         CurrReportPageNoCaptionLbl: Label 'Page';
         SalesHeaderBilltoNameCaptLbl: Label 'Customer';

@@ -1,6 +1,7 @@
 ﻿namespace System.Threading;
 
 using System.Automation;
+using System.Utilities;
 using System.Environment;
 using System.IO;
 using System.Security.User;
@@ -234,12 +235,16 @@ codeunit 456 "Job Queue Management"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategory: Record "Job Queue Category";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        JobQueueEntry2: Record "Job Queue Entry";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        JobQueueCategory2: Record "Job Queue Category";
         Categories: Dictionary of [Text, Boolean];
         Category: Text;
     begin
-        if not JobQueueEntry.WritePermission() then
+        if not JobQueueEntry2.WritePermission() then
             exit;
-        if not JobQueueCategory.WritePermission() then
+        if not JobQueueCategory2.WritePermission() then
             exit;
 
         JobQueueEntry.ReadIsolation(IsolationLevel::ReadCommitted);
@@ -269,8 +274,12 @@ codeunit 456 "Job Queue Management"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueLogEntry: Record "Job Queue Log Entry";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        JobQueueEntry2: Record "Job Queue Entry";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        JobQueueLogEntry2: Record "Job Queue Log Entry";
     begin
-        if JobQueueEntry.WritePermission() then begin
+        if JobQueueEntry2.WritePermission() then begin
             // Find all in process job queue entries
             JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
             if JobQueueEntry.FindSet() then
@@ -278,7 +287,8 @@ codeunit 456 "Job Queue Management"
                     // Check if job is still running or stale
                     // JQE is stale if it has task no longer exists
                     // If stale, set to error
-                    if not TaskScheduler.TaskExists(JobQueueEntry."System Task ID") then begin
+                    if (not TaskScheduler.TaskExists(JobQueueEntry."System Task ID")) and
+                    HasNoActiveSession(JobQueueEntry."User Service Instance ID", JobQueueEntry."User Session ID") then begin
                         JobQueueEntry.SetError(JobSomethingWentWrongMsg);
 
                         StaleJobQueueEntryTelemetry(JobQueueEntry);
@@ -286,7 +296,7 @@ codeunit 456 "Job Queue Management"
                 until JobQueueEntry.Next() = 0;
         end;
 
-        if JobQueueLogEntry.WritePermission() then begin
+        if JobQueueLogEntry2.WritePermission() then begin
             // Find all in process job queue log entries
             JobQueueLogEntry.SetRange(Status, JobQueueLogEntry.Status::"In Process");
             if JobQueueLogEntry.FindSet() then
@@ -296,7 +306,7 @@ codeunit 456 "Job Queue Management"
                         // Check if job is still running or stale
                         // JQLE is stale if it has no task or active session
                         // If stale, set to error
-                        if not TaskScheduler.TaskExists(JobQueueLogEntry."System Task ID") or
+                        if (not TaskScheduler.TaskExists(JobQueueLogEntry."System Task ID")) and
                             HasNoActiveSession(JobQueueLogEntry."User Service Instance ID", JobQueueLogEntry."User Session ID") then begin
                             JobQueueLogEntry.Status := JobQueueLogEntry.Status::Error;
                             JobQueueLogEntry."Error Message" := JobSomethingWentWrongMsg;
@@ -420,6 +430,17 @@ codeunit 456 "Job Queue Management"
             end;
     end;
 
+    local procedure DeleteErrorMessageRegister(RegisterId: Guid)
+    var
+        ErrorMessageRegister: Record "Error Message Register";
+    begin
+        if IsNullGuid(RegisterId) then
+            exit;
+
+        ErrorMessageRegister.SetRange(ID, RegisterId);
+        ErrorMessageRegister.DeleteAll(true);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reporting Triggers", 'ScheduleReport', '', false, false)]
     local procedure ScheduleReport(ReportId: Integer; RequestPageXml: Text; var Scheduled: Boolean)
     var
@@ -449,6 +470,35 @@ codeunit 456 "Job Queue Management"
         Session.LogMessage('0000FNM', JobQueueStatusChangeTxt, Verbosity::Normal, DataClassification::OrganizationIdentifiableInformation, TelemetryScope::ExtensionPublisher, Dimensions);
 
         GlobalLanguage(CurrentLanguage);
+
+        if Rec."Error Message Register Id" <> xRec."Error Message Register Id" then
+            DeleteErrorMessageRegister(xRec."Error Message Register Id");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure OnBeforeDeleteJobQueueEntry(var Rec: Record "Job Queue Entry"; RunTrigger: Boolean)
+    var
+        JobQueueLogEntry: Record "Job Queue Log Entry";
+    begin
+        if IsNullGuid(Rec."Error Message Register Id") then
+            exit;
+
+        JobQueueLogEntry.SetRange("Error Message Register Id", Rec."Error Message Register Id");
+        if JobQueueLogEntry.IsEmpty() then
+            DeleteErrorMessageRegister(Rec."Error Message Register Id");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Log Entry", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure OnBeforeDeleteJobQueueLogEntry(var Rec: Record "Job Queue Log Entry"; RunTrigger: Boolean)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        if IsNullGuid(Rec."Error Message Register Id") then
+            exit;
+
+        JobQueueEntry.SetRange("Error Message Register Id", Rec."Error Message Register Id");
+        if JobQueueEntry.IsEmpty() then
+            DeleteErrorMessageRegister(Rec."Error Message Register Id");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnAfterCompanyClose', '', true, true)]

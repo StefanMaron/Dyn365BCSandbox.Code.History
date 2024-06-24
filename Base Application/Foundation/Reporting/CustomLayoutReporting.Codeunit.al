@@ -1529,6 +1529,7 @@ codeunit 8800 "Custom Layout Reporting"
 
     local procedure IsObjectOptionsInsertDeleteAllowed(): Boolean
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
         ObjectOptions: Record "Object Options";
         User: Record User;
     begin

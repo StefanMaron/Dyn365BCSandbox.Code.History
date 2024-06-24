@@ -828,12 +828,10 @@ codeunit 137030 "SCM Extend Warehouse"
         WhseActivityLine: Record "Warehouse Activity Line";
     begin
         Clear(WhseActivityLine);
-        with WhseActivityLine do begin
-            SetRange("Activity Type", WhseActivityHdr.Type);
-            SetRange("No.", WhseActivityHdr."No.");
-            FindFirst();
-            TestField(Quantity, Qty);
-        end;
+        WhseActivityLine.SetRange("Activity Type", WhseActivityHdr.Type);
+        WhseActivityLine.SetRange("No.", WhseActivityHdr."No.");
+        WhseActivityLine.FindFirst();
+        WhseActivityLine.TestField(Quantity, Qty);
     end;
 
     local procedure AssertWhseActivityHdr(var WhseActivityHdr: Record "Warehouse Activity Header"; Location: Record Location; ActivityType: Enum "Warehouse Activity Type"; Message: Text[30])

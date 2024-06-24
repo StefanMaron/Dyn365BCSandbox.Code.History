@@ -653,7 +653,9 @@ page 9223 "Item Statistics Matrix"
         IncludeExpected: Boolean;
         Qty: Decimal;
         CellAmount: Decimal;
+#pragma warning disable AA0074
         Text002: Label 'Period';
+#pragma warning restore AA0074
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_ColumnOrdinal: Integer;
         MATRIX_CellData: array[32] of Decimal;

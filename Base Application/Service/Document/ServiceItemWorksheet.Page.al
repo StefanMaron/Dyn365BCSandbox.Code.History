@@ -118,6 +118,7 @@ page 5906 "Service Item Worksheet"
                               "Document No." = field("Document No."),
                               "Service Item No." = field("Service Item No."),
                               "Service Item Line No." = field("Line No.");
+                UpdatePropagation = Both;
             }
             group(Customer)
             {
@@ -522,7 +523,7 @@ page 5906 "Service Item Worksheet"
                         DemandOverview: Page "Demand Overview";
                     begin
                         DemandOverview.SetCalculationParameter(true);
-                        DemandOverview.Initialize(0D, 4, Rec."Document No.", '', '');
+                        DemandOverview.SetParameters(0D, Microsoft.Inventory.Requisition."Demand Order Source Type"::"Service Demand", Rec."Document No.", '', '');
                         DemandOverview.RunModal();
                     end;
                 }
@@ -629,7 +630,9 @@ page 5906 "Service Item Worksheet"
         IsSellToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
 
+#pragma warning disable AA0470
         CannotOpenWindowErr: Label 'You cannot open the window because %1 is %2 in the %3 table.';
+#pragma warning restore AA0470
 
     procedure Caption(): Text
     begin
