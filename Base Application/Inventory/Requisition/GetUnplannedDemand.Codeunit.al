@@ -8,7 +8,6 @@ using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.Service.Document;
 using System.Reflection;
 using System.Text;
 
@@ -16,8 +15,7 @@ codeunit 5520 "Get Unplanned Demand"
 {
     Permissions = TableData "Production Order" = r,
                   TableData "Prod. Order Component" = r,
-                  TableData "Prod. Order Capacity Need" = r,
-                  TableData "Service Header" = r;
+                  TableData "Prod. Order Capacity Need" = r;
     TableNo = "Unplanned Demand";
 
     trigger OnRun()
@@ -29,20 +27,18 @@ codeunit 5520 "Get Unplanned Demand"
         SalesLine.SetFilter("Document Type", '%1|%2', SalesLine."Document Type"::Order, SalesLine."Document Type"::"Return Order");
         ProdOrderComp.SetFilter(
             Status, '%1|%2|%3', ProdOrderComp.Status::Planned, ProdOrderComp.Status::"Firm Planned", ProdOrderComp.Status::Released);
-        ServLine.SetRange("Document Type", ServLine."Document Type"::Order);
         AsmLine.SetRange("Document Type", AsmLine."Document Type"::Order);
         JobPlanningLine.SetRange(Status, JobPlanningLine.Status::Order);
-        RecordCounter := SalesLine.Count() + ProdOrderComp.Count() + ServLine.Count() + JobPlanningLine.Count() + AsmLine.Count();
+        RecordCounter := SalesLine.Count() + ProdOrderComp.Count() + JobPlanningLine.Count() + AsmLine.Count();
         OnBeforeOpenPlanningWindow(RecordCounter, ProdOrderComp);
         OpenWindow(ProgressMsg, RecordCounter);
 
         GetUnplannedSalesLine(Rec);
         GetUnplannedProdOrderComp(Rec);
         GetUnplannedAsmLine(Rec);
-        GetUnplannedServLine(Rec);
         GetUnplannedJobPlanningLine(Rec);
 
-        OnAfterGetUnplanned(Rec);
+        OnAfterGetUnplanned(Rec, ItemFilter);
 
         OnBeforeClosePlanningWindow(Rec, Window, NoOfRecords);
         Window.Close();
@@ -58,9 +54,9 @@ codeunit 5520 "Get Unplanned Demand"
     var
         SalesLine: Record "Sales Line";
         ProdOrderComp: Record "Prod. Order Component";
-        ServLine: Record "Service Line";
         JobPlanningLine: Record "Job Planning Line";
         AsmLine: Record "Assembly Line";
+        ItemFilter: TextBuilder;
         Window: Dialog;
         WindowUpdateDateTime: DateTime;
         NoOfRecords: Integer;
@@ -83,7 +79,6 @@ codeunit 5520 "Get Unplanned Demand"
         SelectionFilterMgt: Codeunit SelectionFilterManagement;
         ItemNoList: List of [Code[20]];
         ItemNo: Code[20];
-        ItemFilter: TextBuilder;
     begin
         SalesLine.SetRange(Type, SalesLine.Type::Item);
         AsmLine.SetRange(Type, AsmLine.Type::Item);
@@ -117,7 +112,6 @@ codeunit 5520 "Get Unplanned Demand"
             end;
 
             SalesLine.SetFilter("No.", ItemFilter.ToText());
-            ServLine.SetFilter("No.", ItemFilter.ToText());
             ProdOrderComp.SetFilter("Item No.", ItemFilter.ToText());
             AsmLine.SetFilter("No.", ItemFilter.ToText());
             JobPlanningLine.SetFilter("No.", ItemFilter.ToText());
@@ -203,30 +197,6 @@ codeunit 5520 "Get Unplanned Demand"
             until AsmLine.Next() = 0;
     end;
 
-    local procedure GetUnplannedServLine(var UnplannedDemand: Record "Unplanned Demand")
-    var
-        ServHeader: Record "Service Header";
-    begin
-        OnBeforeGetUnplannedServLine(UnplannedDemand, ServLine);
-
-        if ServLine.FindSet() then
-            repeat
-                UpdateWindow();
-                DemandQtyBase := GetServLineNeededQty(ServLine);
-                if DemandQtyBase > 0 then begin
-                    if not ((ServLine."Document Type".AsInteger() = UnplannedDemand."Demand SubType") and
-                            (ServLine."Document No." = UnplannedDemand."Demand Order No."))
-                    then begin
-                        ServHeader.Get(ServLine."Document Type", ServLine."Document No.");
-                        InsertUnplannedDemand(
-                          UnplannedDemand, UnplannedDemand."Demand Type"::Service, ServLine."Document Type".AsInteger(), ServLine."Document No.", ServHeader.Status.AsInteger());
-                        OnGetUnplannedServLineOnAfterInsertUnplannedDemand(UnplannedDemand);
-                    end;
-                    InsertServLine(UnplannedDemand);
-                end;
-            until ServLine.Next() = 0;
-    end;
-
     local procedure GetUnplannedJobPlanningLine(var UnplannedDemand: Record "Unplanned Demand")
     var
         Job: Record Job;
@@ -295,15 +265,6 @@ codeunit 5520 "Get Unplanned Demand"
         exit(-AssemblyLine.SignedXX(AssemblyLine."Remaining Quantity (Base)" - AssemblyLine."Reserved Qty. (Base)"));
     end;
 
-    local procedure GetServLineNeededQty(ServiceLine: Record "Service Line"): Decimal
-    begin
-        if ServiceLine.Planned or (ServiceLine."No." = '') or (ServiceLine.Type <> ServiceLine.Type::Item) then
-            exit(0);
-
-        ServiceLine.CalcFields(ServiceLine."Reserved Qty. (Base)");
-        exit(-ServiceLine.SignedXX(ServiceLine."Outstanding Qty. (Base)" - ServiceLine."Reserved Qty. (Base)"));
-    end;
-
     local procedure GetJobPlanningLineNeededQty(JobPlanningLine: Record "Job Planning Line"): Decimal
     begin
         if JobPlanningLine.Planned or (JobPlanningLine."No." = '') or (JobPlanningLine.Type <> JobPlanningLine.Type::Item) or JobPlanningLine.IsNonInventoriableItem() then
@@ -366,21 +327,6 @@ codeunit 5520 "Get Unplanned Demand"
         UnplannedDemand.Copy(UnplannedDemand2);
     end;
 
-    local procedure InsertServLine(var UnplannedDemand: Record "Unplanned Demand")
-    var
-        UnplannedDemand2: Record "Unplanned Demand";
-    begin
-        UnplannedDemand2.Copy(UnplannedDemand);
-        UnplannedDemand.InitRecord(
-          ServLine."Line No.", 0, ServLine."No.", ServLine.Description, ServLine."Variant Code", ServLine."Location Code",
-          ServLine."Bin Code", ServLine."Unit of Measure Code", ServLine."Qty. per Unit of Measure",
-          DemandQtyBase, ServLine."Needed by Date");
-        UnplannedDemand.Reserve := ServLine.Reserve = ServLine.Reserve::Always;
-        OnInsertServLineOnBeforeInsert(UnplannedDemand, ServLine);
-        UnplannedDemand.Insert();
-        UnplannedDemand.Copy(UnplannedDemand2);
-    end;
-
     local procedure InsertJobPlanningLine(var UnplannedDemand: Record "Unplanned Demand")
     var
         UnplannedDemand2: Record "Unplanned Demand";
@@ -396,7 +342,7 @@ codeunit 5520 "Get Unplanned Demand"
         UnplannedDemand.Copy(UnplannedDemand2);
     end;
 
-    local procedure InsertUnplannedDemand(var UnplannedDemand: Record "Unplanned Demand"; DemandType: Enum "Unplanned Demand Type"; DemandSubtype: Integer; DemandOrderNo: Code[20]; DemandStatus: Integer)
+    procedure InsertUnplannedDemand(var UnplannedDemand: Record "Unplanned Demand"; DemandType: Enum "Unplanned Demand Type"; DemandSubtype: Integer; DemandOrderNo: Code[20]; DemandStatus: Integer)
     var
         IsHandled: Boolean;
     begin
@@ -564,7 +510,7 @@ codeunit 5520 "Get Unplanned Demand"
         Window.Open(DisplayText);
     end;
 
-    local procedure UpdateWindow()
+    procedure UpdateWindow()
     begin
         i := i + 1;
         if CurrentDateTime - WindowUpdateDateTime >= 300 then begin
@@ -573,8 +519,8 @@ codeunit 5520 "Get Unplanned Demand"
         end;
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetUnplanned(var UnplannedDemand: Record "Unplanned Demand");
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterGetUnplanned(var UnplannedDemand: Record "Unplanned Demand"; var ItemFilter: TextBuilder);
     begin
     end;
 
@@ -608,10 +554,18 @@ codeunit 5520 "Get Unplanned Demand"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnBeforeGetUnplannedServLine(var UnplannedDemand: Record "Unplanned Demand"; var ServiceLine: Record Microsoft.Service.Document."Service Line");
+    begin
+        OnBeforeGetUnplannedServLine(UnplannedDemand, ServiceLine);
+    end;
+
+    [Obsolete('Moved to codeunit ServiceLinePlanning', '25.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetUnplannedServLine(var UnplannedDemand: Record "Unplanned Demand"; var ServiceLine: Record "Service Line");
+    local procedure OnBeforeGetUnplannedServLine(var UnplannedDemand: Record "Unplanned Demand"; var ServiceLine: Record Microsoft.Service.Document."Service Line");
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetUnplannedJobPlanningLine(var UnplannedDemand: Record "Unplanned Demand"; var JobPlanningLine: Record "Job Planning Line");
@@ -648,10 +602,18 @@ codeunit 5520 "Get Unplanned Demand"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnGetUnplannedServLineOnAfterInsertUnplannedDemand(var UnplannedDemand: Record "Unplanned Demand")
+    begin
+        OnGetUnplannedServLineOnAfterInsertUnplannedDemand(UnplannedDemand);
+    end;
+
+    [Obsolete('Moved to codeunit ServiceLinePlanning', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnGetUnplannedServLineOnAfterInsertUnplannedDemand(var UnplannedDemand: Record "Unplanned Demand")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnGetUnplannedSalesLineOnAfterInsertUnplannedDemand(var SalesLine: Record "Sales Line"; var UnplannedDemand: Record "Unplanned Demand")
@@ -693,10 +655,18 @@ codeunit 5520 "Get Unplanned Demand"
     begin
     end;
 
+#if not CLEAN25
+    internal procedure RunOnInsertServLineOnBeforeInsert(var UnplannedDemand: Record "Unplanned Demand"; ServiceLine: Record Microsoft.Service.Document."Service Line")
+    begin
+        OnInsertServLineOnBeforeInsert(UnplannedDemand, ServiceLine);
+    end;
+
+    [Obsolete('Moved to codeunit ServiceLinePlanning', '25.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnInsertServLineOnBeforeInsert(var UnplannedDemand: Record "Unplanned Demand"; ServiceLine: Record "Service Line")
+    local procedure OnInsertServLineOnBeforeInsert(var UnplannedDemand: Record "Unplanned Demand"; ServiceLine: Record Microsoft.Service.Document."Service Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertJobPlanningLineOnBeforeInsert(var UnplannedDemand: Record "Unplanned Demand"; JobPlanningLine: Record "Job Planning Line")

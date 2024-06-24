@@ -377,7 +377,7 @@ page 5741 "Transfer Order Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromTransLine(Rec, ItemAvailFormsMgt.ByEvent());
+                            TransferAvailabilityMgt.ShowItemAvailabilityFromTransLine(Rec, "Item Availability Type"::"Event");
                         end;
                     }
                     action(Period)
@@ -389,7 +389,7 @@ page 5741 "Transfer Order Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromTransLine(Rec, ItemAvailFormsMgt.ByPeriod());
+                            TransferAvailabilityMgt.ShowItemAvailabilityFromTransLine(Rec, "Item Availability Type"::Period);
                         end;
                     }
                     action(Variant)
@@ -401,7 +401,7 @@ page 5741 "Transfer Order Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromTransLine(Rec, ItemAvailFormsMgt.ByVariant());
+                            TransferAvailabilityMgt.ShowItemAvailabilityFromTransLine(Rec, "Item Availability Type"::Variant);
                         end;
                     }
                     action(Location)
@@ -414,7 +414,7 @@ page 5741 "Transfer Order Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromTransLine(Rec, ItemAvailFormsMgt.ByLocation());
+                            TransferAvailabilityMgt.ShowItemAvailabilityFromTransLine(Rec, "Item Availability Type"::Location);
                         end;
                     }
                     action(Lot)
@@ -436,7 +436,7 @@ page 5741 "Transfer Order Subform"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromTransLine(Rec, ItemAvailFormsMgt.ByBOM());
+                            TransferAvailabilityMgt.ShowItemAvailabilityFromTransLine(Rec, "Item Availability Type"::BOM);
                         end;
                     }
                 }
@@ -468,7 +468,7 @@ page 5741 "Transfer Order Subform"
 
                         trigger OnAction()
                         begin
-                            Rec.OpenItemTrackingLines(Enum::"Transfer Direction"::Outbound);
+                            Rec.OpenItemTrackingLines("Transfer Direction"::Outbound);
                         end;
                     }
                     action(Receipt)
@@ -481,7 +481,7 @@ page 5741 "Transfer Order Subform"
 
                         trigger OnAction()
                         begin
-                            Rec.OpenItemTrackingLinesWithReclass(Enum::"Transfer Direction"::Inbound);
+                            Rec.OpenItemTrackingLinesWithReclass("Transfer Direction"::Inbound);
                         end;
                     }
                 }
@@ -515,7 +515,7 @@ page 5741 "Transfer Order Subform"
     end;
 
     var
-        ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
+        TransferAvailabilityMgt: Codeunit "Transfer Availability Mgt.";
 
     protected var
         ShortcutDimCode: array[8] of Code[20];

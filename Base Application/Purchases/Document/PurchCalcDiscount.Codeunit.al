@@ -30,7 +30,9 @@ codeunit 70 "Purch.-Calc.Discount"
     end;
 
     var
+#pragma warning disable AA0074
         Text000: Label 'Service Charge';
+#pragma warning restore AA0074
         PurchLine: Record "Purchase Line";
         VendInvDisc: Record "Vendor Invoice Disc.";
         VendPostingGr: Record "Vendor Posting Group";
@@ -217,25 +219,21 @@ codeunit 70 "Purch.-Calc.Discount"
                         case GLSetup."Discount Calculation" of
                             GLSetup."Discount Calculation"::"Line Disc. + Inv. Disc. + Payment Disc.",
                             GLSetup."Discount Calculation"::"Line Disc. * Inv. Disc. + Payment Disc.":
-                                begin
-                                    if PurchLine2."Line Amount" <> 0 then begin
-                                        TempPurchLine."Pmt. Discount Amount" :=
-                                          TempPurchLine."Pmt. Discount Amount" +
-                                          (PurchLine2."Line Amount" + PurchLine2."Line Discount Amount") *
-                                          PurchHeader."Payment Discount %" / 100;
-                                        PurchLine2."Pmt. Discount Amount" := Round(TempPurchLine."Pmt. Discount Amount", 0.01);
-                                    end;
+                                if PurchLine2."Line Amount" <> 0 then begin
+                                    TempPurchLine."Pmt. Discount Amount" :=
+                                        TempPurchLine."Pmt. Discount Amount" +
+                                        (PurchLine2."Line Amount" + PurchLine2."Line Discount Amount") *
+                                        PurchHeader."Payment Discount %" / 100;
+                                    PurchLine2."Pmt. Discount Amount" := Round(TempPurchLine."Pmt. Discount Amount", 0.01);
                                 end;
                             GLSetup."Discount Calculation"::"Line Disc. + Inv. Disc. * Payment Disc.",
                             GLSetup."Discount Calculation"::"Line Disc. * Inv. Disc. * Payment Disc.":
-                                begin
-                                    if PurchLine2."Line Amount" <> 0 then begin
-                                        TempPurchLine."Pmt. Discount Amount" :=
-                                          TempPurchLine."Pmt. Discount Amount" +
-                                          (PurchLine2."Line Amount" - PurchLine2."Inv. Discount Amount") *
-                                          PurchHeader."Payment Discount %" / 100;
-                                        PurchLine2."Pmt. Discount Amount" := Round(TempPurchLine."Pmt. Discount Amount", 0.01);
-                                    end;
+                                if PurchLine2."Line Amount" <> 0 then begin
+                                    TempPurchLine."Pmt. Discount Amount" :=
+                                        TempPurchLine."Pmt. Discount Amount" +
+                                        (PurchLine2."Line Amount" - PurchLine2."Inv. Discount Amount") *
+                                        PurchHeader."Payment Discount %" / 100;
+                                    PurchLine2."Pmt. Discount Amount" := Round(TempPurchLine."Pmt. Discount Amount", 0.01);
                                 end;
                         end;
                         TempPurchLine."Pmt. Discount Amount" :=

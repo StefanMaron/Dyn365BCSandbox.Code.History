@@ -477,9 +477,17 @@ table 5766 "Warehouse Activity Header"
         WhseSetup: Record "Warehouse Setup";
         InvtSetup: Record "Inventory Setup";
         NoSeries: Codeunit "No. Series";
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot rename a %1.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         SetUpWarehouseEmployeeInLocationErr: Label 'You must first set up user %1 as a warehouse employee. %2 %3', Comment = '%1 - user ID, %2 - caption, %3 - location code.';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text002: Label 'You cannot change %1 because one or more lines exist.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         NotSupportedSourceDocumentTypeErr: Label 'Source Document type %1 is not supported.', Comment = '%1 - source document type, like Sales Order.';
 
     procedure AssistEdit(OldWhseActivHeader: Record "Warehouse Activity Header"): Boolean

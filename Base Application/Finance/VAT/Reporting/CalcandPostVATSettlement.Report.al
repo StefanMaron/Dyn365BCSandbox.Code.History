@@ -664,19 +664,6 @@ report 20 "Calc. and Post VAT Settlement"
                 {
                     Caption = 'Options';
 
-#if not CLEAN22
-                    field(VATDateTypeField; VATDateType)
-                    {
-                        ApplicationArea = VAT;
-                        Caption = 'Period Date Type';
-                        ToolTip = 'Specifies the type of date used for the period from which VAT entries are processed in the batch job.';
-                        Visible = false;
-                        Enabled = false;
-                        ObsoleteReason = 'Report only support VAT Date';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '22.0';
-                    }
-#endif
                     field(StartingDate; EntrdStartDate)
                     {
                         ApplicationArea = Basic, Suite;
@@ -823,9 +810,6 @@ report 20 "Calc. and Post VAT Settlement"
         EnteredEndDate: Date;
         PrintVATEntries: Boolean;
         NextVATEntryNo: Integer;
-#if not CLEAN22
-        VATDateType: Enum "VAT Date Type";
-#endif
         PostingDate: Date;
         VATDate: Date;
         DocNo: Code[20];
@@ -840,15 +824,23 @@ report 20 "Calc. and Post VAT Settlement"
         UseAmtsInAddCurr: Boolean;
         HeaderText: Text[30];
         IsVATDateEnabled: Boolean;
+#pragma warning disable AA0074
         Text000: Label 'Enter the posting date.';
         Text001: Label 'Enter the document no.';
         Text002: Label 'Enter the settlement account.';
         Text003: Label 'Do you want to calculate and post the VAT Settlement?';
         Text004: Label 'VAT Settlement';
+#pragma warning disable AA0470
         Text005: Label 'Period: %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         AllAmountsAreInTxt: Label 'All amounts are in %1.', Comment = '%1 = Currency Code';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text007: Label 'Purchase VAT settlement: #1######## #2########';
         Text008: Label 'Sales VAT settlement  : #1######## #2########';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         EnterVATDateLbl: Label 'Enter the VAT Date';
         CalcandPostVATSettleCaptionLbl: Label 'Calc. and Post VAT Settlement';
         PageNoCaptionLbl: Label 'Page';
@@ -893,22 +885,6 @@ report 20 "Calc. and Post VAT Settlement"
         PostSettlement := Post;
         Initialized := true;
     end;
-
-#if not CLEAN22
-    [Obsolete('Replaced By InitializeRequest without VAT date', '22.0')]
-    procedure InitializeRequest(NewStartDate: Date; NewEndDate: Date; NewVATDateType: Enum "VAT Date Type"; NewPostingDate: Date; NewDocNo: Code[20]; NewSettlementAcc: Code[20]; ShowVATEntries: Boolean; Post: Boolean)
-    begin
-        EntrdStartDate := NewStartDate;
-        EnteredEndDate := NewEndDate;
-        PostingDate := NewPostingDate;
-        VATDateType := NewVATDateType;
-        DocNo := NewDocNo;
-        GLAccSettle."No." := NewSettlementAcc;
-        PrintVATEntries := ShowVATEntries;
-        PostSettlement := Post;
-        Initialized := true;
-    end;
-#endif
 
     procedure InitializeRequest2(NewUseAmtsInAddCurr: Boolean)
     begin

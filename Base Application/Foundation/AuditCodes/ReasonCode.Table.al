@@ -4,8 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Foundation.AuditCodes;
 
-using Microsoft.Service.Contract;
-
 table 231 "Reason Code"
 {
     Caption = 'Reason Code';
@@ -27,15 +25,6 @@ table 231 "Reason Code"
         {
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
-        }
-        field(5901; "Contract Gain/Loss Amount"; Decimal)
-        {
-            AutoFormatType = 1;
-            CalcFormula = sum("Contract Gain/Loss Entry".Amount where("Reason Code" = field(Code),
-                                                                       "Change Date" = field("Date Filter")));
-            Caption = 'Contract Gain/Loss Amount';
-            Editable = false;
-            FieldClass = FlowField;
         }
     }
 

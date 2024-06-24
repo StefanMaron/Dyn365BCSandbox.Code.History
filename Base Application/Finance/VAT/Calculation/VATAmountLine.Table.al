@@ -11,7 +11,6 @@ using Microsoft.Finance.VAT.Clause;
 using Microsoft.Foundation.Enums;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
-using Microsoft.Service.History;
 
 table 290 "VAT Amount Line"
 {
@@ -259,12 +258,18 @@ table 290 "VAT Amount Line"
         CurrencyCode: Code[10];
         RoundingPrec: Decimal;
 
+#pragma warning disable AA0074
         Text001: Label 'VAT Amount';
+#pragma warning disable AA0470
         Text002: Label '%1 must not be negative.';
         Text004: Label '%1 for %2 must not exceed %3 = %4.';
         Text005: Label '%1 must not exceed %2 = %3.';
-        InvoiceDiscAmtIsGreaterThanBaseAmtErr: Label 'The maximum %1 that you can apply is %2.', Comment = '1 Invoice Discount Amount that should be set 2 Maximum Amount that you can assign';
         Text1100000: Label 'VAT+EC Amount';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+#pragma warning disable AA0470
+        InvoiceDiscAmtIsGreaterThanBaseAmtErr: Label 'The maximum %1 that you can apply is %2.', Comment = '1 Invoice Discount Amount that should be set 2 Maximum Amount that you can assign';
+#pragma warning restore AA0470
 
     procedure CheckVATDifference(NewCurrencyCode: Code[10]; NewAllowVATDifference: Boolean)
     var
@@ -1072,7 +1077,9 @@ table 290 "VAT Amount Line"
         OnAfterCopyFromSalesCrMemoLine(Rec, SalesCrMemoLine);
     end;
 
-    procedure CopyFromServInvLine(ServiceInvoiceLine: Record "Service Invoice Line")
+#if not CLEAN25
+    [Obsolete('Replaced by procedure CopyToVATAmountLine in table Service Invoice Line', '25.0')]
+    procedure CopyFromServInvLine(ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line")
     begin
         "VAT Identifier" := ServiceInvoiceLine."VAT Identifier";
         "VAT Calculation Type" := ServiceInvoiceLine."VAT Calculation Type";
@@ -1094,8 +1101,11 @@ table 290 "VAT Amount Line"
 
         OnAfterCopyFromServInvLine(Rec, ServiceInvoiceLine);
     end;
+#endif
 
-    procedure CopyFromServCrMemoLine(ServiceCrMemoLine: Record "Service Cr.Memo Line")
+#if not CLEAN25
+    [Obsolete('Replaced by procedure CopyToVATAmountLine in table Service Cr.Memo Line', '25.0')]
+    procedure CopyFromServCrMemoLine(ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line")
     begin
         "VAT Identifier" := ServiceCrMemoLine."VAT Identifier";
         "VAT Calculation Type" := ServiceCrMemoLine."VAT Calculation Type";
@@ -1117,6 +1127,7 @@ table 290 "VAT Amount Line"
 
         OnAfterCopyFromServCrMemoLine(Rec, ServiceCrMemoLine);
     end;
+#endif
 
     local procedure GetVATBaseDiscountPerc(VATBaseDiscountPerc: Decimal) NewVATBaseDiscountPerc: Decimal
     var
@@ -1158,15 +1169,31 @@ table 290 "VAT Amount Line"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyFromServInvLine(var VATAmountLine: Record "VAT Amount Line"; ServiceInvoiceLine: Record "Service Invoice Line")
+#if not CLEAN25
+    internal procedure RunOnAfterCopyFromServInvLine(var VATAmountLine: Record "VAT Amount Line"; ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line")
     begin
+        OnAfterCopyFromServInvLine(VATAmountLine, ServiceInvoiceLine);
     end;
 
+    [Obsolete('Replaced by event OnAfterCopyToVATAmountLine in table Service Invoice Line', '25.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyFromServCrMemoLine(var VATAmountLine: Record "VAT Amount Line"; ServiceCrMemoLine: Record "Service Cr.Memo Line")
+    local procedure OnAfterCopyFromServInvLine(var VATAmountLine: Record "VAT Amount Line"; ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line")
     begin
     end;
+#endif
+
+#if not CLEAN25
+    internal procedure RunOnAfterCopyFromServCrMemoLine(var VATAmountLine: Record "VAT Amount Line"; ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line")
+    begin
+        OnAfterCopyFromServCrMemoLine(VATAmountLine, ServiceCrMemoLine);
+    end;
+
+    [Obsolete('Replaced by event OnAfterCopyToVATAmountLine in table Service Cr.Memo Line', '25.0')]
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyFromServCrMemoLine(var VATAmountLine: Record "VAT Amount Line"; ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line")
+    begin
+    end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSalesTaxCalculateCalculateTax(var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency; TaxAreaCode: Code[20]; TaxLiable: Boolean; PostingDate: Date; CurrencyFactor: Decimal)

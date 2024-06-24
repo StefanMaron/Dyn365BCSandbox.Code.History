@@ -62,16 +62,24 @@ codeunit 361 MoveEntries
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'You cannot delete %1 %2 because it has ledger entries in a fiscal year that has not been closed yet.';
         Text001: Label 'You cannot delete %1 %2 because there are one or more open ledger entries.';
         Text002: Label 'There are item entries that have not been adjusted for item %1. ';
+#pragma warning restore AA0470
         Text003: Label 'If you delete this item the inventory valuation will be incorrect. ';
+#pragma warning disable AA0470
         Text004: Label 'Use the %2 batch job before deleting the item.';
+#pragma warning restore AA0470
         Text005: Label 'Adjust Cost - Item Entries';
+#pragma warning disable AA0470
         Text006: Label 'You cannot delete %1 %2 because it has ledger entries.';
         Text007: Label 'You cannot delete %1 %2 because there are outstanding purchase order lines.';
         Text008: Label 'There are item entries that have not been completely invoiced for item %1. ';
+#pragma warning restore AA0470
         Text009: Label 'Invoice all item entries before deleting the item.';
+#pragma warning restore AA0074
         AccountingPeriod: Record "Accounting Period";
         GLEntry: Record "G/L Entry";
         CustLedgEntry: Record "Cust. Ledger Entry";
@@ -91,10 +99,16 @@ codeunit 361 MoveEntries
         ServiceItemComponent: Record "Service Item Component";
         ServContract: Record "Service Contract Header";
         CannotDeleteGLBudgetEntriesErr: Label 'You cannot delete G/L account %1 because it contains budget ledger entries after %2 for G/L budget name %3.', Comment = '%1 - G/L Account No., %2 - Date, %3 - G/L Budget Name. You cannot delete G/L Account 1000 because it has budget ledger entries\ after 25/01/2018 in G/L Budget Name = Budget_2018.';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text013: Label 'You cannot delete %1 %2 because prepaid contract entries exist in %3.';
         Text014: Label 'You cannot delete %1 %2, because open prepaid contract entries exist in %3.';
         Text015: Label 'You cannot delete %1 %2 because there are outstanding purchase return order lines.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+#pragma warning disable AA0470
         TimeSheetLinesErr: Label 'You cannot delete project %1 because it has open or submitted time sheet lines.', Comment = 'You cannot delete project PROJECT001 because it has open or submitted time sheet lines.';
+#pragma warning restore AA0470
         GLAccDeleteClosedPeriodsQst: Label 'Note that accounting regulations may require that you save accounting data for a certain number of years. Are you sure you want to delete the G/L account?';
         CannotDeleteGLAccountWithEntriesInOpenFiscalYearErr: Label 'You cannot delete G/L account %1 because it has ledger entries in a fiscal year that has not been closed yet.', Comment = '%1 - G/L Account No. You cannot delete G/L Account 1000 because it has ledger entries in a fiscal year that has not been closed yet.';
         CannotDeleteGLAccountWithEntriesAfterDateErr: Label 'You cannot delete G/L account %1 because it has ledger entries posted after %2.', Comment = '%1 - G/L Account No., %2 - Date. You cannot delete G/L Account 1000 because it has ledger entries posted after 01-01-2010.';

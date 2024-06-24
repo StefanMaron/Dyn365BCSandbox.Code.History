@@ -239,6 +239,9 @@ report 1306 "Standard Sales - Invoice"
             column(ShipToAddress8; ShipToAddr[8])
             {
             }
+            column(ShipToPhoneNo; Header."Ship-to Phone No.")
+            {
+            }
             column(SellToContactPhoneNoLbl; SellToContactPhoneNoLbl)
             {
             }
@@ -703,6 +706,8 @@ report 1306 "Standard Sales - Invoice"
                     TotalAmountInclVAT += "Amount Including VAT";
                     TotalPaymentDiscOnVAT += -("Line Amount" - "Inv. Discount Amount" - "Amount Including VAT");
 
+                    if FormatDocument.HideDocumentLine(HideLinesWithZeroQuantity, Line, FieldNo(Quantity)) then
+                        CurrReport.Skip();
                     if FirstLineHasBeenOutput then
                         Clear(DummyCompanyInfo.Picture);
                     FirstLineHasBeenOutput := true;
@@ -1270,6 +1275,12 @@ report 1306 "Standard Sales - Invoice"
                         Caption = 'Show Additional Fee Note';
                         ToolTip = 'Specifies if you want notes about additional fees to be shown on the document.';
                     }
+                    field(HideLinesWithZeroQuantityControl; HideLinesWithZeroQuantity)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies if the lines with zero quantity are printed.';
+                        Caption = 'Hide lines with zero quantity';
+                    }
                 }
             }
         }
@@ -1471,8 +1482,10 @@ report 1306 "Standard Sales - Invoice"
         ChecksPayableLbl: Label 'Please make checks payable to %1', Comment = '%1 = company name';
         QuestionsLbl: Label 'Questions?';
         ThanksLbl: Label 'Thank You!';
+#pragma warning disable AA0074
         JobNoLbl2: Label 'Project No.';
         JobTaskNoLbl2: Label 'Project Task No.';
+#pragma warning restore AA0074
         JobTaskDescription: Text[100];
         JobTaskDescLbl: Label 'Project Task Description';
         UnitLbl: Label 'Unit';
@@ -1530,6 +1543,7 @@ report 1306 "Standard Sales - Invoice"
         PaymentTermsDescLbl: Label 'Payment Terms';
         ShptMethodDescLbl: Label 'Shipment Method';
         ShiptoAddrLbl: Label 'Ship-to Address';
+        HideLinesWithZeroQuantity: Boolean;
 
     local procedure InitLogInteraction()
     begin

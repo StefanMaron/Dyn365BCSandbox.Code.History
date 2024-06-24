@@ -480,7 +480,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         if TempInvoicePostingBuffer.Find('+') then
             repeat
                 LineCount := LineCount + 1;
-                if GuiAllowed and not HideProgressWindow then
+                if GuiAllowed() and not HideProgressWindow then
                     Window.Update(3, LineCount);
 
                 TempInvoicePostingBuffer.ApplyRoundingForFinalPosting();
@@ -661,9 +661,6 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         GenJnlLine.CopyFromPurchHeaderPayment(PurchHeader);
 
         InitGenJnlLineAmountFieldsFromTotalLines(GenJnlLine, PurchHeader);
-#if not CLEAN22
-        GenJnlLine."Pmt. Address Code" := PurchHeader."Pay-at Code";
-#endif
         GenJnlLine."Recipient Bank Account" := PurchHeader."Vendor Bank Acc. Code";
         GenJnlLine."Generate AutoInvoices" := PurchHeader."Generate Autoinvoices" or PurchHeader."Generate Autocredit Memo";
         GenJnlLine."AutoDoc. No." := InvoicePostingParameters."Auto Document No.";

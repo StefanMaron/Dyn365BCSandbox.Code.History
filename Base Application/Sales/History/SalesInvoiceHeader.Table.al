@@ -600,6 +600,11 @@ table 112 "Sales Invoice Header"
         {
             Caption = 'Work Description';
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -746,6 +751,11 @@ table 112 "Sales Invoice Header"
             Caption = 'Responsibility Center';
             TableRelation = "Responsibility Center";
         }
+        field(5794; "Shipping Agent Service Code"; Code[10])
+        {
+            Caption = 'Shipping Agent Service Code';
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
+        }
         field(7000; "Price Calculation Method"; Enum "Price Calculation Method")
         {
             Caption = 'Price Calculation Method';
@@ -781,7 +791,7 @@ table 112 "Sales Invoice Header"
         }
         field(10706; "SII Status"; Enum "SII Document Status")
         {
-            CalcFormula = Lookup("SII Doc. Upload State".Status where("Document Source" = const("Customer Ledger"),
+            CalcFormula = lookup("SII Doc. Upload State".Status where("Document Source" = const("Customer Ledger"),
                                                                        "Document Type" = const(Invoice),
                                                                        "Document No." = field("No.")));
             Caption = 'SII Status';
@@ -876,13 +886,8 @@ table 112 "Sales Invoice Header"
             Caption = 'Pay-at Code';
             TableRelation = "Customer Pmt. Address".Code where("Customer No." = field("Bill-to Customer No."));
             ObsoleteReason = 'Address is taken from the fields Bill-to Address, Bill-to City, etc.';
-#if CLEAN22
             ObsoleteState = Removed;
             ObsoleteTag = '25.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '22.0';
-#endif
         }
     }
 

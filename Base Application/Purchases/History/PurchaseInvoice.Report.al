@@ -781,6 +781,9 @@ report 406 "Purchase - Invoice"
                         column(ShipToAddressCaption; ShipToAddressCaptionLbl)
                         {
                         }
+                        column(ShipToPhoneNo; "Purch. Inv. Header"."Ship-to Phone No.")
+                        {
+                        }
 
                         trigger OnPreDataItem()
                         begin
@@ -1007,13 +1010,19 @@ report 406 "Purchase - Invoice"
         TotalInvoiceDiscountAmount: Decimal;
         TotalPaymentDiscountOnVAT: Decimal;
 
+#pragma warning disable AA0074
         Text004: Label 'Purchase - Invoice %1', Comment = '%1 = Document No.';
         Text007: Label 'VAT Amount Specification in ';
         Text008: Label 'Local Currency';
+#pragma warning disable AA0470
         Text009: Label 'Exchange rate: %1/%2';
+#pragma warning restore AA0470
         Text010: Label 'Purchase - Prepayment Invoice %1', Comment = '%1 = Document No.';
+#pragma warning disable AA0470
         Text011: Label '%1% VAT';
+#pragma warning restore AA0470
         Text012: Label 'VAT Amount';
+#pragma warning restore AA0074
         VATPercentCaptionLbl: Label 'VAT %';
         VATAmountCaptionLbl: Label 'VAT Amount';
         VATIdentifierCaptionLbl: Label 'VAT Identifier';
@@ -1130,12 +1139,12 @@ report 406 "Purchase - Invoice"
         exit(CACCaptionLbl);
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterInitReport()
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterPostDataItem(var PurchInvHeader: Record "Purch. Inv. Header")
     begin
     end;

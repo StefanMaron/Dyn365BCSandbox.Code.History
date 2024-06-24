@@ -53,10 +53,14 @@ codeunit 7000 "Sales Price Calc. Mgt."
         HideResUnitPriceMessage: Boolean;
         DateCaption: Text[30];
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 is less than %2 in the %3.';
         Text010: Label 'Prices including VAT cannot be calculated when %1 is %2.';
         Text018: Label '%1 %2 is greater than %3 and was adjusted to %4.';
         Text001: Label 'The %1 in the %2 must be same as in the %3.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         TempTableErr: Label 'The table passed as a parameter must be temporary.';
 
     procedure FindSalesLinePrice(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; CalledByFieldNo: Integer)

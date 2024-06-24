@@ -841,7 +841,7 @@ table 5992 "Service Invoice Header"
         }	
         field(10706; "SII Status"; Enum "SII Document Status")
         {
-            CalcFormula = Lookup("SII Doc. Upload State".Status where("Document Source" = const("Customer Ledger"),
+            CalcFormula = lookup("SII Doc. Upload State".Status where("Document Source" = const("Customer Ledger"),
                                                                        "Document Type" = const(Invoice),
                                                                        "Document No." = field("No.")));
             Caption = 'SII Status';
@@ -936,13 +936,8 @@ table 5992 "Service Invoice Header"
             Caption = 'Pay-at Code';
             TableRelation = "Customer Pmt. Address".Code where("Customer No." = field("Bill-to Customer No."));
             ObsoleteReason = 'Address is taken from the fields Bill-to Address, Bill-to City, etc.';
-#if CLEAN22
             ObsoleteState = Removed;
             ObsoleteTag = '25.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '22.0';
-#endif
         }
     }
 

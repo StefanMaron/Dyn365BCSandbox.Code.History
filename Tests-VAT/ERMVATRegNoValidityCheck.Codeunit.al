@@ -30,7 +30,6 @@ codeunit 134060 "ERM VAT Reg. No Validity Check"
         IsInitialized: Boolean;
         GetVATRegNoErr: Label 'Unexpected output of GetVATRegNo method';
         GetCountryCodeErr: Label 'Not expected country code.';
-        CountryRegionDoesNotExistErr: Label 'The %1 does not exist.', Comment = '%1 - Table caption.';
         DisclaimerTxt: Label 'You are accessing a third-party website and service. Review the disclaimer before you continue.';
         VATRegNoVIESSettingIsNotEnabledErr: Label 'VAT Reg. No. Validation Setup is not enabled.';
         NoVATNoToValidateErr: Label 'Specify the VAT registration number that you want to verify.';
@@ -837,8 +836,7 @@ codeunit 134060 "ERM VAT Reg. No Validity Check"
         asserterror VATRegistrationLog.GetCountryCode();
 
         // [THEN] "Country/Region does not exist" error appears
-        Assert.ExpectedError(
-          StrSubstNo(CountryRegionDoesNotExistErr, CountryRegion.TableCaption()));
+        Assert.ExpectedErrorCannotFind(Database::"Country/Region");
     end;
 
     [Test]
@@ -1073,7 +1071,7 @@ codeunit 134060 "ERM VAT Reg. No Validity Check"
         VATRegNoSrvConfig.Insert();
 
         asserterror VATRegNoSrvConfig.GetVATRegNoURL();
-        Assert.ExpectedError('Service Endpoint must have a value in VAT Reg. No. Srv Config: Entry No.=0.');
+        Assert.ExpectedTestFieldError(VATRegNoSrvConfig.FieldCaption("Service Endpoint"), '');
     end;
 
     [Test]
@@ -1395,35 +1393,29 @@ codeunit 134060 "ERM VAT Reg. No Validity Check"
 
     local procedure CreateContact(var Contact: Record Contact)
     begin
-        with Contact do begin
-            Init();
-            Validate("No.", LibraryUtility.GenerateGUID());
-            Type := Type::Company;
-            "Company No." := "No.";
-            Validate("Country/Region Code", 'DK');
-            Validate("VAT Registration No.", Format(LibraryRandom.RandIntInRange(10000000, 99999999)));
-            Insert();
-        end;
+        Contact.Init();
+        Contact.Validate("No.", LibraryUtility.GenerateGUID());
+        Contact.Type := Contact.Type::Company;
+        Contact."Company No." := Contact."No.";
+        Contact.Validate("Country/Region Code", 'DK');
+        Contact.Validate("VAT Registration No.", Format(LibraryRandom.RandIntInRange(10000000, 99999999)));
+        Contact.Insert();
     end;
 
     local procedure CreateCustomer(var Customer: Record Customer)
     begin
         LibrarySales.CreateCustomer(Customer);
-        with Customer do begin
-            Validate("Country/Region Code", 'DK');
-            Validate("VAT Registration No.", Format(LibraryRandom.RandIntInRange(10000000, 99999999)));
-            Modify();
-        end;
+        Customer.Validate("Country/Region Code", 'DK');
+        Customer.Validate("VAT Registration No.", Format(LibraryRandom.RandIntInRange(10000000, 99999999)));
+        Customer.Modify();
     end;
 
     local procedure CreateVendor(var Vendor: Record Vendor)
     begin
         LibraryPurchase.CreateVendor(Vendor);
-        with Vendor do begin
-            Validate("Country/Region Code", 'DK');
-            Validate("VAT Registration No.", Format(LibraryRandom.RandIntInRange(10000000, 99999999)));
-            Modify();
-        end;
+        Vendor.Validate("Country/Region Code", 'DK');
+        Vendor.Validate("VAT Registration No.", Format(LibraryRandom.RandIntInRange(10000000, 99999999)));
+        Vendor.Modify();
     end;
 
     local procedure CreateCustomerWithVATRegNoWithValidFormat(var Customer: Record Customer; var VATRegistrationNo: Text[20])

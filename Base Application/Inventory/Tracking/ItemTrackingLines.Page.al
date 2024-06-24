@@ -1,7 +1,8 @@
-﻿namespace Microsoft.Inventory.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 using Microsoft.Assembly.Document;
 using Microsoft.Assembly.History;
+using System.Telemetry;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Inventory.Document;
 using Microsoft.Inventory.Item;
@@ -15,7 +16,6 @@ using Microsoft.Manufacturing.Document;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.Service.Document;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Journal;
@@ -48,10 +48,13 @@ page 6510 "Item Tracking Lines"
                 end;
 
                 trigger BarcodeAvailable(Barcode: Text; Format: Text)
+                var
+                    FeatureTelemetry: Codeunit "Feature Telemetry";
                 begin
                     if not CameraContinuousScanningMode then
                         exit;
 
+                    FeatureTelemetry.LogUsage('0000MZR', FeatureTelemetryNameLbl, ScannedBarcodeAvailableLbl);
                     if CheckItemTrackingLineIsInBoundForBarcodeScanning() then
                         case ItemTrackingEntryType of
                             "Item Tracking Entry Type"::"Serial No.":
@@ -337,6 +340,7 @@ page 6510 "Item Tracking Lines"
                         ItemTrackingDataCollection.AssistEditTrackingNo(Rec,
                             DoSearchForSupply((CurrentSignFactor * SourceQuantityArray[1] < 0) and not InsertIsBlocked),
                             CurrentSignFactor, "Item Tracking Type"::"Lot No.", MaxQuantity);
+                        OnAfterLotNoAssistEditOnBeforeClearBinCode(Rec, ForBinCode);
                         Rec."Bin Code" := '';
                         OnAssistEditLotNoOnBeforeCurrPageUdate(Rec, xRec);
                         CurrPage.Update();
@@ -1105,7 +1109,9 @@ page 6510 "Item Tracking Lines"
         ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
     begin
-        if not UpdateUndefinedQty() then
+        IsHandled := false;
+        OnBeforeQueryClosePage(Rec, TotalTrackingSpecification, TempReservEntry, UndefinedQtyArray, SourceQuantityArray, CurrentRunMode, IsHandled);
+        if (not UpdateUndefinedQty()) and (not IsHandled) then
             exit(Confirm(Text006));
 
         if (CountLinesWithQtyZero() > 0) then
@@ -1137,23 +1143,35 @@ page 6510 "Item Tracking Lines"
         CurrentEntryStatus: Enum "Reservation Status";
         QtyRoundingPerBase: Decimal;
         QtyToAddAsBlank: Decimal;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text002: Label 'Quantity must be %1.';
+#pragma warning restore AA0470
         Text003: Label 'negative';
         Text004: Label 'positive';
+#pragma warning restore AA0074
         SecondSourceID: Integer;
         IsAssembleToOrder: Boolean;
         ExpectedReceiptDate: Date;
         ShipmentDate: Date;
+#pragma warning disable AA0074
         Text005: Label 'Error when writing to database.';
         Text006: Label 'The corrections cannot be saved as excess quantity has been defined.\Close the form anyway?';
         Text007: Label 'Another user has modified the item tracking data since it was retrieved from the database.\Start again.';
         Text008: Label 'The quantity to create must be an integer.';
         Text009: Label 'The quantity to create must be positive.';
         Text011: Label 'Tracking specification with Serial No. %1 and Lot No. %2 and Package %3 already exists.', Comment = '%1 - serial no, %2 - lot no, %3 - package no.';
+#pragma warning disable AA0470
         Text012: Label 'Tracking specification with Serial No. %1 already exists.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         DeleteIsBlocked: Boolean;
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text014: Label 'The total item tracking quantity %1 exceeds the %2 quantity %3.\The changes cannot be saved to the database.';
         Text015: Label 'Do you want to synchronize item tracking on the line with item tracking on the related drop shipment %1?';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         BlockCommit: Boolean;
         IsCorrection: Boolean;
         CurrentPageIsOpen: Boolean;
@@ -1161,11 +1179,15 @@ page 6510 "Item Tracking Lines"
         CurrentSourceCaption: Text[255];
         CurrentSourceRowID: Text[250];
         SecondSourceRowID: Text[250];
+#pragma warning disable AA0074
         Text016: Label 'purchase order line';
         Text017: Label 'sales order line';
         Text018: Label 'Saving item tracking line changes';
+#pragma warning restore AA0074
         AvailabilityWarningsQst: Label 'You do not have enough inventory to meet the demand for items in one or more lines.\This is indicated by No in the Availability fields.\Do you want to continue?';
+#pragma warning disable AA0074
         Text020: Label 'Placeholder';
+#pragma warning restore AA0074
         ExcludePostedEntries: Boolean;
         ProdOrderLineHandling: Boolean;
         UnincrementableStringErr: Label 'The value in the %1 field must have a number so that we can assign the next number in the series.', Comment = '%1 = serial number';
@@ -1180,6 +1202,8 @@ page 6510 "Item Tracking Lines"
         BarcodeScannerIsNotContinuousScanningMode: Boolean;
         CameraBarcodeScannerAvailable: Boolean;
         BarcodeFailureErr: Label 'Barcode Failure with code %1', Comment = '%1 = failure reason code';
+        FeatureTelemetryNameLbl: Label 'Barcode Scanning', Locked = true;
+        ScannedBarcodeAvailableLbl: Label 'Scanned barcode from camera available for processing.', Locked = true;
 
     protected var
         Item: Record Item;
@@ -1736,6 +1760,7 @@ page 6510 "Item Tracking Lines"
             CurrentRunMode := CurrentRunMode::Transfer;
         end;
 
+        OnSetSourceSpecOnBeforeAddToGlobalRecordSet(TempTrackingSpecification, ForBinCode);
         AddToGlobalRecordSet(TempTrackingSpecification);
         AddToGlobalRecordSet(TempTrackingSpecification2);
         CalculateSums();
@@ -2857,6 +2882,7 @@ page 6510 "Item Tracking Lines"
             Error(Text008);
 
         GetItem(Rec."Item No.");
+        OnAssignSerialNoBatchOnAfterGetItem(Item);
 
         if CreateLotNo then begin
             Rec.TestField("Lot No.", '');
@@ -2929,6 +2955,7 @@ page 6510 "Item Tracking Lines"
             OnAssignTrackingNoOnAfterCalcQtyToCreate(Rec, SourceTrackingSpecification, TotalTrackingSpecification, QtyToCreate, Rec.FieldNo("Lot No."));
 
             GetItem(Rec."Item No.");
+            OnAssignLotNoOnAfterGetItem(Item);
 
             Rec.Validate("Quantity Handled (Base)", 0);
             Rec.Validate("Quantity Invoiced (Base)", 0);
@@ -3408,7 +3435,7 @@ page 6510 "Item Tracking Lines"
         MaxQuantity := UndefinedQtyArray[1];
         if MaxQuantity * CurrentSignFactor > 0 then
             MaxQuantity := 0;
-        Rec."Bin Code" := ForBinCode;
+        SetBinCode();
         OnSelectEntriesOnBeforeSelectMultipleTrackingNo(ItemTrackingDataCollection, CurrentSignFactor);
         ItemTrackingDataCollection.SelectMultipleTrackingNo(Rec, MaxQuantity, CurrentSignFactor);
         Rec."Bin Code" := '';
@@ -3445,6 +3472,18 @@ page 6510 "Item Tracking Lines"
         UpdateUndefinedQtyArray();
         Rec.CopyFilters(xTrackingSpec);
         CurrPage.Update(false);
+    end;
+
+    local procedure SetBinCode()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeSetBinCode(Rec, ForBinCode, IsHandled);
+        if IsHandled then
+            exit;
+
+        Rec."Bin Code" := ForBinCode;
     end;
 
     procedure SetInbound(NewInbound: Boolean)
@@ -3680,8 +3719,7 @@ page 6510 "Item Tracking Lines"
                                                     Database::"Job Journal Line",
                                                     Database::"Requisition Line"]) or
            ((TrackingSpecification."Source Type" in [Database::"Sales Line",
-                                                    Database::"Purchase Line",
-                                                    Database::"Service Line"]) and
+                                                    Database::"Purchase Line"]) and
            (TrackingSpecification."Source Subtype" in [0, 2, 3])) or
           ((TrackingSpecification."Source Type" = Database::"Assembly Line") and (TrackingSpecification."Source Subtype" = 0));
         OnAfterGetHandleSource(TrackingSpecification, QtyToHandleColumnIsHidden);
@@ -3703,8 +3741,7 @@ page 6510 "Item Tracking Lines"
                                                      Database::"Prod. Order Line",
                                                      Database::"Prod. Order Component"]) or
             ((TrackingSpecification."Source Type" in [Database::"Sales Line",
-                                                      Database::"Purchase Line",
-                                                      Database::"Service Line"]) and
+                                                      Database::"Purchase Line"]) and
             (TrackingSpecification."Source Subtype" in [0, 2, 3, 4]));
 
         OnAfterGetInvoiceSource(TrackingSpecification, QtyToInvoiceColumnIsHidden);
@@ -4376,6 +4413,36 @@ page 6510 "Item Tracking Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAssignPackageNo(var TrackingSpecification: Record "Tracking Specification"; var TempItemTrackingSpecificationInsert: Record "Tracking Specification" temporary; SourceQuantityArray: array[5] of Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAssignLotNoOnAfterGetItem(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAssignSerialNoBatchOnAfterGetItem(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetBinCode(var TrackingSpecification: Record "Tracking Specification"; var ForBinCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeQueryClosePage(var TrackingSpecification: Record "Tracking Specification"; var TotalItemTrackingLine: Record "Tracking Specification"; var TempReservationEntry: Record "Reservation Entry" temporary; var UndefinedQtyArray: array[3] of Decimal; var SourceQuantityArray: array[5] of Decimal; var CurrentRunMode: Enum "Item Tracking Run Mode"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetSourceSpecOnBeforeAddToGlobalRecordSet(var TempTrackingSpecification: Record "Tracking Specification" temporary; ForBinCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterLotNoAssistEditOnBeforeClearBinCode(var TrackingSpecification: Record "Tracking Specification"; var ForBinCode: Code[20])
     begin
     end;
 }

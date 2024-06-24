@@ -44,6 +44,7 @@ table 325 "VAT Posting Setup"
                 CheckZeroVATRateForNoTaxableVAT("VAT+EC %", FieldCaption("VAT+EC %"));
                 if "VAT Calculation Type" <> "VAT Calculation Type"::"No Taxable VAT" then
                     "No Taxable Type" := "No Taxable Type"::" ";
+                "One Stop Shop Reporting" := false;
             end;
         }
         field(4; "VAT+EC %"; Decimal)
@@ -328,6 +329,7 @@ table 325 "VAT Posting Setup"
             trigger OnValidate()
             begin
                 CheckSalesSpecialSchemeCode();
+                "One Stop Shop Reporting" := false;
             end;
         }
         field(10708; "Purch. Special Scheme Code"; Enum "SII Purch. Upload Scheme Code")
@@ -337,6 +339,16 @@ table 325 "VAT Posting Setup"
         field(10709; "Ignore In SII"; Boolean)
         {
             Caption = 'Ignore In SII';
+        }
+        field(10780; "One Stop Shop Reporting"; Boolean)
+        {
+            Caption = 'One Stop Shop Reporting';
+
+            trigger OnValidate()
+            begin
+                TestField("VAT Calculation Type", "VAT Calculation Type"::"Normal VAT");
+                TestField("Sales Special Scheme Code", "Sales Special Scheme Code"::"17 Operations Under The One-Stop-Shop Regime");
+            end;
         }
     }
 
@@ -377,15 +389,19 @@ table 325 "VAT Posting Setup"
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         AccountSuggested: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 must be entered on the tax jurisdiction line when %2 is %3.';
         Text001: Label '%1 = %2 has already been used for %3 = %4 in %5 for %6 = %7 and %8 = %9.';
         DependentFieldActivatedErr: Label 'You cannot change %1 because %2 is selected.';
         RequiredFieldNotActivatedErr: Label 'You cannot change %1 because %2 is empty.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         YouCannotDeleteOrModifyErr: Label 'You cannot modify or delete VAT posting setup %1 %2 as it has been used to generate GL entries. Changing the setup now can cause inconsistencies in your financial data.', Comment = '%1 = "VAT Bus. Posting Group"; %2 = "VAT Prod. Posting Group"';
         VATPostingSetupHasVATEntriesErr: Label 'You cannot change the VAT posting setup because it has been used to generate VAT entries. Changing the setup now can cause inconsistencies in your financial data.';
         InconsitencyOfRegimeCodeAndVATClauseErr: Label 'If the sales special scheme code is 01 General, the SII exemption code of the VAT clause must not be equal to E2 or E3.';
         NoTaxableSetupErr: Label 'The %1 for VAT Calculation Type = No Taxable VAT must be 0.', Comment = '%1 = VAT or EC percent.';
-	    NoAccountSuggestedMsg: Label 'Cannot suggest G/L accounts as there is nothing to base suggestion on.';
+        NoAccountSuggestedMsg: Label 'Cannot suggest G/L accounts as there is nothing to base suggestion on.';
 
     local procedure FailIfVATPostingSetupHasVATEntries()
     var
@@ -659,11 +675,11 @@ table 325 "VAT Posting Setup"
     local procedure OnBeforeGetSalesAccount(var VATPostingSetup: Record "VAT Posting Setup"; Unrealized: Boolean; var SalesVATAccountNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckSetupUsage(var VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20])
     begin
-    end;    
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsNoTaxable(var VATPostingSetup: Record "VAT Posting Setup"; var NoTaxable: Boolean; var IsHandled: Boolean)

@@ -48,12 +48,9 @@
         UndoShipmentMsg: Label 'Do you really want to undo the selected Shipment lines?';
         UndoReturnReceiptMsg: Label 'Do you really want to undo the selected Return Receipt lines?';
         RecordMustBeDeletedTxt: Label 'Order must be deleted.';
-        CannotUndoReservedQuantityErr: Label 'Reserved Quantity must be equal to ''0''  in Item Ledger Entry';
-        BlockedItemErrorMsg: Label 'Blocked must be equal to ''No''  in Item: No.=%1. Current value is ''Yes''', Comment = '%1 = Item No';
 #if not CLEAN23
         SalesLineDiscountMustBeDeletedErr: Label 'Sales Line Discount must be deleted.';
 #endif
-        CannotUndoAppliedQuantityErr: Label 'Remaining Quantity must be equal to ''%1''  in Item Ledger Entry', Comment = '%1 = Value';
         ConfirmTextForChangeOfSellToCustomerOrBuyFromVendorQst: Label 'Do you want to change';
         DiscountErr: Label 'The Discount Amount is not correct.';
         NothingToHandleErr: Label 'Nothing to handle.';
@@ -64,7 +61,6 @@
         DimColumnOption: Option Location,Period;
         WrongValueErr: Label 'Wrong %1 value';
         ExtendedTextErr: Label 'No Line should be created for Extended Text attached to Line with positive Quantity';
-        ReturnQtyErr: Label '%1 must be equal to ''0''  in %2', Comment = '%1 = Field caption; %2 = Table caption';
         ServiceNoMismatchErr: Label 'Values are mismatched in Service Line List and in Service Order.';
         ShipmemtDateErr: Label 'Shipment Date error should not appear.';
         ApplFromItemEntryBlankErr: Label 'Appl.-from Item Entry must have a value in Sales Line';
@@ -124,7 +120,7 @@
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
 
         // [GIVEN] Order is invoiced partially in 'Quantity' iterations, creating 'Quantity' Purch. Invoice Lines
-        For I := 1 to Quantity do begin
+        for I := 1 to Quantity do begin
             PurchaseHeader.Validate("Vendor Invoice No.", LibraryUtility.GenerateGUID());
             PurchaseHeader.Modify();
             PurchaseLine.Get(PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
@@ -495,7 +491,7 @@
             SalesHeader, SalesLine, SalesLine.Type::Item, '', Item."No.", LibraryRandom.RandDec(10, 2), '');
 
         // Verify: Verify Blocked Item error message.
-        Assert.ExpectedError(StrSubstNo(BlockedItemErrorMsg, Item."No."));
+        Assert.ExpectedTestFieldError(Item.FieldCaption(Blocked), Format(false));
     end;
 
 #if not CLEAN23
@@ -1456,7 +1452,7 @@
         asserterror SalesLine.Validate("Unit of Measure Code");
 
         // [THEN] Error is thrown: "Return Qty. Received must be equal to '0'  in Purchase Line"
-        Assert.ExpectedError(StrSubstNo(ReturnQtyErr, SalesLine.FieldCaption("Return Qty. Received"), SalesLine.TableCaption()));
+        Assert.ExpectedTestFieldError(SalesLine.FieldCaption("Return Qty. Received"), Format(0));
     end;
 
     [Test]
@@ -1476,7 +1472,7 @@
         asserterror SalesLine.Validate("Unit of Measure Code");
 
         // [THEN] Error is thrown: "Return Qty. Received (Base) must be equal to '0'  in Purchase Line"
-        Assert.ExpectedError(StrSubstNo(ReturnQtyErr, SalesLine.FieldCaption("Return Qty. Received (Base)"), SalesLine.TableCaption()));
+        Assert.ExpectedTestFieldError(SalesLine.FieldCaption("Return Qty. Received (Base)"), Format(0));
     end;
 
     [Test]
@@ -2625,7 +2621,7 @@
     [Scope('OnPrem')]
     procedure ChangeQtyOnSOAfterSortingOnReservedField()
     var
-        Item: Array[2] of Record Item;
+        Item: array[2] of Record Item;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         SalesHeader: Record "Sales Header";
@@ -2643,7 +2639,7 @@
         UpdateLocationOnPurchaseLine(PurchaseLine, LocationBlue.Code);
         LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item[2]."No.", 10);
         UpdateLocationOnPurchaseLine(PurchaseLine, LocationBlue.Code);
-        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, True, True);
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
 
         // [GIVEN] Sales Order with Item "I1" - qty = 1, Item "I2" - qty = 2.
         CreateSalesOrder(
@@ -2826,6 +2822,7 @@
         SalesHeader2: Record "Sales Header";
         SalesLine: Record "Sales Line";
         Item: Record Item;
+        ItemLedgEntry: Record "Item Ledger Entry";
         PostedDocumentNo: Code[20];
         Quantity: Decimal;
     begin
@@ -2846,7 +2843,7 @@
             asserterror UndoReturnReceiptLine(PostedDocumentNo);
 
         // Verify: Error Message Cannot Undo for Reserved Quantity.
-        Assert.IsTrue(StrPos(GetLastErrorText, CannotUndoReservedQuantityErr) > 0, GetLastErrorText);
+        Assert.ExpectedTestFieldError(ItemLedgEntry.FieldCaption("Reserved Quantity"), Format(0));
     end;
 
     local procedure CreateFullWarehouseSetup(var Location: Record Location)
@@ -3652,12 +3649,10 @@
         LibraryService.CreateServiceItem(ServiceItem, ServiceHeader."Customer No.");
         LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
         LibraryInventory.CreateItem(Item);
-        with ServiceLine do begin
-            LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, Type::Item, Item."No.");
-            Validate("Service Item Line No.", ServiceItemLine."Line No.");
-            Validate(Quantity, LibraryRandom.RandInt(10));
-            Modify(true);
-        end;
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.");
+        ServiceLine.Validate("Service Item Line No.", ServiceItemLine."Line No.");
+        ServiceLine.Validate(Quantity, LibraryRandom.RandInt(10));
+        ServiceLine.Modify(true);
         LibraryService.ReleaseServiceDocument(ServiceHeader);
     end;
 
@@ -4047,11 +4042,9 @@
     var
         PurchaseLine: Record "Purchase Line";
     begin
-        with PurchaseLine do begin
-            SetRange("Document No.", DocumentNo);
-            FindFirst();
-            exit("VAT Identifier");
-        end;
+        PurchaseLine.SetRange("Document No.", DocumentNo);
+        PurchaseLine.FindFirst();
+        exit(PurchaseLine."VAT Identifier");
     end;
 
     local procedure GetPostedDocumentLines(DocumentNo: Code[20])
@@ -4443,7 +4436,7 @@
             asserterror UndoReturnReceiptLine(PostedDocumentNo);
 
         // Verify: Error Message Cannot Undo Applied Quantity.
-        Assert.IsTrue(StrPos(GetLastErrorText, StrSubstNo(CannotUndoAppliedQuantityErr, Quantity)) > 0, GetLastErrorText);
+        Assert.ExpectedTestFieldError(ItemLedgerEntry.FieldCaption("Remaining Quantity"), Format(Quantity));
     end;
 
     local procedure UpdateApplyToItemEntryOnSalesLine(var SalesLine: Record "Sales Line"; ApplToItemEntry: Integer)
@@ -4466,12 +4459,10 @@
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
     begin
-        with SalesReceivablesSetup do begin
-            Get();
-            "Post Invoice Discount" := IsDiscount;
-            "Post Line Discount" := IsDiscount;
-            Modify();
-        end;
+        SalesReceivablesSetup.Get();
+        SalesReceivablesSetup."Post Invoice Discount" := IsDiscount;
+        SalesReceivablesSetup."Post Line Discount" := IsDiscount;
+        SalesReceivablesSetup.Modify();
     end;
 
     local procedure UpdateExpectedReceiptDateOnPurchaseLine(var PurchaseLine: Record "Purchase Line")
@@ -4808,16 +4799,14 @@
         SalesLine: Record "Sales Line";
         LineNo: Integer;
     begin
-        with SalesLine do begin
-            SetRange("Document No.", SalesHeaderNo);
-            SetRange("No.", ItemNo);
-            FindFirst();
-            LineNo := "Line No.";
-            SetRange("No.", '');
-            SetRange(Description, ItemNo);
-            FindFirst();
-            TestField("Attached to Line No.", LineNo);
-        end;
+        SalesLine.SetRange("Document No.", SalesHeaderNo);
+        SalesLine.SetRange("No.", ItemNo);
+        SalesLine.FindFirst();
+        LineNo := SalesLine."Line No.";
+        SalesLine.SetRange("No.", '');
+        SalesLine.SetRange(Description, ItemNo);
+        SalesLine.FindFirst();
+        SalesLine.TestField("Attached to Line No.", LineNo);
     end;
 
     local procedure VerifyNoSeriesOnPostedWhseReceipt(ItemNo: Code[20]; NoSeries: Code[20])
@@ -4894,14 +4883,12 @@
         GLEntry: Record "G/L Entry";
         TotalAMount: Decimal;
     begin
-        with GLEntry do begin
-            SetRange("Document No.", PostedDocNo);
-            SetFilter("G/L Account No.", '%1|%2', LineDiscAccount, InvDiscAccount);
-            FindSet();
-            repeat
-                TotalAMount += Amount;
-            until Next() = 0;
-        end;
+        GLEntry.SetRange("Document No.", PostedDocNo);
+        GLEntry.SetFilter("G/L Account No.", '%1|%2', LineDiscAccount, InvDiscAccount);
+        GLEntry.FindSet();
+        repeat
+            TotalAMount += GLEntry.Amount;
+        until GLEntry.Next() = 0;
 
         Assert.AreEqual(ExpdTotalDisAmt, TotalAMount, DiscountErr);
     end;
@@ -4937,14 +4924,13 @@
     var
         PurchaseLine: Record "Purchase Line";
     begin
-        with PurchaseLine do begin
-            SetRange("Document No.", DocumentNo);
-            SetRange("Document Type", DocumentType);
-            SetFilter("No.", '<>''''');  // To skip Description line
-            FindFirst();
-            Assert.AreEqual(
-              VATIdentifier, "VAT Identifier", StrSubstNo(WrongValueErr, FieldCaption("VAT Identifier")));
-        end;
+        PurchaseLine.SetRange("Document No.", DocumentNo);
+        PurchaseLine.SetRange("Document Type", DocumentType);
+        PurchaseLine.SetFilter("No.", '<>''''');
+        // To skip Description line
+        PurchaseLine.FindFirst();
+        Assert.AreEqual(
+          VATIdentifier, PurchaseLine."VAT Identifier", StrSubstNo(WrongValueErr, PurchaseLine.FieldCaption("VAT Identifier")));
     end;
 
     local procedure VerifySalesLineByItemNoWithReservation(var SalesLine: Record "Sales Line"; ItemNo: Code[20])

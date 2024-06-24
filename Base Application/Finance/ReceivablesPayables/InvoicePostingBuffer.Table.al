@@ -736,7 +736,7 @@ table 55 "Invoice Posting Buffer"
             PurchSetup."Copy Line Descr. to G/L Entry",
             PurchaseLine."Line No.",
             PurchaseLine.Description,
-            PurchaseHeader."Posting Description");
+            PurchaseHeader."Posting Description", true);
     end;
 
     local procedure UpdateEntryDescriptionFromSalesLine(SalesLine: Record "Sales Line")
@@ -750,7 +750,7 @@ table 55 "Invoice Posting Buffer"
             SalesSetup."Copy Line Descr. to G/L Entry",
             SalesLine."Line No.",
             SalesLine.Description,
-            SalesHeader."Posting Description");
+            SalesHeader."Posting Description", SalesSetup."Copy Line Descr. to G/L Entry");
     end;
 
     local procedure UpdateEntryDescriptionFromServiceLine(ServiceLine: Record "Service Line")
@@ -764,16 +764,18 @@ table 55 "Invoice Posting Buffer"
             ServiceSetup."Copy Line Descr. to G/L Entry",
             ServiceLine."Line No.",
             ServiceLine.Description,
-            ServiceHeader."Posting Description");
+            ServiceHeader."Posting Description", false);
     end;
 
-    local procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100])
+    local procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100]; SetLineNo: Boolean)
     begin
-        if CopyLineDescrToGLEntry and (Type = type::"G/L Account") then begin
-            "Entry Description" := LineDescription;
-            "Fixed Asset Line No." := LineNo;
-        end else
-            "Entry Description" := HeaderDescription;
+        "Entry Description" := HeaderDescription;
+        if Type in [Type::"G/L Account", Type::"Fixed Asset"] then begin
+            if CopyLineDescrToGLEntry then
+                "Entry Description" := LineDescription;
+            if SetLineNo then
+                "Fixed Asset Line No." := LineNo;
+        end;
     end;
 
     local procedure AdjustRoundingForUpdate()

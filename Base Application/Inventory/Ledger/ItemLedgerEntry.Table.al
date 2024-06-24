@@ -517,9 +517,9 @@ table 32 "Item Ledger Entry"
         {
             Caption = 'Shipment Method Code';
             ObsoleteReason = 'Merge to W1';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             TableRelation = "Shipment Method";
-            ObsoleteTag = '15.0';
+            ObsoleteTag = '25.0';
         }
     }
 
@@ -599,7 +599,9 @@ table 32 "Item Ledger Entry"
         ItemTrackingType: Enum "Item Tracking Type";
         GLSetupRead: Boolean;
         UseItemTrackingLinesPageErr: Label 'You must use form %1 to enter %2, if item tracking is used.', Comment = '%1 - page caption, %2 - field caption';
+#pragma warning disable AA0470
         IsNotOnInventoryErr: Label 'You have insufficient quantity of Item %1 on inventory.';
+#pragma warning restore AA0470
 
     procedure GetCurrencyCode(): Code[10]
     begin

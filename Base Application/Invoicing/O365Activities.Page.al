@@ -483,7 +483,9 @@
         TaskIdCalculateCue: Integer;
         PBTTelemetryCategoryLbl: Label 'PBT', Locked = true;
         PBTTelemetryMsgTxt: Label 'PBT errored with code %1 and text %2. The call stack is as follows %3.', Locked = true;
+#pragma warning disable AA0074
         PBTTimeoutSystemErrorCode: Label 'ChildSessionTaskTimeout', Locked = true;
+#pragma warning restore AA0074
         PBTTimeoutNotificationTxt: Label 'Calculation of %1 was cancelled because it took too long. Run ''Refresh Data'' force refresh data in the foreground.', Locked = true;
         IntegrationErrorsCue: Text;
         CoupledErrorsCue: Text;

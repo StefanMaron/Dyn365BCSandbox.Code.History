@@ -32,7 +32,9 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
         ModifyFailedErr: Label 'Modifying %1 failed because of the following error: %2.', Comment = '%1 = Table Caption, %2 = Error from modify process.';
         ModifyFailedSimpleErr: Label 'Modifying %1 failed.', Comment = '%1 = Table Caption';
         ConfigurationTemplateNotFoundErr: Label 'The %1 %2 was not found.', Comment = '%1 = Configuration Template table caption, %2 = Configuration Template Name';
+#pragma warning disable AA0470
         CoupledRecordIsDeletedErr: Label 'The %1 record cannot be updated because it is coupled to a deleted record.', Comment = '1% = Source Table Caption';
+#pragma warning restore AA0470
         CopyDataErr: Label 'The data could not be updated because of the following error: %1.', Comment = '%1 = Error message from transferdata process.';
         SynchActionContext: Option;
         IgnoreSynchOnlyCoupledRecordsContext: Boolean;
@@ -464,7 +466,7 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
             IsDestinationDeleted := not IntegrationTableMapping.GetRecordRef(IDValueVariant, DestinationRecordRef);
     end;
 
-    internal procedure PrepareNewDestination(var IntegrationTableMapping: Record "Integration Table Mapping"; var RecordRef: RecordRef; var CoupledRecordRef: RecordRef)
+    procedure PrepareNewDestination(var IntegrationTableMapping: Record "Integration Table Mapping"; var RecordRef: RecordRef; var CoupledRecordRef: RecordRef)
     begin
         CoupledRecordRef.Close();
 

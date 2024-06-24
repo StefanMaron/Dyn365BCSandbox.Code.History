@@ -1522,11 +1522,10 @@ codeunit 137606 "SCM CETAF Costing Reval. WIP"
         if InventorySetup."Average Cost Period" <> NewAvgCostPeriod then begin
             InventorySetup.Validate("Average Cost Period", NewAvgCostPeriod);
             InventorySetup.Modify();
-        end else begin
+        end else
             // For message handler if no change for Average Cost Period
             if Confirm(AnyQst) then
                 Message(AnyMsg);
-        end;
     end;
 
     local procedure VerifyCost(Item1: Record Item; Item2: Record Item; Item3: Record Item; ProdOrder1: Record "Production Order"; ProdOrder2: Record "Production Order"; VerifyVariance: Boolean)

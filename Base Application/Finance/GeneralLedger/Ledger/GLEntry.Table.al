@@ -27,7 +27,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
-using Microsoft;
 
 table 17 "G/L Entry"
 {
@@ -479,7 +478,6 @@ table 17 "G/L Entry"
             Caption = 'Old G/L Account No.';
             ObsoleteReason = 'Obsolete feature';
             ObsoleteState = Removed;
-            TableRelation = "Historic G/L Account";
             ObsoleteTag = '15.0';
         }
         field(10722; Updated; Boolean)
