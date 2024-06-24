@@ -696,6 +696,7 @@ report 7151 "Item Dimensions - Total"
         PrintEndTotals: array[50] of Boolean;
         ItemFilterSet: Boolean;
 
+#pragma warning disable AA0074
         Text000: Label 'Enter an analysis view code.';
         Text001: Label 'Enter a column template.';
         Text002: Label 'Enter a date filter.';
@@ -705,6 +706,7 @@ report 7151 "Item Dimensions - Total"
         Text006: Label '(Thousands)';
         Text007: Label '(Millions)';
         Text009: Label '(no location code)';
+#pragma warning restore AA0074
         ColumnTemplateCaptionLbl: Label 'Column Template';
         PeriodCaptionLbl: Label 'Period';
         AnalysisViewCaptionLbl: Label 'Analysis View';

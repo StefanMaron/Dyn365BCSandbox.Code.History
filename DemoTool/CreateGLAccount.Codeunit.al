@@ -1559,6 +1559,8 @@ codeunit 101015 "Create G/L Account"
                 UpdateGLAccounts(GLAccountCategory, '16100', '16600');
             GLAccountCategoryMgt.GetInventory():
                 UpdateGLAccounts(GLAccountCategory, '14000', '14999');
+            GLAccountCategoryMgt.GetAR():
+                UpdateGLAccounts(GLAccountCategory, '15000', '15200');
             GLAccountCategoryMgt.GetEquipment():
                 UpdateGLAccounts(GLAccountCategory, '12210', '12299');
             GLAccountCategoryMgt.GetAccumDeprec():

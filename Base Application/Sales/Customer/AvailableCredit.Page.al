@@ -145,7 +145,11 @@ page 7177 "Available Credit"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label 'Overdue Amounts (LCY) as of %1';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         StyleTxt: Text;
 }
 

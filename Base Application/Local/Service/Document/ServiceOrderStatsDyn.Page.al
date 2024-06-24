@@ -880,10 +880,10 @@ page 10452 "Service Order Stats. Dyn"
 
         for i := 1 to MaxIndexNo do begin
             if (i = 1) or not PartialInvoicing then
-                if IndexNo[i] = 1 then begin
+                if IndexNo[i] = 1 then
                     TempSalesTaxLine1.SetInvoiceDiscountAmount(
-                      TotalServLine[IndexNo[i]]."Inv. Discount Amount", TotalServLine[IndexNo[i]]."Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
-                end else
+                      TotalServLine[IndexNo[i]]."Inv. Discount Amount", TotalServLine[IndexNo[i]]."Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %")
+                else
                     TempSalesTaxLine2.SetInvoiceDiscountAmount(
                       TotalServLine[IndexNo[i]]."Inv. Discount Amount", TotalServLine[IndexNo[i]]."Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
 

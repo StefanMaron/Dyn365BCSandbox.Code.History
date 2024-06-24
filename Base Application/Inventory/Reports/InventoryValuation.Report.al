@@ -209,7 +209,6 @@ report 10139 "Inventory Valuation"
                 }
             }
         }
-
         actions
         {
         }

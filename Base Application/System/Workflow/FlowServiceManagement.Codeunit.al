@@ -118,6 +118,7 @@ codeunit 6400 "Flow Service Management"
 
     procedure CanApproveForAll(): Boolean
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
         FlowUserEnvironmentConfig: Record "Flow User Environment Config";
     begin
         exit(FlowUserEnvironmentConfig.WritePermission());

@@ -600,6 +600,11 @@ table 112 "Sales Invoice Header"
         {
             Caption = 'Work Description';
         }
+        field(210; "Ship-to Phone No."; Text[30])
+        {
+            Caption = 'Ship-to Phone No.';
+            ExtendedDatatype = PhoneNo;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -745,6 +750,11 @@ table 112 "Sales Invoice Header"
         {
             Caption = 'Responsibility Center';
             TableRelation = "Responsibility Center";
+        }
+        field(5794; "Shipping Agent Service Code"; Code[10])
+        {
+            Caption = 'Shipping Agent Service Code';
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(7000; "Price Calculation Method"; Enum "Price Calculation Method")
         {

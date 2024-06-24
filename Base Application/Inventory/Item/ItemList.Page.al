@@ -35,10 +35,6 @@ using Microsoft.RoleCenters;
 #endif
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
-using Microsoft.Service.Document;
-using Microsoft.Service.Item;
-using Microsoft.Service.Maintenance;
-using Microsoft.Service.Resources;
 using Microsoft.Warehouse.ADCS;
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Setup;
@@ -130,12 +126,12 @@ page 31 "Item List"
                 field("Production BOM No."; Rec."Production BOM No.")
                 {
                     ApplicationArea = Manufacturing;
-                    ToolTip = 'Specifies the number of the production BOM that the item represents.';
+                    ToolTip = 'Specifies the production BOM that is used to manufacture this item.';
                 }
                 field("Routing No."; Rec."Routing No.")
                 {
                     ApplicationArea = Manufacturing;
-                    ToolTip = 'Specifies the number of the production routing that the item is used in.';
+                    ToolTip = 'Specifies the production route that contains the operations needed to manufacture this item.';
                 }
                 field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
@@ -415,10 +411,21 @@ page 31 "Item List"
                               "Serial No. Filter" = field("Serial No. Filter");
                 Visible = false;
             }
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::Item), "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::Item), "No." = field("No.");
             }
             part(ItemAttributesFactBox; "Item Attributes Factbox")
@@ -440,23 +447,6 @@ page 31 "Item List"
     {
         area(processing)
         {
-#if not CLEAN22
-            group(Item)
-            {
-                Caption = 'Item';
-                Image = DataEntry;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The contents of this group has been moved to the Navigation->Item and Processing (root).';
-                ObsoleteTag = '22.0';
-                group(Action145)
-                {
-                    Visible = IsFoundationEnabled;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'The contents of this group has been moved to the Navigation->Item and Processing (root).';
-                    ObsoleteTag = '22.0';
-                }
-            }
-#endif
             group(History)
             {
                 Caption = 'History';
@@ -1662,7 +1652,7 @@ page 31 "Item List"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, "Item Availability Type"::"Event");
                         end;
                     }
                     action(Period)
@@ -1725,7 +1715,7 @@ page 31 "Item List"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            ItemAvailFormsMgt.ShowItemAvailabilityFromItem(Rec, "Item Availability Type"::BOM);
                         end;
                     }
                     action("Unit of Measure")
@@ -2231,78 +2221,6 @@ page 31 "Item List"
                     ToolTip = 'Open the item''s SKUs to view or edit instances of the item at different locations or with different variants. ';
                 }
             }
-            group(Service)
-            {
-                Caption = 'Service';
-                Image = ServiceItem;
-                action("Ser&vice Items")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Ser&vice Items';
-                    Image = ServiceItem;
-                    RunObject = Page "Service Items";
-                    RunPageLink = "Item No." = field("No.");
-                    RunPageView = sorting("Item No.");
-                    ToolTip = 'View instances of the item as service items, such as machines that you maintain or repair for customers through service orders. ';
-                }
-                action(Troubleshooting)
-                {
-                    AccessByPermission = TableData "Service Header" = R;
-                    ApplicationArea = Service;
-                    Caption = 'Troubleshooting';
-                    Image = Troubleshoot;
-                    ToolTip = 'View or edit information about technical problems with a service item.';
-
-                    trigger OnAction()
-                    var
-                        TroubleshootingHeader: Record "Troubleshooting Header";
-                    begin
-                        TroubleshootingHeader.ShowForItem(Rec);
-                    end;
-                }
-                action("Troubleshooting Setup")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Troubleshooting Setup';
-                    Image = Troubleshoot;
-                    RunObject = Page "Troubleshooting Setup";
-                    RunPageLink = Type = const(Item),
-                                  "No." = field("No.");
-                    ToolTip = 'View or edit your settings for troubleshooting service items.';
-                }
-            }
-            group(Resources)
-            {
-                Caption = 'Resources';
-                Image = Resource;
-                action("Resource &Skills")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Resource &Skills';
-                    Image = ResourceSkills;
-                    RunObject = Page "Resource Skills";
-                    RunPageLink = Type = const(Item),
-                                  "No." = field("No.");
-                    ToolTip = 'View the assignment of skills to resources, items, service item groups, and service items. You can use skill codes to allocate skilled resources to service items or items that need special skills for servicing.';
-                }
-                action("Skilled R&esources")
-                {
-                    AccessByPermission = TableData "Service Header" = R;
-                    ApplicationArea = Service;
-                    Caption = 'Skilled R&esources';
-                    Image = ResourceSkills;
-                    ToolTip = 'View a list of all registered resources with information about whether they have the skills required to service the particular service item group, item, or service item.';
-
-                    trigger OnAction()
-                    var
-                        ResourceSkill: Record "Resource Skill";
-                    begin
-                        Clear(SkilledResourceList);
-                        SkilledResourceList.Initialize(ResourceSkill.Type::Item, Rec."No.", Rec.Description);
-                        SkilledResourceList.RunModal();
-                    end;
-                }
-            }
         }
         area(Promoted)
         {
@@ -2643,7 +2561,6 @@ page 31 "Item List"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         ClientTypeManagement: Codeunit "Client Type Management";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-        SkilledResourceList: Page "Skilled Resource List";
         IsInventoryAdjmtAllowed: Boolean;
 
     protected var

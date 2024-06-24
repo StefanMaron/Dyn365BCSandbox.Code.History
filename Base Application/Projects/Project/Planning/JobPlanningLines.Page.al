@@ -1,4 +1,4 @@
-namespace Microsoft.Projects.Project.Planning;
+﻿namespace Microsoft.Projects.Project.Planning;
 
 using Microsoft.Inventory.Availability;
 using Microsoft.Inventory.BOM;
@@ -8,6 +8,7 @@ using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Reports;
+using Microsoft.Purchases.Document;
 using Microsoft.Warehouse.Activity;
 using System.Email;
 using System.Security.User;
@@ -673,6 +674,22 @@ page 1007 "Job Planning Lines"
                         end;
                     }
                 }
+                action(PurchaseLines)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Purchase Lines';
+                    Image = LinesFromJob;
+                    ToolTip = 'View purchase lines for products that are related to this project planning line.';
+
+                    trigger OnAction()
+                    var
+                        PurchaseLine: Record "Purchase Line";
+                    begin
+                        Rec.SetPurchLineFilters(PurchaseLine);
+                        PurchaseLine.SetFilter("Outstanding Amount (LCY)", '<> 0');
+                        Page.RunModal(Page::"Purchase Lines", PurchaseLine);
+                    end;
+                }
             }
         }
         area(processing)
@@ -818,7 +835,7 @@ page 1007 "Job Planning Lines"
                     begin
                         DemandOverview.SetCalculationParameter(true);
 
-                        DemandOverview.Initialize(0D, 3, Rec."Job No.", '', '');
+                        DemandOverview.SetParameters(0D, Microsoft.Inventory.Requisition."Demand Order Source Type"::"Job Demand", Rec."Job No.", '', '');
                         DemandOverview.RunModal();
                     end;
                 }
@@ -1007,12 +1024,11 @@ page 1007 "Job Planning Lines"
 
     trigger OnModifyRecord(): Boolean
     begin
-        if Rec."System-Created Entry" then begin
+        if Rec."System-Created Entry" then
             if Confirm(Text001, false) then
                 Rec."System-Created Entry" := false
             else
                 Error('');
-        end;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1035,8 +1051,12 @@ page 1007 "Job Planning Lines"
 
     var
         JobCreateInvoice: Codeunit "Job Create-Invoice";
+#pragma warning disable AA0074
         Text001: Label 'This project planning line was automatically generated. Do you want to continue?';
+#pragma warning disable AA0470
         Text002: Label 'The %1 was successfully transferred to a %2.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         ExtendedPriceEnabled: Boolean;
         VariantCodeMandatory: Boolean;
         SelectMultipleItemsVisible: Boolean;

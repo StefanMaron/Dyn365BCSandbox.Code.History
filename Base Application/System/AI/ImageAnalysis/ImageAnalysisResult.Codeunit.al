@@ -14,17 +14,6 @@ codeunit 2021 "Image Analysis Result"
         Faces: DotNet JArray;
         LastAnalysisTypes: List of [Enum "Image Analysis Type"];
 
-#if not CLEAN22
-    [Obsolete('Use SetResult with an Enum::"Image Analysis Type" as second parameter instead.', '22.0')]
-    procedure SetJson(InputJSONManagement: Codeunit "JSON Management"; AnalysisType: Option Tags,Faces,Color)
-    var
-        InputImageAnalysisType: Enum "Image Analysis Type";
-    begin
-        Evaluate(InputImageAnalysisType, Format(AnalysisType));
-        SetResult(InputJSONManagement, InputImageAnalysisType);
-    end;
-#endif
-
     procedure SetResult(InputJSONManagement: Codeunit "JSON Management"; AnalysisType: Enum "Image Analysis Type")
     var
         AnalysisTypes: List of [Enum "Image Analysis Type"];
@@ -176,15 +165,6 @@ codeunit 2021 "Image Analysis Result"
             exit(Gender);
         end;
     end;
-
-#if not CLEAN22
-    [Obsolete('Use GetLatestImageAnalysisTypes instead.', '22.0')]
-    procedure GetLatestAnalysisType(var AnalysisType: Option Tags,Faces,Color)
-    begin
-        if LastAnalysisTypes.Count > 0 then
-            if Evaluate(AnalysisType, Format(LastAnalysisTypes.Get(1))) then;
-    end;
-#endif
 
     procedure GetLatestImageAnalysisTypes(var AnalysisType: List of [Enum "Image Analysis Type"])
     begin

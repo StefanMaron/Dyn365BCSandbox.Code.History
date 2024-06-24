@@ -46,11 +46,15 @@ codeunit 427 ICInboxOutboxMgt
         DimMgt: Codeunit DimensionManagement;
         GLSetupFound: Boolean;
         CompanyInfoFound: Boolean;
+#pragma warning disable AA0074
         Text000: Label 'Do you want to re-create the transaction?';
+#pragma warning disable AA0470
         Text001: Label '%1 %2 does not exist as a %3 in %1 %4.';
         Text002: Label 'You cannot send IC document because %1 %2 has %3 %4.';
         Text004: Label 'Transaction %1 for %2 %3 already exists in the %4 table.';
         Text005: Label '%1 must be %2 or %3 in order to be re-created.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
         NoItemForCommonItemErr: Label 'There is no Item related to Common Item No. %1.', Comment = '%1 = Common Item No value';
         TransactionAlreadyExistsInOutboxHandledQst: Label '%1 %2 has already been sent to intercompany partner %3. Resending it will create a duplicate %1 for them. Do you want to send it again?', Comment = '%1 - Document Type, %2 - Document No, %3 - IC parthner code';
         TransactionCantBeFoundErr: Label 'The Intercompany transaction that originated this document cannot be found.';
@@ -87,9 +91,6 @@ codeunit 427 ICInboxOutboxMgt
         OutboxJnlTransaction."Document No." := TempGenJnlLine."Document No.";
         OutboxJnlTransaction."Posting Date" := TempGenJnlLine."Posting Date";
         OutboxJnlTransaction."Document Date" := TempGenJnlLine."Document Date";
-#if not CLEAN22
-        OutboxJnlTransaction."IC Partner G/L Acc. No." := TempGenJnlLine."IC Partner G/L Acc. No.";
-#endif
         OutboxJnlTransaction."IC Account Type" := TempGenJnlLine."IC Account Type";
         OutboxJnlTransaction."IC Account No." := TempGenJnlLine."IC Account No.";
         OutboxJnlTransaction."Source Line No." := TempGenJnlLine."Source Line No.";
@@ -626,12 +627,6 @@ codeunit 427 ICInboxOutboxMgt
         FeatureTelemetry.LogUsage('0000IK2', ICMapping.GetFeatureTelemetryName(), 'Creating Outbox Journal Line');
 
         GetGLSetup();
-#if not CLEAN22
-        if (TempGenJnlLine."IC Partner G/L Acc. No." <> '') and (TempGenJnlLine."IC Account No." = '') then begin
-            TempGenJnlLine."IC Account Type" := TempGenJnlLine."IC Account Type"::"G/L Account";
-            TempGenJnlLine."IC Account No." := TempGenJnlLine."IC Partner G/L Acc. No.";
-        end;
-#endif
         if ((TempGenJnlLine."Bal. Account Type" in
              [TempGenJnlLine."Bal. Account Type"::Customer, TempGenJnlLine."Bal. Account Type"::Vendor, TempGenJnlLine."Bal. Account Type"::"IC Partner"]) and
             (TempGenJnlLine."Bal. Account No." <> '')) or
@@ -911,6 +906,7 @@ codeunit 427 ICInboxOutboxMgt
             SalesHeader."Ship-to Post Code" := ICInboxSalesHeader."Ship-to Post Code";
             SalesHeader."Ship-to County" := ICInboxSalesHeader."Ship-to County";
             SalesHeader."Ship-to Country/Region Code" := ICInboxSalesHeader."Ship-to Country/Region Code";
+            SalesHeader."Ship-to Phone No." := ICInboxSalesHeader."Ship-to Phone No.";
             if ReplacePostingDate then
                 SalesHeader.Validate("Posting Date", PostingDate)
             else
@@ -1035,6 +1031,7 @@ codeunit 427 ICInboxOutboxMgt
                 if not IsHandled then begin
                     SalesLine.Validate("Unit Price", ICInboxSalesLine."Unit Price");
                     SalesLine."Amount Including VAT" := ICInboxSalesLine."Amount Including VAT";
+                    SalesLine."VAT Difference" := ICInboxSalesLine."VAT Difference";
                     SalesLine.Validate("Line Discount %", ICInboxSalesLine."Line Discount %");
                     SalesLine.Validate("Inv. Discount Amount", ICInboxSalesLine."Inv. Discount Amount");
                     SalesLine.UpdateAmounts();
@@ -1177,6 +1174,7 @@ codeunit 427 ICInboxOutboxMgt
             PurchHeader."Ship-to Post Code" := ICInboxPurchHeader."Ship-to Post Code";
             PurchHeader."Ship-to County" := ICInboxPurchHeader."Ship-to County";
             PurchHeader."Ship-to Country/Region Code" := ICInboxPurchHeader."Ship-to Country/Region Code";
+            PurchHeader."Ship-to Phone No." := ICInboxPurchHeader."Ship-to Phone No.";
             PurchHeader."Vendor Order No." := ICInboxPurchHeader."Vendor Order No.";
             if ReplacePostingDate then
                 PurchHeader.Validate("Posting Date", PostingDate)
@@ -1309,6 +1307,7 @@ codeunit 427 ICInboxOutboxMgt
                     PurchLine.Validate("Line Discount Amount", ICInboxPurchLine."Line Discount Amount");
                     PurchLine.Validate("Inv. Discount Amount", ICInboxPurchLine."Inv. Discount Amount");
                     PurchLine."VAT Base Amount" := Round(ICInboxPurchLine."Amount Including VAT" / (1 + (PurchLine."VAT %" / 100)), Precision2);
+                    PurchLine."VAT Difference" := ICInboxPurchLine."VAT Difference";
                     if PurchHeader."Prices Including VAT" then
                         PurchLine."Line Amount" := ICInboxPurchLine."Amount Including VAT"
                     else
@@ -1603,9 +1602,6 @@ codeunit 427 ICInboxOutboxMgt
         InboxTransaction."Transaction Source" := InboxTransaction."Transaction Source"::"Created by Partner";
         InboxTransaction."Transaction Source" := HandledInboxTransaction2."Transaction Source";
         InboxTransaction."Document Date" := HandledInboxTransaction2."Document Date";
-#if not CLEAN22
-        InboxTransaction."IC Partner G/L Acc. No." := HandledInboxTransaction2."IC Partner G/L Acc. No.";
-#endif
         InboxTransaction."IC Account Type" := HandledInboxTransaction2."IC Account Type";
         InboxTransaction."IC Account No." := HandledInboxTransaction2."IC Account No.";
         InboxTransaction."Source Line No." := HandledInboxTransaction2."Source Line No.";
@@ -1765,9 +1761,6 @@ codeunit 427 ICInboxOutboxMgt
             OutboxTransaction."Transaction Source" := OutboxTransaction."Transaction Source"::"Created by Current Company";
             OutboxTransaction."Transaction Source" := HandledOutboxTransaction2."Transaction Source";
             OutboxTransaction."Document Date" := HandledOutboxTransaction2."Document Date";
-#if not CLEAN22
-            OutboxTransaction."IC Partner G/L Acc. No." := HandledOutboxTransaction2."IC Partner G/L Acc. No.";
-#endif
             OutboxTransaction."IC Account Type" := HandledOutboxTransaction2."IC Account Type";
             OutboxTransaction."IC Account No." := HandledOutboxTransaction2."IC Account No.";
             OutboxTransaction."Source Line No." := HandledOutboxTransaction2."Source Line No.";
@@ -2187,9 +2180,6 @@ codeunit 427 ICInboxOutboxMgt
         ICInboxTrans."Posting Date" := ICOutboxTrans."Posting Date";
         ICInboxTrans."Document Date" := ICOutboxTrans."Document Date";
         ICInboxTrans."Line Action" := ICInboxTrans."Line Action"::"No Action";
-#if not CLEAN22
-        ICInboxTrans."IC Partner G/L Acc. No." := ICOutboxTrans."IC Partner G/L Acc. No.";
-#endif
         ICInboxTrans."IC Account Type" := ICOutboxTrans."IC Account Type";
         ICInboxTrans."IC Account No." := ICOutboxTrans."IC Account No.";
         ICInboxTrans."Source Line No." := ICOutboxTrans."Source Line No.";
@@ -2348,6 +2338,7 @@ codeunit 427 ICInboxOutboxMgt
         ICInboxPurchHeader."Ship-to Post Code" := ICOutboxSalesHeader."Ship-to Post Code";
         ICInboxPurchHeader."Ship-to County" := ICOutboxSalesHeader."Ship-to County";
         ICInboxPurchHeader."Ship-to Country/Region Code" := ICOutboxSalesHeader."Ship-to Country/Region Code";
+        ICInboxPurchHeader."Ship-to Phone No." := ICOutboxSalesHeader."Ship-to Phone No.";
         ICInboxPurchHeader."Posting Date" := ICOutboxSalesHeader."Posting Date";
         ICInboxPurchHeader."Due Date" := ICOutboxSalesHeader."Due Date";
         ICInboxPurchHeader."Payment Discount %" := ICOutboxSalesHeader."Payment Discount %";
@@ -2395,6 +2386,7 @@ codeunit 427 ICInboxOutboxMgt
         ICInboxPurchLine."Amount Including VAT" := ICOutboxSalesLine."Amount Including VAT";
         ICInboxPurchLine."Job No." := ICOutboxSalesLine."Job No.";
         ICInboxPurchLine."VAT Base Amount" := ICOutboxSalesLine."VAT Base Amount";
+        ICInboxPurchLine."VAT Difference" := ICOutboxSalesLine."VAT Difference";
         ICInboxPurchLine."Unit Cost" := ICOutboxSalesLine."Unit Price";
         ICInboxPurchLine."Line Amount" := ICOutboxSalesLine."Line Amount";
         ICInboxPurchLine.Amount := ICOutboxSalesLine.Amount;
@@ -2463,6 +2455,7 @@ codeunit 427 ICInboxOutboxMgt
         ICInboxSalesHeader."Ship-to Post Code" := ICOutboxPurchHeader."Ship-to Post Code";
         ICInboxSalesHeader."Ship-to County" := ICOutboxPurchHeader."Ship-to County";
         ICInboxSalesHeader."Ship-to Country/Region Code" := ICOutboxPurchHeader."Ship-to Country/Region Code";
+        ICInboxSalesHeader."Ship-to Phone No." := ICOutboxPurchHeader."Ship-to Phone No.";
         ICInboxSalesHeader."Posting Date" := ICOutboxPurchHeader."Posting Date";
         ICInboxSalesHeader."Due Date" := ICOutboxPurchHeader."Due Date";
         ICInboxSalesHeader."Payment Discount %" := ICOutboxPurchHeader."Payment Discount %";
@@ -2508,6 +2501,7 @@ codeunit 427 ICInboxOutboxMgt
         ICInboxSalesLine."Inv. Discount Amount" := ICOutboxPurchLine."Inv. Discount Amount";
         ICInboxSalesLine."Job No." := ICOutboxPurchLine."Job No.";
         ICInboxSalesLine."VAT Base Amount" := ICOutboxPurchLine."VAT Base Amount";
+        ICInboxSalesLine."VAT Difference" := ICOutboxPurchLine."VAT Difference";
         ICInboxSalesLine."Unit Price" := ICOutboxPurchLine."Direct Unit Cost";
         ICInboxSalesLine."Line Amount" := ICOutboxPurchLine."Line Amount";
         ICInboxSalesLine."Line Discount %" := ICOutboxPurchLine."Line Discount %";

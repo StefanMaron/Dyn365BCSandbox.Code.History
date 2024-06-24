@@ -17,9 +17,14 @@ table 6300 "Azure AD App Setup"
         field(2; "Secret Key"; BLOB)
         {
             Caption = 'Secret Key';
-            ObsoleteState = Pending;
             ObsoleteReason = 'The Secret Key has been moved to Isolated Storage. Use GetSecretKeyFromIsolatedStorage/SetSecretKeyToIsolatedStorage to retrieve or set the Secret Key.';
+#if CLEAN25
+            ObsoleteState = Removed;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Pending;
             ObsoleteTag = '17.0';
+#endif
         }
         field(3; "Primary Key"; Integer)
         {

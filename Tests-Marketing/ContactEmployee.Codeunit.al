@@ -16,7 +16,6 @@ codeunit 136210 "Contact Employee"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryTemplates: Codeunit "Library - Templates";
         IsInitialized: Boolean;
-        TypePersonTestFieldErr: Label 'Type must be equal to ''Person''';
         PrivactBlockedTestFieldErr: Label 'they are marked as blocked due to privacy';
         ShownEmployeeCardErr: Label 'Wrong employee card is shown';
         ShownContactCardErr: Label 'Wrong contact card is shown';
@@ -121,7 +120,7 @@ codeunit 136210 "Contact Employee"
         asserterror Contact.CreateEmployee();
 
         // [THEN] Employee was not created
-        Assert.ExpectedError(TypePersonTestFieldErr);
+        Assert.ExpectedTestFieldError(Contact.FieldCaption(Type), Format(Contact.Type::Person));
     end;
 
     [Test]
@@ -195,7 +194,7 @@ codeunit 136210 "Contact Employee"
         asserterror Contact.CreateEmployeeLink();
 
         // [THEN] Employee was not linked with contact
-        Assert.ExpectedError(TypePersonTestFieldErr);
+        Assert.ExpectedTestFieldError(Contact.FieldCaption(Type), Format(Contact.Type::Person));
     end;
 
     [Test]

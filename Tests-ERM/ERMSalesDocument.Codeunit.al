@@ -1000,6 +1000,89 @@
 
     [Test]
     [Scope('OnPrem')]
+    procedure UpdateSalesInvoice()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesLine: Record "Sales Line";
+        xSalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesInvoiceNo: Code[20];
+    begin
+        // [SCENARIO] A Posted Sales Invoice is Updated
+        // [GIVEN] A Sales Invoice exists
+        Initialize();
+        CreateSalesDocument(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, CreateCustomer());
+        LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        SalesInvoiceNo := FindPostedSalesInvoiceNo(SalesHeader."No.");
+        xSalesInvoiceHeader.Get(SalesInvoiceNo);
+
+        // [WHEN] A Sales Invoice Header is Updated
+        LibrarySales.ModifySalesInvoiceHeader(xSalesInvoiceHeader);
+        LibrarySales.UpdateSalesInvoiceHeader(xSalesInvoiceHeader);
+
+        // [THEN] The Sales Invoice is updated with the new values
+        SalesInvoiceHeader.Get(SalesInvoiceNo);
+        //        ValidateError: Label '%1 must be %2 in %3 %4 = %5.';
+        Assert.AreEqual(SalesInvoiceHeader."Payment Method Code", xSalesInvoiceHeader."Payment Method Code",
+            StrSubstNo(ValidateError,
+                SalesInvoiceHeader.FieldCaption("Payment Method Code"),
+                xSalesInvoiceHeader."Payment Method Code",
+                SalesInvoiceHeader.TableCaption(),
+                SalesInvoiceHeader.FieldCaption("No."),
+                SalesInvoiceHeader."No."));
+
+        Assert.AreEqual(SalesInvoiceHeader."Payment Reference", xSalesInvoiceHeader."Payment Reference",
+            StrSubstNo(ValidateError,
+                SalesInvoiceHeader.FieldCaption("Payment Reference"),
+                xSalesInvoiceHeader."Payment Reference",
+                SalesInvoiceHeader.TableCaption(),
+                SalesInvoiceHeader.FieldCaption("No."),
+                SalesInvoiceHeader."No."));
+
+        Assert.AreEqual(SalesInvoiceHeader."Company Bank Account Code", xSalesInvoiceHeader."Company Bank Account Code",
+            StrSubstNo(ValidateError,
+                SalesInvoiceHeader.FieldCaption("Company Bank Account Code"),
+                xSalesInvoiceHeader."Company Bank Account Code",
+                SalesInvoiceHeader.TableCaption(),
+                SalesInvoiceHeader.FieldCaption("No."),
+                SalesInvoiceHeader."No."));
+
+        Assert.AreEqual(SalesInvoiceHeader."Posting Description", xSalesInvoiceHeader."Posting Description",
+            StrSubstNo(ValidateError,
+                SalesInvoiceHeader.FieldCaption("Posting Description"),
+                xSalesInvoiceHeader."Posting Description",
+                SalesInvoiceHeader.TableCaption(),
+                SalesInvoiceHeader.FieldCaption("No."),
+                SalesInvoiceHeader."No."));
+
+        Assert.AreEqual(SalesInvoiceHeader."Shipping Agent Code", xSalesInvoiceHeader."Shipping Agent Code",
+            StrSubstNo(ValidateError,
+                SalesInvoiceHeader.FieldCaption("Shipping Agent Code"),
+                xSalesInvoiceHeader."Shipping Agent Code",
+                SalesInvoiceHeader.TableCaption(),
+                SalesInvoiceHeader.FieldCaption("No."),
+                SalesInvoiceHeader."No."));
+
+        Assert.AreEqual(SalesInvoiceHeader."Package Tracking No.", xSalesInvoiceHeader."Package Tracking No.",
+            StrSubstNo(ValidateError,
+                SalesInvoiceHeader.FieldCaption("Package Tracking No."),
+                xSalesInvoiceHeader."Package Tracking No.",
+                SalesInvoiceHeader.TableCaption(),
+                SalesInvoiceHeader.FieldCaption("No."),
+                SalesInvoiceHeader."No."));
+
+        Assert.AreEqual(SalesInvoiceHeader."Shipping Agent Service Code", xSalesInvoiceHeader."Shipping Agent Service Code",
+            StrSubstNo(ValidateError,
+                SalesInvoiceHeader.FieldCaption("Shipping Agent Service Code"),
+                xSalesInvoiceHeader."Shipping Agent Service Code",
+                SalesInvoiceHeader.TableCaption(),
+                SalesInvoiceHeader.FieldCaption("No."),
+                SalesInvoiceHeader."No."));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
     procedure SalesRetOrderReceiptCreditMemo()
     var
         SalesHeader: Record "Sales Header";
@@ -1963,16 +2046,13 @@
         Customer.Validate("Location Code", Location.Code);
         Customer.Modify(true);
 
-        with SalesHeader do begin
-            // [WHEN] Create Sales Order with Customer.
-            Init();
-            Validate("Sell-to Customer No.", Customer."No.");
-            Insert(true);
-
-            // [THEN] Sales Order contains "Outbound Whse. Handling Time" = "X"
-            Find();
-            Assert.AreEqual(OneDay, Format("Outbound Whse. Handling Time"), HandlingTimeErr);
-        end;
+        // [WHEN] Create Sales Order with Customer.
+        SalesHeader.Init();
+        SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
+        SalesHeader.Insert(true);
+        // [THEN] Sales Order contains "Outbound Whse. Handling Time" = "X"
+        SalesHeader.Find();
+        Assert.AreEqual(OneDay, Format(SalesHeader."Outbound Whse. Handling Time"), HandlingTimeErr);
     end;
 
     [Test]
@@ -3406,13 +3486,13 @@
         Initialize();
 
         // [GIVEN] Set SalesSetup."Copy Line Descr. to G/L Entry" = "Yes"
-        SetSalesSetupCopyLineDescrToGLEntry(TRUE);
+        SetSalesSetupCopyLineDescrToGLEntry(true);
 
         // [GIVEN] Create sales order with 5 "G/L Account" type sales lines with unique descriptions "Descr1" - "Descr5"
         CreateSalesOrderWithUniqueDescriptionLines(SalesHeader, TempSalesLine, TempSalesLine.Type::"G/L Account");
 
         // [WHEN] Sales order is being posted
-        InvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, TRUE, TRUE);
+        InvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
 
         // [THEN] G/L entries created with descriptions "Descr1" - "Descr5"
         VerifyGLEntriesDescription(TempSalesLine, InvoiceNo);
@@ -3435,13 +3515,13 @@
         BINDSUBSCRIPTION(ERMSalesDocument);
 
         // [GIVEN] Set SalesSetup."Copy Line Descr. to G/L Entry" = "No"
-        SetSalesSetupCopyLineDescrToGLEntry(FALSE);
+        SetSalesSetupCopyLineDescrToGLEntry(false);
 
         // [GIVEN] Create sales order with 5 "Item" type sales lines with unique descriptions "Descr1" - "Descr5"
         CreateSalesOrderWithUniqueDescriptionLines(SalesHeader, TempSalesLine, TempSalesLine.Type::Item);
 
         // [WHEN] Sales order is being posted
-        InvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, TRUE, TRUE);
+        InvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
 
         // [THEN] G/L entries created with descriptions "Descr1" - "Descr5"
         VerifyGLEntriesDescription(TempSalesLine, InvoiceNo);
@@ -4907,19 +4987,17 @@
         RecRef: RecordRef;
     begin
         CustomerNo := CreateCustomer();
-        with ValueEntry do begin
-            Init();
-            RecRef.GetTable(ValueEntry);
-            "Entry No." := LibraryUtility.GetNewLineNo(RecRef, FieldNo("Entry No."));
-            "Item No." := ItemNo;
-            "Posting Date" := WorkDate();
-            "Item Ledger Entry Type" := "Item Ledger Entry Type"::Sale;
-            "Source Type" := "Source Type"::Customer;
-            "Source No." := CustomerNo;
-            "Cost Amount (Expected)" := LibraryRandom.RandDecInRange(100000, 500000, 2);
-            Insert();
-            exit("Cost Amount (Expected)");
-        end;
+        ValueEntry.Init();
+        RecRef.GetTable(ValueEntry);
+        ValueEntry."Entry No." := LibraryUtility.GetNewLineNo(RecRef, ValueEntry.FieldNo("Entry No."));
+        ValueEntry."Item No." := ItemNo;
+        ValueEntry."Posting Date" := WorkDate();
+        ValueEntry."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type"::Sale;
+        ValueEntry."Source Type" := ValueEntry."Source Type"::Customer;
+        ValueEntry."Source No." := CustomerNo;
+        ValueEntry."Cost Amount (Expected)" := LibraryRandom.RandDecInRange(100000, 500000, 2);
+        ValueEntry.Insert();
+        exit(ValueEntry."Cost Amount (Expected)");
     end;
 
     local procedure CreatePaymentMethodCode(var PaymentMethod: Record "Payment Method")
@@ -4927,11 +5005,9 @@
         GLAccount: Record "G/L Account";
     begin
         LibraryERM.CreateGLAccount(GLAccount);
-        with PaymentMethod do begin
-            LibraryERM.CreatePaymentMethod(PaymentMethod);
-            Validate("Bal. Account No.", GLAccount."No.");
-            Modify(true);
-        end;
+        LibraryERM.CreatePaymentMethod(PaymentMethod);
+        PaymentMethod.Validate("Bal. Account No.", GLAccount."No.");
+        PaymentMethod.Modify(true);
     end;
 
     local procedure CreateSalesLines(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
@@ -5000,15 +5076,15 @@
         i: Integer;
     begin
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, LibrarySales.CreateCustomerNo());
-        FOR i := 1 TO LibraryRandom.RandIntInRange(3, 7) DO BEGIN
-            CASE Type OF
+        for i := 1 to LibraryRandom.RandIntInRange(3, 7) do begin
+            case Type of
                 SalesLine.Type::"G/L Account":
                     LibrarySales.CreateSalesLine(
                       SalesLine, SalesHeader, SalesLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithSalesSetup(), 1);
                 SalesLine.Type::Item:
                     LibrarySales.CreateSalesLine(
                       SalesLine, SalesHeader, SalesLine.Type::Item, LibraryInventory.CreateItemNo(), 1);
-            END;
+            end;
             SalesLine.Description :=
               COPYSTR(
                 LibraryUtility.GenerateRandomAlphabeticText(MAXSTRLEN(SalesLine.Description), 1),
@@ -5017,7 +5093,7 @@
             SalesLine.Modify();
             TempSalesLine := SalesLine;
             TempSalesLine.Insert();
-        END;
+        end;
     end;
 
     local procedure CreateVATPostingSetupWithVATClauseCode(var VATPostingSetup: Record "VAT Posting Setup"; VATClauseCode: Code[20])
@@ -5345,12 +5421,10 @@
 
     local procedure FindSalesLine(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
     begin
-        with SalesLine do begin
-            SetRange("Document Type", SalesHeader."Document Type");
-            SetRange("Document No.", SalesHeader."No.");
-            SetRange(Type, Type::Item);
-            FindFirst();
-        end;
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        SalesLine.FindFirst();
     end;
 
     local procedure FindAndDeleteOneSalesLine(var SalesHeader: Record "Sales Header")
@@ -5573,7 +5647,7 @@
     local procedure OnAfterInvPostBufferPrepareSales(var SalesLine: Record "Sales Line"; var InvoicePostBuffer: Record "Invoice Post. Buffer")
     begin
         // Example of extending feature "Copy document line description to G/L entries" for lines with type = "Item"
-        IF InvoicePostBuffer.Type = InvoicePostBuffer.Type::Item THEN BEGIN
+        if InvoicePostBuffer.Type = InvoicePostBuffer.Type::Item then begin
             InvoicePostBuffer."Fixed Asset Line No." := SalesLine."Line No.";
             InvoicePostBuffer."Entry Description" := SalesLine.Description;
         end;
@@ -5584,7 +5658,7 @@
     local procedure OnAfterPrepareSales(var SalesLine: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
     begin
         // Example of extending feature "Copy document line description to G/L entries" for lines with type = "Item"
-        IF InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::Item THEN BEGIN
+        if InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::Item then begin
             InvoicePostingBuffer."Fixed Asset Line No." := SalesLine."Line No.";
             InvoicePostingBuffer."Entry Description" := SalesLine.Description;
             InvoicePostingBuffer.BuildPrimaryKey();
@@ -5595,46 +5669,40 @@
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            SetRange("Document No.", DocumentNo);
-            SetRange("G/L Account No.", GLAccountNo);
-            FindFirst();
-            Assert.AreNearlyEqual(
-              Amount2,
-              Amount,
-              LibraryERM.GetInvoiceRoundingPrecisionLCY(),
-              StrSubstNo(ValidateError, FieldCaption(Amount), Amount2, TableCaption(), FieldCaption("Entry No."), "Entry No."));
-        end;
+        GLEntry.SetRange("Document No.", DocumentNo);
+        GLEntry.SetRange("G/L Account No.", GLAccountNo);
+        GLEntry.FindFirst();
+        Assert.AreNearlyEqual(
+          Amount2,
+          GLEntry.Amount,
+          LibraryERM.GetInvoiceRoundingPrecisionLCY(),
+          StrSubstNo(ValidateError, GLEntry.FieldCaption(Amount), Amount2, GLEntry.TableCaption(), GLEntry.FieldCaption("Entry No."), GLEntry."Entry No."));
     end;
 
     local procedure VerifyACYAmountOnGLEntry(DocumentNo: Code[20]; GLAccountNo: Code[20]; Amount2: Decimal; CurrencyCode: Code[10])
     var
         GLEntry: Record "G/L Entry";
     begin
-        with GLEntry do begin
-            FindGLEntry(GLEntry, DocumentNo, GLAccountNo);
-            Amount2 := LibraryERM.ConvertCurrency(Amount2, '', CurrencyCode, WorkDate());
-            Assert.AreNearlyEqual(
-              Amount2, "Additional-Currency Amount", LibraryERM.GetInvoiceRoundingPrecisionLCY(),
-              StrSubstNo(ValidateError, FieldCaption("Additional-Currency Amount"), Amount,
-                TableCaption, FieldCaption("Entry No."), "Entry No."));
-        end;
+        FindGLEntry(GLEntry, DocumentNo, GLAccountNo);
+        Amount2 := LibraryERM.ConvertCurrency(Amount2, '', CurrencyCode, WorkDate());
+        Assert.AreNearlyEqual(
+          Amount2, GLEntry."Additional-Currency Amount", LibraryERM.GetInvoiceRoundingPrecisionLCY(),
+          StrSubstNo(ValidateError, GLEntry.FieldCaption("Additional-Currency Amount"), GLEntry.Amount,
+            GLEntry.TableCaption, GLEntry.FieldCaption("Entry No."), GLEntry."Entry No."));
     end;
 
     local procedure VerifyAmountLCYOnCustLedger(DocumentNo: Code[20]; AmountLCY: Decimal)
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        with CustLedgerEntry do begin
-            SetRange("Document No.", DocumentNo);
-            FindFirst();
-            CalcFields("Amount (LCY)");
-            Assert.AreNearlyEqual(
-              AmountLCY,
-              "Amount (LCY)",
-              LibraryERM.GetInvoiceRoundingPrecisionLCY(),
-              StrSubstNo(ValidateError, FieldCaption("Amount (LCY)"), AmountLCY, TableCaption(), FieldCaption("Entry No."), "Entry No."));
-        end;
+        CustLedgerEntry.SetRange("Document No.", DocumentNo);
+        CustLedgerEntry.FindFirst();
+        CustLedgerEntry.CalcFields("Amount (LCY)");
+        Assert.AreNearlyEqual(
+          AmountLCY,
+          CustLedgerEntry."Amount (LCY)",
+          LibraryERM.GetInvoiceRoundingPrecisionLCY(),
+          StrSubstNo(ValidateError, CustLedgerEntry.FieldCaption("Amount (LCY)"), AmountLCY, CustLedgerEntry.TableCaption(), CustLedgerEntry.FieldCaption("Entry No."), CustLedgerEntry."Entry No."));
     end;
 
     local procedure VerifyBinCodeOnSalesLine(ItemNo: Code[20]; BinCode: Code[20])
@@ -5650,18 +5718,16 @@
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        with CustLedgerEntry do begin
-            SetRange("Document No.", DocumentNo);
-            SetRange("Document Type", DocumentType);
-            FindFirst();
-            CalcFields("Remaining Amount");
-            Assert.AreNearlyEqual(
-              RemainingAmount,
-              "Remaining Amount",
-              LibraryERM.GetInvoiceRoundingPrecisionLCY(),
-              StrSubstNo(
-                ValidateError, FieldCaption("Remaining Amount"), RemainingAmount, TableCaption(), FieldCaption("Entry No."), "Entry No."));
-        end;
+        CustLedgerEntry.SetRange("Document No.", DocumentNo);
+        CustLedgerEntry.SetRange("Document Type", DocumentType);
+        CustLedgerEntry.FindFirst();
+        CustLedgerEntry.CalcFields("Remaining Amount");
+        Assert.AreNearlyEqual(
+          RemainingAmount,
+          CustLedgerEntry."Remaining Amount",
+          LibraryERM.GetInvoiceRoundingPrecisionLCY(),
+          StrSubstNo(
+            ValidateError, CustLedgerEntry.FieldCaption("Remaining Amount"), RemainingAmount, CustLedgerEntry.TableCaption(), CustLedgerEntry.FieldCaption("Entry No."), CustLedgerEntry."Entry No."));
     end;
 
     local procedure VerifyCustomerLedgerEntry(ReturnOrderNo: Code[20]; Amount: Decimal)
@@ -5845,10 +5911,10 @@
     begin
         GLEntry.SETRANGE("Document No.", InvoiceNo);
         TempSalesLine.FindSet();
-        REPEAT
+        repeat
             GLEntry.SETRANGE(Description, TempSalesLine.Description);
             Assert.RecordIsNotEmpty(GLEntry);
-        UNTIL TempSalesLine.Next() = 0;
+        until TempSalesLine.Next() = 0;
     end;
 
     local procedure VerifyVATEntryForCreditMemo(DocumentNo: Code[20]; Amount: Decimal)
@@ -6167,12 +6233,10 @@
     var
         AnalysisColumn: Record "Analysis Column";
     begin
-        with AnalysisColumn do begin
-            SetRange("Analysis Area", "Analysis Area"::Sales);
-            SetRange("Analysis Column Template", AnalysisColumnTemplateName);
-            FindFirst();
-            LibraryVariableStorage.Enqueue("Column Header");
-        end;
+        AnalysisColumn.SetRange("Analysis Area", AnalysisColumn."Analysis Area"::Sales);
+        AnalysisColumn.SetRange("Analysis Column Template", AnalysisColumnTemplateName);
+        AnalysisColumn.FindFirst();
+        LibraryVariableStorage.Enqueue(AnalysisColumn."Column Header");
     end;
 
     [PageHandler]

@@ -477,10 +477,10 @@ page 10027 "Sales Order Shipment Subform"
 
     procedure ShowTracking()
     var
-        TrackingForm: Page "Order Tracking";
+        OrderTracking: Page "Order Tracking";
     begin
-        TrackingForm.SetSalesLine(Rec);
-        TrackingForm.RunModal();
+        OrderTracking.SetVariantRec(Rec, Rec."No.", Rec."Outstanding Qty. (Base)", Rec."Shipment Date", Rec."Shipment Date");
+        OrderTracking.RunModal();
     end;
 
     procedure ItemChargeAssgnt()

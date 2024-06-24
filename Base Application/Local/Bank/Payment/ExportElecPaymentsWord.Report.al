@@ -282,7 +282,7 @@ report 11383 "ExportElecPayments - Word"
                     {
                         DataItemLink = "Applies-to ID" = field("Applies-to ID");
                         DataItemLinkReference = "Gen. Journal Line";
-                        DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
+                        DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code") order(descending) where(Open = const(true));
                         column(Cust__Ledger_Entry__Document_Type_; "Document Type")
                         {
                         }
@@ -350,7 +350,7 @@ report 11383 "ExportElecPayments - Word"
                     {
                         DataItemLink = "Applies-to ID" = field("Applies-to ID");
                         DataItemLinkReference = "Gen. Journal Line";
-                        DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
+                        DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code") order(descending) where(Open = const(true));
                         column(Vendor_Ledger_Entry__Document_Type_; "Document Type")
                         {
                         }
@@ -415,7 +415,7 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem(CustomerInfo; "Integer")
                     {
-                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
+                        DataItemTableView = sorting(Number) order(ascending) where(Number = const(1));
                         column(AmountPaid_Customer; AmountPaid)
                         {
                         }
@@ -443,7 +443,7 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem(VendorInfo; "Integer")
                     {
-                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
+                        DataItemTableView = sorting(Number) order(ascending) where(Number = const(1));
                         column(Vend_Remaining_Amt_LCY; -VendLedgEntry."Remaining Amt. (LCY)")
                         {
                         }

@@ -22,6 +22,7 @@ using Microsoft.Projects.Project.Reports;
 using Microsoft.Projects.Project.Archive;
 using Microsoft.Projects.Project.WIP;
 using Microsoft.Projects.TimeSheet;
+using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
@@ -719,6 +720,12 @@ page 88 "Job Card"
                             end;
                         }
                     }
+                    field("Ship-to Phone No."; Rec."Ship-to Phone No.")
+                    {
+                        ApplicationArea = Jobs;
+                        Caption = 'Phone No.';
+                        ToolTip = 'Specifies the telephone number of the company''s shipping address.';
+                    }
                     field("Ship-to Contact"; Rec."Ship-to Contact")
                     {
                         ApplicationArea = Jobs;
@@ -938,10 +945,22 @@ page 88 "Job Card"
                 SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = false;
             }
+#if not CLEAN25
             part("Attached Documents"; "Document Attachment Factbox")
             {
+                ObsoleteTag = '25.0';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
                 Caption = 'Attachments';
+                SubPageLink = "Table ID" = const(Database::Job),
+                              "No." = field("No.");
+            }
+#endif
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
                 SubPageLink = "Table ID" = const(Database::Job),
                               "No." = field("No.");
             }
@@ -1133,6 +1152,22 @@ page 88 "Job Card"
                         AssembleToOrderLink: Record "Assemble-to-Order Link";
                     begin
                         AssembleToOrderLink.ShowAsmOrders(Rec, '');
+                    end;
+                }
+                action(PurchaseLines)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Purchase Lines';
+                    Image = LinesFromJob;
+                    ToolTip = 'View purchase lines for products that are related to this project.';
+
+                    trigger OnAction()
+                    var
+                        PurchaseLine: Record "Purchase Line";
+                    begin
+                        Rec.SetPurchLineFilters(PurchaseLine);
+                        PurchaseLine.SetFilter("Outstanding Amount (LCY)", '<> 0');
+                        Page.RunModal(Page::"Purchase Lines", PurchaseLine);
                     end;
                 }
             }
@@ -1589,6 +1624,20 @@ page 88 "Job Card"
                 Caption = 'F&unctions';
                 Image = "Action";
 
+                action(CreatePurchaseOrder)
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Create Purchase Orders';
+                    Image = Document;
+                    ToolTip = 'Create one or more new purchase orders to buy the items that are required by this project, deducting any quantity that is already available.';
+
+                    trigger OnAction()
+                    var
+                        PurchaseDocFromJob: Codeunit "Purchase Doc. From Job";
+                    begin
+                        PurchaseDocFromJob.CreatePurchaseOrder(Rec);
+                    end;
+                }
                 action("Archive Job")
                 {
                     ApplicationArea = Jobs;
@@ -1601,6 +1650,14 @@ page 88 "Job Card"
                         JobArchiveManagement.ArchiveJob(Rec);
                         CurrPage.Update(false);
                     end;
+                }
+                action("Create Job &Sales Invoice")
+                {
+                    ApplicationArea = Jobs;
+                    Caption = 'Create Project &Sales Invoice';
+                    Image = JobSalesInvoice;
+                    RunObject = Report "Job Create Sales Invoice";
+                    ToolTip = 'Use a batch job to help you create project sales invoices for the involved project planning lines.';
                 }
             }
         }

@@ -15,8 +15,6 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
-using Microsoft.Service.Contract;
-using Microsoft.Service.Document;
 using System.Globalization;
 using System.Integration;
 using System.Security.AccessControl;
@@ -335,16 +333,24 @@ table 5065 "Interaction Log Entry"
     end;
 
     var
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 %2 is marked %3.\';
+#pragma warning restore AA0470
         Text001: Label 'Do you wish to remove the checkmark?';
+#pragma warning disable AA0470
         Text002: Label 'Do you wish to mark %1 %2 as %3?';
+#pragma warning restore AA0470
         Text003: Label 'It is not possible to view sales statements after they have been printed.';
         Text004: Label 'It is not possible to show cover sheets after they have been printed.';
+#pragma warning disable AA0470
         Text005: Label 'Do you wish to remove the checkmark from the selected %1 lines?';
         Text006: Label 'Do you wish to mark the selected %1 lines as %2?';
+#pragma warning restore AA0470
         Text009: Label 'Do you want to remove Attachment?';
         Text010: Label 'Do you want to remove unique Attachments for the selected lines?';
         Text011: Label 'Very Positive,Positive,Neutral,Negative,Very Negative';
+#pragma warning restore AA0074
         TitleFromLbl: Label '%1 - from %2', Comment = '%1 - document description, %2 - name';
         TitleByLbl: Label '%1 - by %2', Comment = '%1 - document description, %2 - name';
         OpenMessageQst: Label 'You are about to open an email message in Outlook Online. Email messages might contain harmful content. Use caution when interacting with the message. Do you want to continue?';
@@ -495,7 +501,6 @@ table 5065 "Interaction Log Entry"
                     exit;
                 end;
             end;
-            Attachment.DisplayInOutlook();
         end;
 
         OnAfterOpenAttachment(Rec, Attachment, SegmentLine);
@@ -582,7 +587,7 @@ table 5065 "Interaction Log Entry"
             InteractLogEntry.SetCurrentKey("Attachment No.");
             InteractLogEntry.SetRange("Attachment No.", "Attachment No.");
             InteractLogEntry.SetFilter("Entry No.", '<>%1', "Entry No.");
-            IsUnique := not InteractLogEntry.FindFirst();
+            IsUnique := InteractLogEntry.IsEmpty();
         end;
     end;
 
@@ -607,12 +612,10 @@ table 5065 "Interaction Log Entry"
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchRcptHeader: Record "Purch. Rcpt. Header";
         PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
-        ServHeader: Record "Service Header";
         ReturnRcptHeader: Record "Return Receipt Header";
         IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
         ReturnShipmentHeader: Record "Return Shipment Header";
-        ServiceContractHeader: Record "Service Contract Header";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -685,11 +688,6 @@ table 5065 "Interaction Log Entry"
                 begin
                     IssuedReminderHeader.Get("Document No.");
                     PAGE.Run(PAGE::"Issued Reminder", IssuedReminderHeader);
-                end;
-            "Document Type"::"Serv. Ord. Create":
-                begin
-                    ServHeader.Get(ServHeader."Document Type"::Order, "Document No.");
-                    PAGE.Run(PAGE::"Service Order", ServHeader)
                 end;
             "Document Type"::"Purch.Qte.":
                 if "Version No." <> 0 then begin
@@ -775,21 +773,6 @@ table 5065 "Interaction Log Entry"
                 else begin
                     ReturnShipmentHeader.SetRange("Return Order No.", "Document No.");
                     PAGE.Run(PAGE::"Posted Return Shipment", ReturnShipmentHeader);
-                end;
-            "Document Type"::"Service Contract":
-                begin
-                    ServiceContractHeader.Get(ServiceContractHeader."Contract Type"::Contract, "Document No.");
-                    PAGE.Run(PAGE::"Service Contract", ServiceContractHeader);
-                end;
-            "Document Type"::"Service Contract Quote":
-                begin
-                    ServiceContractHeader.Get(ServiceContractHeader."Contract Type"::Quote, "Document No.");
-                    PAGE.Run(PAGE::"Service Contract Quote", ServiceContractHeader);
-                end;
-            "Document Type"::"Service Quote":
-                begin
-                    ServHeader.Get(ServHeader."Document Type"::Quote, "Document No.");
-                    PAGE.Run(PAGE::"Service Quote", ServHeader);
                 end;
         end;
 

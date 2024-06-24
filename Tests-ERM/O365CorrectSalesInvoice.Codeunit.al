@@ -1440,7 +1440,7 @@ codeunit 138015 "O365 Correct Sales Invoice"
 
         // [WHEN] Invoice is corrected
         // [THEN] Error message 'Amount must have a value in Sales Invoice Header' appears
-        asserterror CorrectPostedSalesInvoice.TestCorrectInvoiceIsAllowed(SalesInvoiceHeader, FALSE);
+        asserterror CorrectPostedSalesInvoice.TestCorrectInvoiceIsAllowed(SalesInvoiceHeader, false);
         Assert.ExpectedError(AmountSalesInvErr);
     end;
 
@@ -1468,7 +1468,7 @@ codeunit 138015 "O365 Correct Sales Invoice"
         CreateItemsWithPrice(Item2, 10);
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLineType::Item, Item1."No.", 1);
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLineType::Item, Item2."No.", 1);
-        PostedSalesInvoiceNo := LibrarySales.PostSalesDocument(Salesheader, TRUE, TRUE);
+        PostedSalesInvoiceNo := LibrarySales.PostSalesDocument(Salesheader, true, true);
         SalesInvoiceHeader.GET(PostedSalesInvoiceNo);
 
         // [WHEN] Correct Posted Invoice is invoked

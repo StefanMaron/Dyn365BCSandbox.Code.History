@@ -161,9 +161,11 @@ report 5608 "Fixed Asset - Acquisition List"
         EndingDate: Date;
         FAWithoutAcqDate: Boolean;
         PrintFA: Boolean;
+#pragma warning disable AA0074
         Text001: Label 'You must specify a Starting Date.';
         Text002: Label 'You must specify an Ending Date.';
         Text003: Label 'You must specify an Ending Date that is later than the Starting Date.';
+#pragma warning restore AA0074
         FixedAssetAcqListCptnLbl: Label 'Fixed Asset - Acquisition List';
         CurrReportPageNoCaptionLbl: Label 'Page';
         FADeprBkAcquisitionDtCptnLbl: Label 'Acquisition Date';

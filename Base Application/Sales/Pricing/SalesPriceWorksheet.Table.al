@@ -269,9 +269,13 @@ table 7023 "Sales Price Worksheet"
         Campaign: Record Campaign;
         PriceAlreadyExists: Boolean;
 
+#pragma warning disable AA0074
+#pragma warning disable AA0470
         Text000: Label '%1 cannot be after %2';
         Text001: Label '%1 must be blank.';
         Text002: Label '%1 and %2 can only be altered from the Campaign Card when %3 = %4.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
 
     protected var
         Item: Record Item;
