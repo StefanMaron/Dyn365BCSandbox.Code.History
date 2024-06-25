@@ -1998,7 +1998,7 @@ codeunit 136103 "Service Items"
     var
         ServiceLedgerEntry: Record "Service Ledger Entry";
         ServiceItem: Record "Service Item";
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 376221] COD361 MoveEntries.CheckIfServiceItemCanBeDeleted() returns empty result in positive case
@@ -2007,7 +2007,7 @@ codeunit 136103 "Service Items"
         CreateServiceItem(ServiceItem);
         MockServiceItemLedgerEntry(ServiceLedgerEntry, ServiceItem."No.", 0D, false);
 
-        Assert.IsTrue(MoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, ServiceItem."No.") = '', ServiceItem."No.");
+        Assert.IsTrue(ServMoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, ServiceItem."No.") = '', ServiceItem."No.");
     end;
 
     [Test]
@@ -2016,7 +2016,7 @@ codeunit 136103 "Service Items"
     var
         ServiceLedgerEntry: Record "Service Ledger Entry";
         ServiceItem: Record "Service Item";
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 376221] COD361 MoveEntries.CheckIfServiceItemCanBeDeleted() returns error text in case of existing Service Ledger Entry with Posting Date within Accounting Period
@@ -2027,7 +2027,7 @@ codeunit 136103 "Service Items"
 
         Assert.ExpectedMessage(
           StrSubstNo(CheckIfCanBeDeletedServiceItemDatePeriodErr, ServiceItem.TableCaption(), ServiceItem."No."),
-          MoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, ServiceItem."No."));
+          ServMoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, ServiceItem."No."));
     end;
 
     [Test]
@@ -2036,7 +2036,7 @@ codeunit 136103 "Service Items"
     var
         ServiceLedgerEntry: Record "Service Ledger Entry";
         ServiceItem: Record "Service Item";
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 376221] COD361 MoveEntries.CheckIfServiceItemCanBeDeleted() returns error text in case of Open Service Ledger Entry
@@ -2047,7 +2047,7 @@ codeunit 136103 "Service Items"
 
         Assert.ExpectedMessage(
           StrSubstNo(CheckIfCanBeDeletedServiceItemOpenErr, ServiceItem.TableCaption(), ServiceItem."No."),
-          MoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, ServiceItem."No."));
+          ServMoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, ServiceItem."No."));
     end;
 
     [Test]
@@ -2056,7 +2056,7 @@ codeunit 136103 "Service Items"
     var
         ServiceLedgerEntry: Record "Service Ledger Entry";
         ServiceItem: Record "Service Item";
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 376221] COD361 MoveEntries.MoveServiceItemLedgerEntries() clears "Service Ledger Entry"."Service Item No. (Serviced)"
@@ -2064,7 +2064,7 @@ codeunit 136103 "Service Items"
 
         CreateServiceItem(ServiceItem);
         MockServiceItemLedgerEntry(ServiceLedgerEntry, ServiceItem."No.", 0D, false);
-        MoveEntries.MoveServiceItemLedgerEntries(ServiceItem);
+        ServMoveEntries.MoveServiceItemLedgerEntries(ServiceItem);
 
         ServiceLedgerEntry.Find();
         Assert.AreEqual(
@@ -2079,7 +2079,7 @@ codeunit 136103 "Service Items"
     var
         ServiceLedgerEntry: Record "Service Ledger Entry";
         ServiceItem: Record "Service Item";
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 376221] COD361 MoveEntries.MoveServiceItemLedgerEntries() throws an error in case of existing Service Ledger Entry with Posting Date within Accounting Period
@@ -2087,7 +2087,7 @@ codeunit 136103 "Service Items"
 
         CreateServiceItem(ServiceItem);
         MockServiceItemLedgerEntry(ServiceLedgerEntry, ServiceItem."No.", LibraryFiscalYear.GetFirstPostingDate(false), false);
-        asserterror MoveEntries.MoveServiceItemLedgerEntries(ServiceItem);
+        asserterror ServMoveEntries.MoveServiceItemLedgerEntries(ServiceItem);
 
         Assert.ExpectedErrorCode('Dialog');
         Assert.ExpectedError(StrSubstNo(CheckIfCanBeDeletedServiceItemDatePeriodErr, ServiceItem.TableCaption(), ServiceItem."No."));
@@ -2099,7 +2099,7 @@ codeunit 136103 "Service Items"
     var
         ServiceLedgerEntry: Record "Service Ledger Entry";
         ServiceItem: Record "Service Item";
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 376221] COD361 MoveEntries.MoveServiceItemLedgerEntries() throws an error in case of Open Service Ledger Entry
@@ -2107,7 +2107,7 @@ codeunit 136103 "Service Items"
 
         CreateServiceItem(ServiceItem);
         MockServiceItemLedgerEntry(ServiceLedgerEntry, ServiceItem."No.", 0D, true);
-        asserterror MoveEntries.MoveServiceItemLedgerEntries(ServiceItem);
+        asserterror ServMoveEntries.MoveServiceItemLedgerEntries(ServiceItem);
 
         Assert.ExpectedErrorCode('Dialog');
         Assert.ExpectedError(StrSubstNo(CheckIfCanBeDeletedServiceItemOpenErr, ServiceItem.TableCaption(), ServiceItem."No."));

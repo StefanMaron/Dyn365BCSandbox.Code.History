@@ -1,6 +1,4 @@
-namespace Microsoft.Serice.Extension;
-
-using Microsoft.Projects.Project.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
 tableextension 6460 "Serv. Job Planning Line" extends "Job Planning Line"
 {
