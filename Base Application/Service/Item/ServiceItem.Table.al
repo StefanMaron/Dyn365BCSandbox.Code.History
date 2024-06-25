@@ -1091,7 +1091,7 @@ table 5940 "Service Item"
         if IsHandled then
             exit;
 
-        MoveEntries.MoveServiceItemLedgerEntries(Rec);
+        ServMoveEntries.MoveServiceItemLedgerEntries(Rec);
 
         ResultDescription := CheckIfCanBeDeleted();
         if ResultDescription <> '' then
@@ -1130,10 +1130,10 @@ table 5940 "Service Item"
             NoSeriesMgt.RaiseObsoleteOnBeforeInitSeries(ServMgtSetup."Service Item Nos.", xRec."No. Series", 0D, "No.", "No. Series", IsHandled);
             if not IsHandled then begin
 #endif
-                "No. Series" := ServMgtSetup."Service Item Nos.";
-                if NoSeries.AreRelated("No. Series", xRec."No. Series") then
-                    "No. Series" := xRec."No. Series";
-                "No." := NoSeries.GetNextNo("No. Series");
+            "No. Series" := ServMgtSetup."Service Item Nos.";
+            if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "No." := NoSeries.GetNextNo("No. Series");
 #if not CLEAN24
                 NoSeriesMgt.RaiseObsoleteOnAfterInitSeries("No. Series", ServMgtSetup."Service Item Nos.", 0D, "No.");
             end;
@@ -1179,7 +1179,7 @@ table 5940 "Service Item"
         Currency: Record Currency;
         NoSeries: Codeunit "No. Series";
         ServLogMgt: Codeunit ServLogManagement;
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
         ResSkillMgt: Codeunit "Resource Skill Mgt.";
         DimMgt: Codeunit DimensionManagement;
         CancelResSkillChanges: Boolean;
@@ -1322,7 +1322,7 @@ table 5940 "Service Item"
                 exit(
                   StrSubstNo(Text002, TableCaption(), "No."));
 
-        exit(MoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, "No."));
+        exit(ServMoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, "No."));
     end;
 
     procedure OmitAssignResSkills(IsSetOmitted: Boolean)

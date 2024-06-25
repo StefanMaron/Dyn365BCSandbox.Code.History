@@ -1,6 +1,5 @@
-namespace Microsoft.Serice.Extension;
+namespace Microsoft.Projects.TimeSheet;
 
-using Microsoft.Projects.TimeSheet;
 using Microsoft.Service.Document;
 
 tableextension 6465 "Serv. Time Sheet Line Arch." extends "Time Sheet Line Archive"
