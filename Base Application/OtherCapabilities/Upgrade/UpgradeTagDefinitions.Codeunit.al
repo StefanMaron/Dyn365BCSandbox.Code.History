@@ -1094,9 +1094,19 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-447067-GetVATDateFieldSalesPurchUpgrade-20220830');
     end;
 
+    procedure GetVATDateFieldServiceUpgrade(): Code[250]
+    begin
+        exit('MS-447067-GetVATDateFieldServiceUpgrade-20220830');
+    end;
+
     internal procedure GetVATDateFieldSalesPurchBlankUpgrade(): Code[250]
     begin
         exit('MS-465444-GetVATDateFieldSalesPurchBlankUpgrade-20230301');
+    end;
+
+    internal procedure GetVATDateFieldServiceBlankUpgrade(): Code[250]
+    begin
+        exit('MS-465444-GetVATDateFieldServiceBlankUpgrade-20230301');
     end;
 
     procedure GetVATDateFieldIssuedDocsUpgrade(): Code[250]
