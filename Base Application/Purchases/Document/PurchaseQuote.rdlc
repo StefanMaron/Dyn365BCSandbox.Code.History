@@ -3249,6 +3249,9 @@ End Function</Code>
         <Field Name="PaytoVendorNo_PurchHdr">
           <DataField>PaytoVendorNo_PurchHdr</DataField>
         </Field>
+        <Field Name="CompanyPicture">
+          <DataField>CompanyPicture</DataField>
+        </Field>
         <Field Name="DocumentDate_PurchHdr">
           <DataField>DocumentDate_PurchHdr</DataField>
         </Field>
