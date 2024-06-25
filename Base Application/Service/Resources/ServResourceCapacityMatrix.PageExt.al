@@ -1,6 +1,5 @@
-namespace Microsoft.Serice.Extension;
+namespace Microsoft.Projects.Resources.Analysis;
 
-using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Service.Resources;
 
 pageextension 6460 "Serv. Resource Capacity Matrix" extends "Resource Capacity Matrix"

@@ -1099,7 +1099,7 @@ table 5940 "Service Item"
         if IsHandled then
             exit;
 
-        MoveEntries.MoveServiceItemLedgerEntries(Rec);
+        ServMoveEntries.MoveServiceItemLedgerEntries(Rec);
 
         ResultDescription := CheckIfCanBeDeleted();
         if ResultDescription <> '' then
@@ -1187,7 +1187,7 @@ table 5940 "Service Item"
         Currency: Record Currency;
         NoSeries: Codeunit "No. Series";
         ServLogMgt: Codeunit ServLogManagement;
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
         ResSkillMgt: Codeunit "Resource Skill Mgt.";
         DimMgt: Codeunit DimensionManagement;
         CancelResSkillChanges: Boolean;
@@ -1330,7 +1330,7 @@ table 5940 "Service Item"
                 exit(
                   StrSubstNo(Text002, TableCaption(), "No."));
 
-        exit(MoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, "No."));
+        exit(ServMoveEntries.CheckIfServiceItemCanBeDeleted(ServiceLedgerEntry, "No."));
     end;
 
     procedure OmitAssignResSkills(IsSetOmitted: Boolean)

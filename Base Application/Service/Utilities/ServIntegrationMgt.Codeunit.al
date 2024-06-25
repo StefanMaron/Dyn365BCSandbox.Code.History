@@ -1,4 +1,4 @@
-namespace Microsoft.Service.Extension;
+namespace Microsoft.Utilities;
 
 using Microsoft.Foundation.Attachment;
 using Microsoft.Inventory.Item;
@@ -16,7 +16,6 @@ using Microsoft.Service.Contract;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Service.Setup;
 using Microsoft.Integration.D365Sales;
-using Microsoft.Utilities;
 using Microsoft.Manufacturing.Planning;
 
 codeunit 6450 "Serv. Integration Mgt."

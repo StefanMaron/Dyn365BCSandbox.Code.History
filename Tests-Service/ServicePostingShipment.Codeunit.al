@@ -1899,9 +1899,9 @@ codeunit 136107 "Service Posting - Shipment"
 
     local procedure CreateWhseShipmentFromServiceHeader(ServiceHeader: Record "Service Header")
     var
-        GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
+        ServGetSourceDocOutbound: Codeunit "Serv. Get Source Doc. Outbound";
     begin
-        GetSourceDocOutbound.CreateFromServiceOrder(ServiceHeader);
+        ServGetSourceDocOutbound.CreateFromServiceOrder(ServiceHeader);
     end;
 
     local procedure GetServiceLines(var ServiceLine: Record "Service Line"; DocumentNo: Code[20])
