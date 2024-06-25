@@ -8336,6 +8336,9 @@ End Function</Code>
         <Field Name="VendAddr6">
           <DataField>VendAddr6</DataField>
         </Field>
+        <Field Name="CompanyPicture">
+          <DataField>CompanyPicture</DataField>
+        </Field>
         <Field Name="CompanyInfoVATRegNo">
           <DataField>CompanyInfoVATRegNo</DataField>
         </Field>
