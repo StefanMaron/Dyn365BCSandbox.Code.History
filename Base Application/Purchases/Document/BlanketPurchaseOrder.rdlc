@@ -4579,6 +4579,9 @@ End Function</Code>
         <Field Name="CompanyInfo__Bank_Account_No__">
           <DataField>CompanyInfo__Bank_Account_No__</DataField>
         </Field>
+        <Field Name="CompanyPicture">
+          <DataField>CompanyPicture</DataField>
+        </Field>
         <Field Name="Purchase_Header___Pay_to_Vendor_No__">
           <DataField>Purchase_Header___Pay_to_Vendor_No__</DataField>
         </Field>

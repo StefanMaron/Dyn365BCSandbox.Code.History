@@ -131,6 +131,9 @@ report 404 "Purchase - Quote"
                     column(CompanyInfoBankAccNo; CompanyInfo."Bank Account No.")
                     {
                     }
+                    column(CompanyPicture; DummyCompanyInfo.Picture)
+                    {
+                    }
                     column(PaytoVendNo_PurchHdr; "Purchase Header"."Pay-to Vendor No.")
                     {
                     }
@@ -269,8 +272,17 @@ report 404 "Purchase - Quote"
                         DataItemLinkReference = "Purchase Header";
                         DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
+                        trigger OnAfterGetRecord()
+                        begin
+                            if FirstLineHasBeenOutput then
+                                Clear(DummyCompanyInfo.Picture);
+                            FirstLineHasBeenOutput := true;
+                        end;
+
                         trigger OnPreDataItem()
                         begin
+                            FirstLineHasBeenOutput := false;
+                            DummyCompanyInfo.Picture := CompanyInfo.Picture;
                             CurrReport.Break();
                         end;
                     }
@@ -516,6 +528,7 @@ report 404 "Purchase - Quote"
 
                 trigger OnAfterGetRecord()
                 begin
+                    FirstLineHasBeenOutput := false;
                     Clear(TempPurchaseLine);
                     Clear(PurchPost);
                     TempPurchaseLine.DeleteAll();
@@ -544,6 +557,7 @@ report 404 "Purchase - Quote"
 
             trigger OnAfterGetRecord()
             begin
+                FirstLineHasBeenOutput := false;
                 CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault("Language Code");
                 CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
@@ -558,6 +572,11 @@ report 404 "Purchase - Quote"
                 if not IsReportInPreviewMode() then
                     if ArchiveDocument then
                         ArchiveManagement.StorePurchDocument("Purchase Header", LogInteraction);
+            end;
+
+            trigger OnPreDataItem()
+            begin
+                FirstLineHasBeenOutput := false;
             end;
 
             trigger OnPostDataItem()
@@ -648,6 +667,7 @@ report 404 "Purchase - Quote"
 
     trigger OnInitReport()
     begin
+        CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         PurchSetup.Get();
 
@@ -677,6 +697,7 @@ report 404 "Purchase - Quote"
 #pragma warning disable AA0074
         Text002: Label 'Purchase - Quote %1', Comment = '%1 = Document No.';
 #pragma warning restore AA0074
+        DummyCompanyInfo: Record "Company Information";
         ShipmentMethod: Record "Shipment Method";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         TempPurchaseLine: Record "Purchase Line" temporary;
@@ -735,6 +756,7 @@ report 404 "Purchase - Quote"
         LogInteraction: Boolean;
         NoOfCopies: Integer;
         ShowInternalInfo: Boolean;
+        FirstLineHasBeenOutput: Boolean;
 
     procedure IntializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewArchiveDocument: Boolean; NewLogInteraction: Boolean)
     begin
