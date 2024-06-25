@@ -3495,9 +3495,9 @@ codeunit 136140 "Service Order Release"
 
     local procedure CreateWarehouseShipmentFromServiceHeader(ServiceHeader: Record "Service Header")
     var
-        GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
+        ServGetSourceDocOutbound: Codeunit "Serv. Get Source Doc. Outbound";
     begin
-        GetSourceDocOutbound.CreateFromServiceOrder(ServiceHeader);
+        ServGetSourceDocOutbound.CreateFromServiceOrder(ServiceHeader);
     end;
 
     local procedure CreateWarehouseShipmentFromSalesOrder(var SalesHeader: Record "Sales Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header")
