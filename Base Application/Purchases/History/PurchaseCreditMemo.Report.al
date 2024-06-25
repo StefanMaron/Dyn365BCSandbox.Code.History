@@ -152,6 +152,9 @@ report 407 "Purchase - Credit Memo"
                     column(CompanyInfoEnterpriseNo; CompanyInfo."Enterprise No.")
                     {
                     }
+                    column(CompanyPicture; DummyCompanyInfo.Picture)
+                    {
+                    }
                     column(CompanyInfoGiroNo; CompanyInfo."Giro No.")
                     {
                     }
@@ -529,6 +532,10 @@ report 407 "Purchase - Credit Memo"
                             TotalAmountVAT += "Amount Including VAT" - Amount;
                             TotalAmountInclVAT += "Amount Including VAT";
                             TotalPaymentDiscountOnVAT += -("Line Amount" - "Inv. Discount Amount" - "Amount Including VAT");
+
+                            if FirstLineHasBeenOutput then
+                                Clear(DummyCompanyInfo.Picture);
+                            FirstLineHasBeenOutput := true;
                         end;
 
                         trigger OnPreDataItem()
@@ -556,6 +563,8 @@ report 407 "Purchase - Credit Memo"
                                 until PurchCrMemoLine.Next() = 0;
                             end;
                             AllowInvDiscount := Format("Allow Invoice Disc.");
+                            FirstLineHasBeenOutput := false;
+                            DummyCompanyInfo.Picture := CompanyInfo.Picture;
                         end;
                     }
                     dataitem(VATCounter; "Integer")
@@ -738,6 +747,7 @@ report 407 "Purchase - Credit Memo"
 
                 trigger OnAfterGetRecord()
                 begin
+                    FirstLineHasBeenOutput := false;
                     if Number > 1 then begin
                         CopyText := FormatDocument.GetCOPYText();
                         OutputNo += 1;
@@ -771,6 +781,7 @@ report 407 "Purchase - Credit Memo"
             begin
                 VATNoText := '';
                 NoText := '';
+                FirstLineHasBeenOutput := false;
                 CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault("Language Code");
                 CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
@@ -798,6 +809,7 @@ report 407 "Purchase - Credit Memo"
 
             trigger OnPreDataItem()
             begin
+                FirstLineHasBeenOutput := false;
                 OnAfterPostDataItem("Purch. Cr. Memo Hdr.");
             end;
         }
@@ -860,6 +872,7 @@ report 407 "Purchase - Credit Memo"
     trigger OnInitReport()
     begin
         GLSetup.Get();
+        CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
 
         OnAfterInitReport();
@@ -889,6 +902,7 @@ report 407 "Purchase - Credit Memo"
 #pragma warning restore AA0470
         Text005: Label 'Purchase - Credit Memo %1', Comment = '%1 = Document No.';
 #pragma warning restore AA0074
+        DummyCompanyInfo: Record "Company Information";
         GLSetup: Record "General Ledger Setup";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
@@ -992,6 +1006,7 @@ report 407 "Purchase - Credit Memo"
 
     protected var
         CompanyInfo: Record "Company Information";
+        FirstLineHasBeenOutput: Boolean;
         ShipToAddr: array[8] of Text[100];
 
     procedure InitLogInteraction()
