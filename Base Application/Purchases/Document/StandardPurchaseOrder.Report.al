@@ -73,7 +73,7 @@ report 1322 "Standard Purchase - Order"
             column(CompanyEMail; CompanyInfo."E-Mail")
             {
             }
-            column(CompanyPicture; CompanyInfo.Picture)
+            column(CompanyPicture; DummyCompanyInfo.Picture)
             {
             }
             column(CompanyPhoneNo; CompanyInfo."Phone No.")
@@ -697,12 +697,19 @@ report 1322 "Standard Purchase - Order"
                             "Purchase Header".CalcFields("Amount Including VAT", Amount);
                             TaxAmount := "Purchase Header"."Amount Including VAT" - "Purchase Header".Amount;
                         end;
+			
+                    if FirstLineHasBeenOutput then
+                        Clear(DummyCompanyInfo.Picture);
+                    FirstLineHasBeenOutput := true;
                 end;
 
                 trigger OnPreDataItem()
                 begin
                     NumberOfLines := Count;
                     OnLineNumber := 0;
+
+                    FirstLineHasBeenOutput := false;
+                    DummyCompanyInfo.Picture := CompanyInfo.Picture;
                 end;
             }
             dataitem(Totals; "Integer")
@@ -763,6 +770,7 @@ report 1322 "Standard Purchase - Order"
                 var
                     TempPrepmtPurchLine: Record "Purchase Line" temporary;
                 begin
+                    FirstLineHasBeenOutput := false;
                     Clear(TempPurchLine);
                     Clear(PurchPost);
                     TempPurchLine.DeleteAll();
@@ -1043,6 +1051,7 @@ report 1322 "Standard Purchase - Order"
 
             trigger OnAfterGetRecord()
             begin
+                FirstLineHasBeenOutput := false;
                 TotalAmount := 0;
                 TotalSubTotal := 0;
                 TaxAmount := 0;
@@ -1084,6 +1093,11 @@ report 1322 "Standard Purchase - Order"
                     UseDate := "Posting Date"
                 else
                     UseDate := WorkDate();
+            end;
+
+            trigger OnPreDataItem()
+            begin
+                FirstLineHasBeenOutput := false;
             end;
         }
     }
@@ -1167,9 +1181,9 @@ report 1322 "Standard Purchase - Order"
         IsHandled: Boolean;
     begin
         GLSetup.Get();
+        CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         PurchSetup.Get();
-        CompanyInfo.CalcFields(Picture);
 
         IsHandled := false;
         OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl);
@@ -1193,6 +1207,7 @@ report 1322 "Standard Purchase - Order"
     end;
 
     var
+        DummyCompanyInfo: Record "Company Information";
         GLSetup: Record "General Ledger Setup";
         TempPurchLine: Record "Purchase Line" temporary;
         TempSalesTaxAmtLine: Record "Sales Tax Amount Line" temporary;
@@ -1351,6 +1366,7 @@ report 1322 "Standard Purchase - Order"
         ArchiveDocument: Boolean;
         LogInteraction: Boolean;
         LogInteractionEnable: Boolean;
+        FirstLineHasBeenOutput: Boolean;
         TotalSubTotal, TotalAmount, TotalInvoiceDiscountAmount : Decimal;
 
     procedure InitializeRequest(LogInteractionParam: Boolean)

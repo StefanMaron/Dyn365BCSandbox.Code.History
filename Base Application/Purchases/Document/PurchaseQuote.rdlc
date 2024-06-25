@@ -3287,6 +3287,9 @@ End Function</Code>
         <Field Name="BuyFromVendNo_PurchaseHeader">
           <DataField>BuyFromVendNo_PurchaseHeader</DataField>
         </Field>
+        <Field Name="CompanyPicture">
+          <DataField>CompanyPicture</DataField>
+        </Field>
         <Field Name="DocDate_PurchaseHeader">
           <DataField>DocDate_PurchaseHeader</DataField>
         </Field>
