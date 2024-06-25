@@ -1,4 +1,4 @@
-codeunit 137162 "SCM Warehouse - Shipping III"
+﻿codeunit 137162 "SCM Warehouse - Shipping III"
 {
     Subtype = Test;
     TestPermissions = Disabled;
@@ -1789,7 +1789,7 @@ codeunit 137162 "SCM Warehouse - Shipping III"
         WhseActivityLine: Record "Warehouse Activity Line";
         ItemLedgerEntry: Record "Item Ledger Entry";
         ReleaseWhseShipment: Codeunit "Whse.-Shipment Release";
-        GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
+        ServGetSourceDocOutbound: Codeunit "Serv. Get Source Doc. Outbound";
         WMSMgt: Codeunit "WMS Management";
         WhseActivityRegister: Codeunit "Whse.-Activity-Register";
         WhsePostShipment: Codeunit "Whse.-Post Shipment";
@@ -1839,7 +1839,7 @@ codeunit 137162 "SCM Warehouse - Shipping III"
 
         // [WHEN] Creating a warehouse shipment for the service order.
         LibraryService.ReleaseServiceDocument(ServiceHeader);
-        GetSourceDocOutbound.CreateFromServiceOrderHideDialog(ServiceHeader);
+        ServGetSourceDocOutbound.CreateFromServiceOrderHideDialog(ServiceHeader);
 
         // [THEN] Only the inventory item is added to the shipment lines.
         WhseShptLine.SetRange("Location Code", Location.Code);

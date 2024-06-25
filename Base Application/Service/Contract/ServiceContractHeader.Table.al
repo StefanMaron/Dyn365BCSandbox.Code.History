@@ -1471,7 +1471,7 @@ table 5965 "Service Contract Header"
               RespCenter.TableCaption(), UserMgt.GetSalesFilter());
 
         if "Contract Type" = "Contract Type"::Contract then begin
-            MoveEntries.MoveServContractLedgerEntries(Rec);
+            ServMoveEntries.MoveServContractLedgerEntries(Rec);
 
             if Status = Status::Signed then
                 Error(Text003, Format(Status), TableCaption);
@@ -1622,7 +1622,7 @@ table 5965 "Service Contract Header"
         ServContractMgt: Codeunit ServContractManagement;
         ServOrderMgt: Codeunit ServOrderManagement;
         DimMgt: Codeunit DimensionManagement;
-        MoveEntries: Codeunit MoveEntries;
+        ServMoveEntries: Codeunit "Serv. Move Entries";
         DaysInThisInvPeriod: Integer;
         DaysInFullInvPeriod: Integer;
         TempDate: Date;
