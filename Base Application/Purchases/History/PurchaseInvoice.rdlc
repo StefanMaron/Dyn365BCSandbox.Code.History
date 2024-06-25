@@ -8979,6 +8979,9 @@ End Function
         <Field Name="CompanyInfoVATRegistrationNo">
           <DataField>CompanyInfoVATRegistrationNo</DataField>
         </Field>
+        <Field Name="CompanyPicture">
+          <DataField>CompanyPicture</DataField>
+        </Field>
         <Field Name="CompanyInfoGiroNo">
           <DataField>CompanyInfoGiroNo</DataField>
         </Field>
