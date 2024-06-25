@@ -3015,6 +3015,9 @@ End Function</Code>
         <Field Name="CompanyInfoEMail">
           <DataField>CompanyInfoEMail</DataField>
         </Field>
+        <Field Name="CompanyPicture">
+          <DataField>CompanyPicture</DataField>
+        </Field>
         <Field Name="PaytoVendNo_PurchHdr">
           <DataField>PaytoVendNo_PurchHdr</DataField>
         </Field>

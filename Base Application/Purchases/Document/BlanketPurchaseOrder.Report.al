@@ -140,6 +140,9 @@ report 410 "Blanket Purchase Order"
                     column(CompanyInfoEMail; CompanyInfo."E-Mail")
                     {
                     }
+                    column(CompanyPicture; DummyCompanyInfo.Picture)
+                    {
+                    }
                     column(PayToVendNo_PurchHdr; "Purchase Header"."Pay-to Vendor No.")
                     {
                     }
@@ -296,8 +299,17 @@ report 410 "Blanket Purchase Order"
                         DataItemLinkReference = "Purchase Header";
                         DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
+                        trigger OnAfterGetRecord()
+                        begin
+                            if FirstLineHasBeenOutput then
+                                Clear(DummyCompanyInfo.Picture);
+                            FirstLineHasBeenOutput := true;
+                        end;
+
                         trigger OnPreDataItem()
                         begin
+                            FirstLineHasBeenOutput := false;
+                            DummyCompanyInfo.Picture := CompanyInfo.Picture;
                             CurrReport.Break();
                         end;
                     }
@@ -474,6 +486,7 @@ report 410 "Blanket Purchase Order"
 
                 trigger OnAfterGetRecord()
                 begin
+                    FirstLineHasBeenOutput := false;
                     Clear(TempPurchaseLine);
                     Clear(PurchPost);
                     TempPurchaseLine.DeleteAll();
@@ -503,6 +516,7 @@ report 410 "Blanket Purchase Order"
 
             trigger OnAfterGetRecord()
             begin
+                FirstLineHasBeenOutput := false;
                 CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault("Language Code");
                 CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
@@ -517,6 +531,11 @@ report 410 "Blanket Purchase Order"
                 if not IsReportInPreviewMode() then
                     if ArchiveDocument then
                         ArchiveManagement.StorePurchDocument("Purchase Header", LogInteraction);
+            end;
+
+            trigger OnPreDataItem()
+            begin
+                FirstLineHasBeenOutput := false;
             end;
         }
     }
@@ -590,6 +609,7 @@ report 410 "Blanket Purchase Order"
 
     trigger OnInitReport()
     begin
+        CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         PurchSetup.Get();
     end;
@@ -614,6 +634,7 @@ report 410 "Blanket Purchase Order"
     end;
 
     var
+        DummyCompanyInfo: Record "Company Information";
         TempPurchaseLine: Record "Purchase Line" temporary;
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
@@ -674,6 +695,7 @@ report 410 "Blanket Purchase Order"
         ShipmentMethod: Record "Shipment Method";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         FormatDocument: Codeunit "Format Document";
+        FirstLineHasBeenOutput: Boolean;
         VendAddr: array[8] of Text[100];
         ShipToAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
