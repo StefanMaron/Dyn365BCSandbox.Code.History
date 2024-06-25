@@ -5643,7 +5643,13 @@ table 36 "Sales Header"
         ErrorContextElement: Codeunit "Error Context Element";
         ErrorMessageMgt: Codeunit "Error Message Management";
         ErrorMessageHandler: Codeunit "Error Message Handler";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSendToPosting(Rec, IsSuccess, IsHandled, PostingCodeunitID);
+        if IsHandled then
+            exit(IsSuccess);
+
         if not IsApprovedForPosting() then
             exit;
 
@@ -10051,6 +10057,11 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateVATReportingDate(var SalesHeader: Record "Sales Header"; CalledByFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendToPosting(var SalesHeader: Record "Sales Header"; var IsSuccess: Boolean; var IsHandled: Boolean; PostingCodeunitID: Integer)
     begin
     end;
 }
