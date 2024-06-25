@@ -560,7 +560,13 @@ codeunit 5510 "Production Journal Mgt"
         ItemJnlLine2: Record "Item Journal Line";
         ReservEntry: Record "Reservation Entry";
         HasChanged: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeDataHasChanged(TemplateName, BatchName, ProdOrderNo, ProdOrderLineNo, HasChanged, IsHandled);
+        if IsHandled then
+            exit(HasChanged);
+
         ItemJnlLine2.Reset();
         ItemJnlLine2.SetRange("Journal Template Name", TemplateName);
         ItemJnlLine2.SetRange("Journal Batch Name", BatchName);
@@ -783,6 +789,11 @@ codeunit 5510 "Production Journal Mgt"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteJnlLinesOnAfterSetFilters(var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDataHasChanged(TemplateName: Code[10]; BatchName: Code[10]; ProdOrderNo: Code[20]; ProdOrderLineNo: Integer; var HasChanged: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
