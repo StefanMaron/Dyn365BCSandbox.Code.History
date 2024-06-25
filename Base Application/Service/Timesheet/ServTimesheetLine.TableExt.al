@@ -1,6 +1,5 @@
-namespace Microsoft.Serice.Extension;
+namespace Microsoft.Projects.TimeSheet;
 
-using Microsoft.Projects.TimeSheet;
 using Microsoft.Service.Document;
 
 tableextension 6464 "Serv. Time Sheet Line" extends "Time Sheet Line"
