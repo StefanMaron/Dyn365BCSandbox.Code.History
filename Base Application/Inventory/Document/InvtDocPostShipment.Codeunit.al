@@ -415,7 +415,7 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
         HideValidationDialog := NewHideValidationDialog;
     end;
 
-    internal procedure SetPreviewMode(NewPreviewMode: Boolean)
+    procedure SetPreviewMode(NewPreviewMode: Boolean)
     begin
         PreviewMode := NewPreviewMode;
     end;
