@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -639,10 +639,10 @@ page 9318 "Service Orders"
 
                     trigger OnAction()
                     var
-                        GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
+                        ServGetSourceDocOutbound: Codeunit "Serv. Get Source Doc. Outbound";
                     begin
                         Rec.PerformManualRelease();
-                        GetSourceDocOutbound.CreateFromServiceOrder(Rec);
+                        ServGetSourceDocOutbound.CreateFromServiceOrder(Rec);
                         if not Rec.Find('=><') then
                             Rec.Init();
                     end;
