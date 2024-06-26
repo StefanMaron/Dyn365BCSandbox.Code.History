@@ -46,10 +46,10 @@ codeunit 1699 "Navigate Bank Deposit Ext."
         PostedBankDepositLine: Record "Posted Bank Deposit Line";
     begin
         if SetPostedBankDepositHeaderFilters(PostedBankDepositHeader, DocNoFilter) then
-            Sender.InsertIntoDocEntry(DocumentEntry, Database::"Posted Bank Deposit Header", PostedBankDepositHeader.TableCaption(), PostedBankDepositHeader.Count());
+            DocumentEntry.InsertIntoDocEntry(Database::"Posted Bank Deposit Header", PostedBankDepositHeader.TableCaption(), PostedBankDepositHeader.Count());
 
         if SetPostedBankDepositLineFilters(PostedBankDepositLine, DocNoFilter, PostingDateFilter, not Sender.GetNavigationFromPostedBankDeposit()) then
-            Sender.InsertIntoDocEntry(DocumentEntry, Database::"Posted Bank Deposit Line", PostedBankDepositLine.TableCaption(), PostedBankDepositLine.Count());
+            DocumentEntry.InsertIntoDocEntry(Database::"Posted Bank Deposit Line", PostedBankDepositLine.TableCaption(), PostedBankDepositLine.Count());
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnBeforeNavigateShowRecords', '', false, false)]
