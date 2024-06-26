@@ -7532,8 +7532,8 @@ codeunit 136101 "Service Orders"
     end;
 #endif
 
-    [EventSubscriber(ObjectType::Table, Database::"Invoice Posting Buffer", 'OnAfterPrepareService', '', false, false)]
-    local procedure OnAfterPrepareService(var ServiceLine: Record "Service Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service Post Invoice Events", 'OnAfterPrepareInvoicePostingBuffer', '', false, false)]
+    local procedure OnAfterPrepareInvoicePostingBuffer(var ServiceLine: Record "Service Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
     begin
         // Example of extending feature "Copy document line description to G/L entries" for lines with type = "Item"
         if InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::Item then begin
