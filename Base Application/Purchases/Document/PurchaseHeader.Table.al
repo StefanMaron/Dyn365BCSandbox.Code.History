@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Purchases.Document;
+namespace Microsoft.Purchases.Document;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
@@ -212,6 +212,7 @@ table 38 "Purchase Header"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -333,6 +334,7 @@ table 38 "Purchase Header"
         field(5; "Pay-to Name"; Text[100])
         {
             Caption = 'Pay-to Name';
+            OptimizeForTextSearch = true;
             TableRelation = Vendor.Name;
             ValidateTableRelation = false;
 
@@ -361,10 +363,12 @@ table 38 "Purchase Header"
         field(6; "Pay-to Name 2"; Text[50])
         {
             Caption = 'Pay-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(7; "Pay-to Address"; Text[100])
         {
             Caption = 'Pay-to Address';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -374,6 +378,7 @@ table 38 "Purchase Header"
         field(8; "Pay-to Address 2"; Text[50])
         {
             Caption = 'Pay-to Address 2';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -383,6 +388,7 @@ table 38 "Purchase Header"
         field(9; "Pay-to City"; Text[30])
         {
             Caption = 'Pay-to City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Pay-to Country/Region Code"));
@@ -408,6 +414,7 @@ table 38 "Purchase Header"
         field(10; "Pay-to Contact"; Text[100])
         {
             Caption = 'Pay-to Contact';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -428,6 +435,7 @@ table 38 "Purchase Header"
         field(11; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
+            OptimizeForTextSearch = true;
         }
         field(12; "Ship-to Code"; Code[10])
         {
@@ -486,22 +494,27 @@ table 38 "Purchase Header"
         field(13; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
+            OptimizeForTextSearch = true;
         }
         field(14; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(15; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
+            OptimizeForTextSearch = true;
         }
         field(16; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
@@ -526,6 +539,7 @@ table 38 "Purchase Header"
         field(18; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(19; "Order Date"; Date)
         {
@@ -657,6 +671,7 @@ table 38 "Purchase Header"
         field(22; "Posting Description"; Text[100])
         {
             Caption = 'Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(23; "Payment Terms Code"; Code[10])
         {
@@ -955,6 +970,7 @@ table 38 "Purchase Header"
         field(42; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
+            OptimizeForTextSearch = true;
             TableRelation = "Language Selection"."Language Tag";
         }
         field(43; "Purchaser Code"; Code[20])
@@ -1221,6 +1237,7 @@ table 38 "Purchase Header"
         field(70; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
+            OptimizeForTextSearch = true;
         }
         field(72; "Sell-to Customer No."; Code[20])
         {
@@ -1310,6 +1327,7 @@ table 38 "Purchase Header"
         field(79; "Buy-from Vendor Name"; Text[100])
         {
             Caption = 'Buy-from Vendor Name';
+            OptimizeForTextSearch = true;
             TableRelation = Vendor.Name;
             ValidateTableRelation = false;
 
@@ -1356,10 +1374,12 @@ table 38 "Purchase Header"
         field(80; "Buy-from Vendor Name 2"; Text[50])
         {
             Caption = 'Buy-from Vendor Name 2';
+            OptimizeForTextSearch = true;
         }
         field(81; "Buy-from Address"; Text[100])
         {
             Caption = 'Buy-from Address';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1370,6 +1390,7 @@ table 38 "Purchase Header"
         field(82; "Buy-from Address 2"; Text[50])
         {
             Caption = 'Buy-from Address 2';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1380,6 +1401,7 @@ table 38 "Purchase Header"
         field(83; "Buy-from City"; Text[30])
         {
             Caption = 'Buy-from City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code".City
             else
             if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Buy-from Country/Region Code"));
@@ -1412,6 +1434,7 @@ table 38 "Purchase Header"
         field(84; "Buy-from Contact"; Text[100])
         {
             Caption = 'Buy-from Contact';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             begin
@@ -1452,6 +1475,7 @@ table 38 "Purchase Header"
         {
             CaptionClass = '5,6,' + "Pay-to Country/Region Code";
             Caption = 'Pay-to County';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1505,6 +1529,7 @@ table 38 "Purchase Header"
         {
             CaptionClass = '5,5,' + "Buy-from Country/Region Code";
             Caption = 'Buy-from County';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1562,6 +1587,7 @@ table 38 "Purchase Header"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
+            OptimizeForTextSearch = true;
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
         {
@@ -1913,6 +1939,7 @@ table 38 "Purchase Header"
         field(127; "IC Reference Document No."; Code[20])
         {
             Caption = 'IC Reference Document No.';
+            OptimizeForTextSearch = true;
             Editable = false;
         }
         field(129; "IC Direction"; Enum "IC Direction Type")
@@ -2020,6 +2047,7 @@ table 38 "Purchase Header"
         field(139; "Prepmt. Posting Description"; Text[100])
         {
             Caption = 'Prepmt. Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(142; "Prepmt. Pmt. Discount Date"; Date)
         {
@@ -2178,6 +2206,7 @@ table 38 "Purchase Header"
         field(210; "Ship-to Phone No."; Text[30])
         {
             Caption = 'Ship-to Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(300; "A. Rcd. Not Inv. Ex. VAT (LCY)"; Decimal)
@@ -2753,14 +2782,17 @@ table 38 "Purchase Header"
         field(12133; "Birth City"; Text[30])
         {
             Caption = 'Birth City';
+            OptimizeForTextSearch = true;
         }
         field(12134; "First Name"; Text[30])
         {
             Caption = 'First Name';
+            OptimizeForTextSearch = true;
         }
         field(12135; "Last Name"; Text[30])
         {
             Caption = 'Last Name';
+            OptimizeForTextSearch = true;
         }
         field(12136; "Date of Birth"; Date)
         {
@@ -2850,18 +2882,22 @@ table 38 "Purchase Header"
         field(12176; "Additional Information"; Text[50])
         {
             Caption = 'Additional Information';
+            OptimizeForTextSearch = true;
         }
         field(12177; "Additional Notes"; Text[50])
         {
             Caption = 'Additional Notes';
+            OptimizeForTextSearch = true;
         }
         field(12178; "Additional Instructions"; Text[50])
         {
             Caption = 'Additional Instructions';
+            OptimizeForTextSearch = true;
         }
         field(12179; "TDD Prepared By"; Text[50])
         {
             Caption = 'TDD Prepared By';
+            OptimizeForTextSearch = true;
             DataClassification = EndUserIdentifiableInformation;
         }
         field(12180; "Subcontracting Order"; Boolean)

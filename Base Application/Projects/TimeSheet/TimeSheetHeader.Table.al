@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -18,6 +18,7 @@ table 950 "Time Sheet Header"
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
         }
         field(3; "Starting Date"; Date)
         {
@@ -57,6 +58,7 @@ table 950 "Time Sheet Header"
         field(6; "Resource Name"; Text[100])
         {
             Caption = 'Resource Name';
+            OptimizeForTextSearch = true;
             FieldClass = FlowField;
             CalcFormula = lookup(Resource.Name where("No." = field("Resource No.")));
             Editable = false;
@@ -76,6 +78,7 @@ table 950 "Time Sheet Header"
         field(10; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(11; "Unit of Measure"; Code[10])

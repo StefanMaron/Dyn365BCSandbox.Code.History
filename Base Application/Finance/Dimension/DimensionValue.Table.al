@@ -19,6 +19,7 @@ table 349 "Dimension Value"
         field(1; "Dimension Code"; Code[20])
         {
             Caption = 'Dimension Code';
+            OptimizeForTextSearch = true;
             NotBlank = true;
             TableRelation = Dimension;
 
@@ -42,6 +43,7 @@ table 349 "Dimension Value"
         field(3; Name; Text[50])
         {
             Caption = 'Name';
+            OptimizeForTextSearch = true;
         }
         field(4; "Dimension Value Type"; Option)
         {
@@ -62,6 +64,7 @@ table 349 "Dimension Value"
         field(5; Totaling; Text[250])
         {
             Caption = 'Totaling';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Dimension Value Type" = const(Total)) "Dimension Value"."Dimension Code" where("Dimension Code" = field("Dimension Code"));
             ValidateTableRelation = false;
 

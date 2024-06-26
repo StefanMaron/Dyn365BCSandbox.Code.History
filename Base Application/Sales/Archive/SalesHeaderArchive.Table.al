@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Sales.Archive;
+namespace Microsoft.Sales.Archive;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
@@ -59,6 +59,7 @@ table 5107 "Sales Header Archive"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
         }
         field(4; "Bill-to Customer No."; Code[20])
         {
@@ -69,32 +70,39 @@ table 5107 "Sales Header Archive"
         field(5; "Bill-to Name"; Text[100])
         {
             Caption = 'Bill-to Name';
+            OptimizeForTextSearch = true;
         }
         field(6; "Bill-to Name 2"; Text[50])
         {
             Caption = 'Bill-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(7; "Bill-to Address"; Text[100])
         {
             Caption = 'Bill-to Address';
+            OptimizeForTextSearch = true;
         }
         field(8; "Bill-to Address 2"; Text[50])
         {
             Caption = 'Bill-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(9; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(10; "Bill-to Contact"; Text[100])
         {
             Caption = 'Bill-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(11; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
+            OptimizeForTextSearch = true;
         }
         field(12; "Ship-to Code"; Code[10])
         {
@@ -104,28 +112,34 @@ table 5107 "Sales Header Archive"
         field(13; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
+            OptimizeForTextSearch = true;
         }
         field(14; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(15; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
+            OptimizeForTextSearch = true;
         }
         field(16; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(19; "Order Date"; Date)
         {
@@ -142,6 +156,7 @@ table 5107 "Sales Header Archive"
         field(22; "Posting Description"; Text[100])
         {
             Caption = 'Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(23; "Payment Terms Code"; Code[10])
         {
@@ -227,6 +242,7 @@ table 5107 "Sales Header Archive"
         field(42; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
+            OptimizeForTextSearch = true;
             TableRelation = "Language Selection"."Language Tag";
         }
         field(43; "Salesperson Code"; Code[20])
@@ -343,6 +359,7 @@ table 5107 "Sales Header Archive"
         field(70; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
+            OptimizeForTextSearch = true;
         }
         field(71; "Combine Shipments"; Boolean)
         {
@@ -380,28 +397,34 @@ table 5107 "Sales Header Archive"
         field(79; "Sell-to Customer Name"; Text[100])
         {
             Caption = 'Sell-to Customer Name';
+            OptimizeForTextSearch = true;
         }
         field(80; "Sell-to Customer Name 2"; Text[50])
         {
             Caption = 'Sell-to Customer Name 2';
+            OptimizeForTextSearch = true;
         }
         field(81; "Sell-to Address"; Text[100])
         {
             Caption = 'Sell-to Address';
+            OptimizeForTextSearch = true;
         }
         field(82; "Sell-to Address 2"; Text[50])
         {
             Caption = 'Sell-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(83; "Sell-to City"; Text[30])
         {
             Caption = 'Sell-to City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(84; "Sell-to Contact"; Text[100])
         {
             Caption = 'Sell-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(85; "Bill-to Post Code"; Code[20])
         {
@@ -413,6 +436,7 @@ table 5107 "Sales Header Archive"
         {
             CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
+            OptimizeForTextSearch = true;
         }
         field(87; "Bill-to Country/Region Code"; Code[10])
         {
@@ -429,6 +453,7 @@ table 5107 "Sales Header Archive"
         {
             CaptionClass = '5,2,' + "Sell-to Country/Region Code";
             Caption = 'Sell-to County';
+            OptimizeForTextSearch = true;
         }
         field(90; "Sell-to Country/Region Code"; Code[10])
         {
@@ -445,6 +470,7 @@ table 5107 "Sales Header Archive"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
+            OptimizeForTextSearch = true;
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
         {
@@ -471,6 +497,7 @@ table 5107 "Sales Header Archive"
         field(100; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(101; "Area"; Code[10])
         {
@@ -497,6 +524,7 @@ table 5107 "Sales Header Archive"
         field(106; "Package Tracking No."; Text[30])
         {
             Caption = 'Package Tracking No.';
+            OptimizeForTextSearch = true;
             ObsoleteReason = 'Field length will be increased to 50.';
             ObsoleteState = Pending;
             ObsoleteTag = '24.0';
@@ -506,6 +534,7 @@ table 5107 "Sales Header Archive"
         field(106; "Package Tracking No."; Text[50])
         {
             Caption = 'Package Tracking No.';
+            OptimizeForTextSearch = true;
         }
 #pragma warning restore AS0086
 #endif
@@ -591,6 +620,7 @@ table 5107 "Sales Header Archive"
         field(127; "IC Reference Document No."; Code[20])
         {
             Caption = 'IC Reference Document No.';
+            OptimizeForTextSearch = true;
             Editable = false;
         }
         field(129; "IC Direction"; Enum "IC Direction Type")
@@ -626,6 +656,7 @@ table 5107 "Sales Header Archive"
         field(135; "Prepmt. Posting Description"; Text[100])
         {
             Caption = 'Prepmt. Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(138; "Prepmt. Pmt. Discount Date"; Date)
         {
@@ -690,12 +721,14 @@ table 5107 "Sales Header Archive"
         field(171; "Sell-to Phone No."; Text[30])
         {
             Caption = 'Sell-to Phone No.';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
             ExtendedDatatype = PhoneNo;
         }
         field(172; "Sell-to E-Mail"; Text[80])
         {
             Caption = 'Sell-to E-Mail';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
             ExtendedDatatype = EMail;
         }
@@ -723,6 +756,7 @@ table 5107 "Sales Header Archive"
         field(210; "Ship-to Phone No."; Text[30])
         {
             Caption = 'Ship-to Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(480; "Dimension Set ID"; Integer)
@@ -961,6 +995,7 @@ table 5107 "Sales Header Archive"
         field(12128; "Place of Birth"; Text[30])
         {
             Caption = 'Place of Birth';
+            OptimizeForTextSearch = true;
         }
         field(12130; "Fiscal Code"; Code[20])
         {
@@ -979,10 +1014,12 @@ table 5107 "Sales Header Archive"
         field(12133; "First Name"; Text[30])
         {
             Caption = 'First Name';
+            OptimizeForTextSearch = true;
         }
         field(12134; "Last Name"; Text[30])
         {
             Caption = 'Last Name';
+            OptimizeForTextSearch = true;
         }
         field(12135; "Date of Birth"; Date)
         {
@@ -1051,18 +1088,22 @@ table 5107 "Sales Header Archive"
         field(12176; "Additional Information"; Text[50])
         {
             Caption = 'Additional Information';
+            OptimizeForTextSearch = true;
         }
         field(12177; "Additional Notes"; Text[50])
         {
             Caption = 'Additional Notes';
+            OptimizeForTextSearch = true;
         }
         field(12178; "Additional Instructions"; Text[50])
         {
             Caption = 'Additional Instructions';
+            OptimizeForTextSearch = true;
         }
         field(12179; "TDD Prepared By"; Text[50])
         {
             Caption = 'TDD Prepared By';
+            OptimizeForTextSearch = true;
             DataClassification = EndUserIdentifiableInformation;
         }
     }
