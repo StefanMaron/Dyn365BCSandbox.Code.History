@@ -10222,7 +10222,7 @@
     end;
 #endif
 
-    [EventSubscriber(ObjectType::table, Database::"Invoice Posting Buffer", 'OnAfterPreparePurchase', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Post Invoice Events", 'OnAfterPrepareInvoicePostingBuffer', '', false, false)]
     local procedure OnAfterPreparePurchase(var PurchaseLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
     begin
         // Example of extending feature "Copy document line description to G/L entries" for lines with type = "Item"
