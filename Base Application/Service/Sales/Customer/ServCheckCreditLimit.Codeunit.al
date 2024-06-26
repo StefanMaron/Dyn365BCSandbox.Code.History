@@ -14,7 +14,7 @@ codeunit 6489 "Serv. Check Credit Limit"
 
     var
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
-        CustCheckCreditLimit: Page "Check Credit Limit";
+        ServCheckCreditLimit: Page "Serv. Check Credit Limit";
         InstructionTypeTxt: Label 'Check Cr. Limit';
         GetDetailsTxt: Label 'Show details';
         CreditLimitNotificationMsg: Label 'The customer''s credit limit has been exceeded.';
@@ -37,8 +37,8 @@ codeunit 6489 "Serv. Check Credit Limit"
 
         OnNewCheckRemoveCustomerNotifications(ServiceHeader.RecordId, true);
 
-        OnServiceHeaderCheckOnBeforeShowWarning(CustCheckCreditLimit);
-        if CustCheckCreditLimit.ServiceHeaderShowWarningAndGetCause(ServiceHeader, AdditionalContextId) then
+        OnServiceHeaderCheckOnBeforeShowWarning(ServCheckCreditLimit);
+        if ServCheckCreditLimit.ServiceHeaderShowWarningAndGetCause(ServiceHeader, AdditionalContextId) then
             CreateAndSendNotification(ServiceHeader.RecordId, AdditionalContextId, '');
     end;
 
@@ -60,8 +60,8 @@ codeunit 6489 "Serv. Check Credit Limit"
             ServiceHeader.Init();
         OnNewCheckRemoveCustomerNotifications(ServiceHeader.RecordId, false);
 
-        OnServiceLineCheckOnBeforeShowWarning(CustCheckCreditLimit);
-        if CustCheckCreditLimit.ServiceLineShowWarningAndGetCause(ServiceLine, AdditionalContextId) then
+        OnServiceLineCheckOnBeforeShowWarning(ServCheckCreditLimit);
+        if ServCheckCreditLimit.ServiceLineShowWarningAndGetCause(ServiceLine, AdditionalContextId) then
             CreateAndSendNotification(ServiceHeader.RecordId, AdditionalContextId, '');
     end;
 
@@ -80,8 +80,8 @@ codeunit 6489 "Serv. Check Credit Limit"
 
         OnNewCheckRemoveCustomerNotifications(ServiceContractHeader.RecordId, true);
 
-        OnServiceContractHeaderCheckOnBeforeShowWarning(CustCheckCreditLimit);
-        if CustCheckCreditLimit.ServiceContractHeaderShowWarningAndGetCause(ServiceContractHeader, AdditionalContextId) then
+        OnServiceContractHeaderCheckOnBeforeShowWarning(ServCheckCreditLimit);
+        if ServCheckCreditLimit.ServiceContractHeaderShowWarningAndGetCause(ServiceContractHeader, AdditionalContextId) then
             CreateAndSendNotification(ServiceContractHeader.RecordId, AdditionalContextId, '');
     end;
 
@@ -105,18 +105,18 @@ codeunit 6489 "Serv. Check Credit Limit"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateAndSendNotification(RecordId, AdditionalContextId, Heading, NotificationToSend, IsHandled, CustCheckCreditLimit);
+        OnBeforeCreateAndSendNotification(RecordId, AdditionalContextId, Heading, NotificationToSend, IsHandled, ServCheckCreditLimit);
         if IsHandled then
             exit;
 
         if AdditionalContextId = GetBothNotificationsId() then begin
-            CreateAndSendNotification(RecordId, GetCreditLimitNotificationId(), CustCheckCreditLimit.GetHeading());
-            CreateAndSendNotification(RecordId, GetOverdueBalanceNotificationId(), CustCheckCreditLimit.GetSecondHeading());
+            CreateAndSendNotification(RecordId, GetCreditLimitNotificationId(), ServCheckCreditLimit.GetHeading());
+            CreateAndSendNotification(RecordId, GetOverdueBalanceNotificationId(), ServCheckCreditLimit.GetSecondHeading());
             exit;
         end;
 
         if Heading = '' then
-            Heading := CustCheckCreditLimit.GetHeading();
+            Heading := ServCheckCreditLimit.GetHeading();
 
         case Heading of
             CreditLimitNotificationMsg:
@@ -130,7 +130,7 @@ codeunit 6489 "Serv. Check Credit Limit"
         NotificationToSend.Message(Heading);
         NotificationToSend.Scope(NOTIFICATIONSCOPE::LocalScope);
         NotificationToSend.AddAction(GetDetailsTxt, CODEUNIT::"Cust-Check Cr. Limit", 'ShowNotificationDetails');
-        CustCheckCreditLimit.PopulateDataOnNotification(NotificationToSend);
+        ServCheckCreditLimit.PopulateDataOnNotification(NotificationToSend);
         NotificationLifecycleMgt.SendNotificationWithAdditionalContext(NotificationToSend, RecordId, AdditionalContextId);
     end;
 
@@ -204,28 +204,36 @@ codeunit 6489 "Serv. Check Credit Limit"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeCreateAndSendNotification(RecordId: RecordID; AdditionalContextId: Guid; Heading: Text[250]; NotificationToSend: Notification; var IsHandled: Boolean; var CustCheckCreditLimit: Page "Check Credit Limit");
+    local procedure OnBeforeCreateAndSendNotification(RecordId: RecordID; AdditionalContextId: Guid; Heading: Text[250]; NotificationToSend: Notification; var IsHandled: Boolean; var ServCheckCreditLimit: Page "Serv. Check Credit Limit");
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnServiceHeaderCheckOnBeforeShowWarning(var CustCheckCreditLimit: Page "Check Credit Limit")
+    local procedure OnServiceHeaderCheckOnBeforeShowWarning(var ServCheckCreditLimit: Page "Serv. Check Credit Limit")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnServiceLineCheckOnBeforeShowWarning(var CustCheckCreditLimit: Page "Check Credit Limit")
+    local procedure OnServiceLineCheckOnBeforeShowWarning(var ServCheckCreditLimit: Page "Serv. Check Credit Limit")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnServiceContractHeaderCheckOnBeforeShowWarning(var CustCheckCreditLimit: Page "Check Credit Limit")
+    local procedure OnServiceContractHeaderCheckOnBeforeShowWarning(var ServCheckCreditLimit: Page "Serv. Check Credit Limit")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeServiceContractHeaderCheck(ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
     begin
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Check Credit Limit", 'OnAfterCalcTotalOutstandingAmt', '', false, false)]
+    local procedure OnAfterCalcTotalOutstandingAmt(var Customer: Record Customer; var Result: Decimal)
+    var
+        ServiceLine: Record "Service Line";
+    begin
+        Result -= ServiceLine.OutstandingInvoiceAmountFromShipment(Customer."No.");
     end;
 }
 
