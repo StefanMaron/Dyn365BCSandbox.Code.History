@@ -997,7 +997,7 @@ codeunit 137112 "SCM Certificate Of Supply"
     end;
 
     [Test]
-    [HandlerFunctions('CertofSupplyRequestPageHandler')]
+    [HandlerFunctions('ServCertofSupplyRequestPageHandler')]
     [Scope('OnPrem')]
     procedure CertofSupplyReportValidationService()
     var
@@ -1025,7 +1025,7 @@ codeunit 137112 "SCM Certificate Of Supply"
     end;
 
     [Test]
-    [HandlerFunctions('CertofSupplyRequestPageHandler')]
+    [HandlerFunctions('ServCertofSupplyRequestPageHandler')]
     [Scope('OnPrem')]
     procedure CertofSupplyReportValidationServiceMultiline()
     var
@@ -1708,6 +1708,23 @@ codeunit 137112 "SCM Certificate Of Supply"
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure CertofSupplyRequestPageHandler(var CertOfSupply: TestRequestPage "Certificate of Supply")
+    var
+        DocumentType: Variant;
+        DocumentNo: Variant;
+        PrintLineDetails: Variant;
+    begin
+        LibraryVariableStorage.Dequeue(DocumentType);
+        LibraryVariableStorage.Dequeue(DocumentNo);
+        LibraryVariableStorage.Dequeue(PrintLineDetails);
+        CertOfSupply.CertificateOfSupply.SetFilter("Document Type", Format(DocumentType));
+        CertOfSupply.CertificateOfSupply.SetFilter("Document No.", DocumentNo);
+        CertOfSupply.PrintLineDetails.SetValue(PrintLineDetails);
+        CertOfSupply.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+    end;
+
+    [RequestPageHandler]
+    [Scope('OnPrem')]
+    procedure ServCertofSupplyRequestPageHandler(var CertOfSupply: TestRequestPage "Service Certificate of Supply")
     var
         DocumentType: Variant;
         DocumentNo: Variant;

@@ -7,6 +7,7 @@ namespace Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Service.Posting;
 using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Document;
@@ -16,6 +17,8 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Receivables;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
 using System.Email;
 using System.Environment.Configuration;
 using System.Media;
@@ -89,6 +92,8 @@ codeunit 5579 "Digital Voucher Impl."
     var
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        ServInvHeader: Record "Service Invoice Header";
+        ServCrMemoHeader: Record "Service Cr.Memo Header";
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
         DigVoucherManualSubscriber: Codeunit "Dig. Voucher Manual Subscriber";
@@ -100,6 +105,22 @@ codeunit 5579 "Digital Voucher Impl."
                     SalesInvHeader.SetRecFilter();
                     BindSubscription(DigVoucherManualSubscriber);
                     SalesInvHeader.PrintToDocumentAttachment(SalesInvHeader);
+                    UnbindSubscription(DigVoucherManualSubscriber);
+                end;
+            Database::"Service Invoice Header":
+                begin
+                    RecRef.SetTable(ServInvHeader);
+                    ServInvHeader.SetRecFilter();
+                    BindSubscription(DigVoucherManualSubscriber);
+                    ServInvHeader.PrintToDocumentAttachment(ServInvHeader);
+                    UnbindSubscription(DigVoucherManualSubscriber);
+                end;
+            Database::"Service Cr.Memo Header":
+                begin
+                    RecRef.SetTable(ServCrMemoHeader);
+                    ServCrMemoHeader.SetRecFilter();
+                    BindSubscription(DigVoucherManualSubscriber);
+                    ServCrMemoHeader.PrintToDocumentAttachment(ServCrMemoHeader);
                     UnbindSubscription(DigVoucherManualSubscriber);
                 end;
             Database::"Sales Cr.Memo Header":
@@ -291,6 +312,30 @@ codeunit 5579 "Digital Voucher Impl."
         DigitalVoucherCheck.CheckVoucherIsAttachedToDocument(ErrorMessageMgt, DigitalVoucherEntrySetup."Entry Type", RecRef);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service-Post", 'OnInitializeOnAfterCheckAndSetPostingConstants', '', true, true)]
+    local procedure OnInitializeOnAfterCheckAndSetPostingConstants(var PassedServiceHeader: Record "Service Header"; var PassedInvoice: Boolean; PreviewMode: Boolean)
+    var
+        DigitalVoucherEntrySetup: Record "Digital Voucher Entry Setup";
+        DummyErrorMessageMgt: Codeunit "Error Message Management";
+        RecRef: RecordRef;
+        DigitalVoucherCheck: Interface "Digital Voucher Check";
+    begin
+        if PreviewMode then
+            exit;
+        if not DigitalVoucherFeature.IsFeatureEnabled() then
+            exit;
+        if not PassedInvoice then
+            exit;
+        if PreviewMode then
+            exit;
+        DigitalVoucherEntrySetup.Get(DigitalVoucherEntrySetup."Entry Type"::"Sales Document");
+        if DigitalVoucherEntrySetup."Check Type" = DigitalVoucherEntrySetup."Check Type"::"No Check" then
+            exit;
+        DigitalVoucherCheck := DigitalVoucherEntrySetup."Check Type";
+        RecRef.GetTable(PassedServiceHeader);
+        DigitalVoucherCheck.CheckVoucherIsAttachedToDocument(DummyErrorMessageMgt, DigitalVoucherEntrySetup."Entry Type", RecRef);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post Prepayments", 'OnAfterCheckPrepmtDoc', '', true, true)]
     local procedure OnAfterCheckSalesPrepmtDoc(SalesHeader: Record "Sales Header"; DocumentType: Option Invoice,"Credit Memo"; CommitIsSuppressed: Boolean; var ErrorMessageMgt: Codeunit "Error Message Management")
     begin
@@ -343,6 +388,27 @@ codeunit 5579 "Digital Voucher Impl."
         if not SalesHeader.Invoice then
             exit;
         HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service-Post", 'OnAfterPostServiceDoc', '', true, true)]
+    local procedure CheckServiceVoucherOnAfterPostServiceDoc(ServInvoiceNo: Code[20]; ServCrMemoNo: Code[20]; PassedInvoice: Boolean)
+    var
+        ServInvHeader: Record "Service Invoice Header";
+        ServCrMemoHeader: Record "Service Cr.Memo Header";
+        RecVar: Variant;
+    begin
+        if not DigitalVoucherFeature.IsFeatureEnabled() then
+            exit;
+        if not PassedInvoice then
+            exit;
+        if ServInvoiceNo = '' then begin
+            ServCrMemoHeader.Get(ServCrMemoNo);
+            RecVar := ServCrMemoHeader;
+        end else begin
+            ServInvHeader.Get(ServInvoiceNo);
+            RecVar := ServInvHeader;
+        end;
+        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", RecVar);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post Prepayments", 'OnAfterPostPrepayments', '', true, true)]
