@@ -2524,7 +2524,7 @@ codeunit 134299 "Test Partner Integration Event"
     begin
         // Ensure there is one known entry so we can invoke Show and handle the page
         DocumentEntry.DeleteAll();
-        InsertIntoDocEntry(DocumentEntry, DATABASE::"G/L Entry", 'G/L Entry', 1);
+        DocumentEntry.InsertIntoDocEntry(DATABASE::"G/L Entry", 'G/L Entry', 1);
         InsertDataTypeBuffer(OnAfterNavigateFindRecordsTxt);
     end;
 
@@ -2973,17 +2973,6 @@ codeunit 134299 "Test Partner Integration Event"
         PurchRcptLine.SetRecFilter();
         UndoPurchaseReceiptLine.SetHideDialog(true);
         UndoPurchaseReceiptLine.Run(PurchRcptLine);
-    end;
-
-    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry"; DocTableID: Integer; DocTableName: Text; DocNoOfRecords: Integer)
-    begin
-        DocumentEntry.Init();
-        DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
-        DocumentEntry."Table ID" := DocTableID;
-        DocumentEntry."Document Type" := DocumentEntry."Document Type"::" ";
-        DocumentEntry."Table Name" := CopyStr(DocTableName, 1, MaxStrLen(DocumentEntry."Table Name"));
-        DocumentEntry."No. of Records" := DocNoOfRecords;
-        DocumentEntry.Insert();
     end;
 }
 
