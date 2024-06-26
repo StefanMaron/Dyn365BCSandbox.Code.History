@@ -137,7 +137,13 @@ table 780 "Certificate of Supply"
 
     procedure Print()
     begin
-        REPORT.RunModal(REPORT::"Certificate of Supply", true, false, Rec);
+        case "Document Type" of
+            "Document Type"::"Sales Shipment",
+            "Document Type"::"Return Shipment":
+                REPORT.RunModal(REPORT::"Certificate of Supply", true, false, Rec);
+            else
+                OnPrint(Rec);
+        end;
     end;
 
     procedure SetPrintedTrue()
@@ -259,6 +265,11 @@ table 780 "Certificate of Supply"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInitRecord(var CertificateOfSupply: Record "Certificate of Supply"; DocumentType: Option; DocumentNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPrint(var CertificateOfSupply: Record "Certificate of Supply")
     begin
     end;
 }
