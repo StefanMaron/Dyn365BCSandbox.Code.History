@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Sales.History;
+namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.AutomaticAccounts;
 using Microsoft.Finance.Currency;
@@ -54,6 +54,7 @@ table 115 "Sales Cr.Memo Line"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
             TableRelation = "Sales Cr.Memo Header";
         }
         field(4; "Line No."; Integer)
@@ -98,14 +99,17 @@ table 115 "Sales Cr.Memo Line"
         field(11; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(12; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
+            OptimizeForTextSearch = true;
         }
         field(15; Quantity; Decimal)
         {
