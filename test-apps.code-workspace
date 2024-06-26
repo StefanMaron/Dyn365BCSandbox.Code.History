@@ -258,6 +258,9 @@
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
     },
     {
+      "path": "./ReportLayouts/Test/Report Layouts Tests"
+    },
+    {
       "path": "./SimplifiedBankStatementImport/Test/Simplified Bank Statement Import Test"
     },
     {
