@@ -9,6 +9,7 @@ using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Service.Posting;
 using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -173,15 +174,23 @@ codeunit 5579 "Digital Voucher Impl."
         IncomingDocumentAttachment.Modify();
     end;
 
-    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef): Boolean
+    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef) Checked: Boolean
     var
         DigitalVoucherEntrySetup: Record "Digital Voucher Entry Setup";
         IncomingDocument: Record "Incoming Document";
+        SourceCodeSetup: Record "Source Code Setup";
         VoucherAttached: Boolean;
     begin
         DigitalVoucherEntrySetup.Get(DigitalVoucherEntryType);
         VoucherAttached := GetIncomingDocumentRecordFromRecordRef(IncomingDocument, RecRef);
-        exit(VoucherAttached or DigitalVoucherEntrySetup."Generate Automatically");
+        if VoucherAttached then
+            exit(true);
+        if DigitalVoucherEntrySetup."Generate Automatically" then
+            exit(true);
+        SourceCodeSetup.Get();
+        if IsPaymentReconciliationJournal(DigitalVoucherEntrySetup."Entry Type", RecRef) then
+            exit(true);
+        exit(false);
     end;
 
     procedure CheckIncomingDocumentChange(Rec: Record "Incoming Document Attachment")
@@ -276,6 +285,23 @@ codeunit 5579 "Digital Voucher Impl."
         ImportAttachmentIncDoc.CreateNewAttachment(InvIncomingDocumentAttachment);
         InvIncomingDocumentAttachment.Insert(true);
         exit(InvIncomingDocumentAttachment."Incoming Document Entry No.");
+    end;
+
+    local procedure IsPaymentReconciliationJournal(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef): Boolean
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+        GenJournalLine: Record "Gen. Journal Line";
+        FieldRef: FieldRef;
+        SourceCodeValue: Text;
+    begin
+        if DigitalVoucherEntryType <> DigitalVoucherEntryType::"Purchase Journal" then
+            exit(false);
+        if not SourceCodeSetup.Get() then
+            exit(false);
+        FieldRef := RecRef.Field(GenJournalLine.FieldNo("Source Code"));
+        if not Evaluate(SourceCodeValue, FieldRef.Value()) then
+            exit(false);
+        exit(SourceCodeValue = SourceCodeSetup."Payment Reconciliation Journal");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Guided Experience", 'OnRegisterAssistedSetup', '', true, true)]
