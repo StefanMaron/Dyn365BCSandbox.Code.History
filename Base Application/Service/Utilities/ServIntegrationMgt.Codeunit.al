@@ -373,7 +373,7 @@ codeunit 6450 "Serv. Integration Mgt."
     // Table "Certificate of Supply"
 
     [EventSubscriber(ObjectType::Table, Database::"Certificate of Supply", 'OnBeforeInitRecord', '', false, false)]
-    local procedure OnBeforeInitRecord(var CertificateOfSupply: Record "Certificate of Supply"; DocumentType: Option; DocumentNo: Code[20]; var IsHandled: Boolean)
+    local procedure CertificateofSupplyOnBeforeInitRecord(var CertificateOfSupply: Record "Certificate of Supply"; DocumentType: Option; DocumentNo: Code[20]; var IsHandled: Boolean)
     var
         ServiceShipmentHeader: Record "Service Shipment Header";
     begin
@@ -385,5 +385,12 @@ codeunit 6450 "Serv. Integration Mgt."
                     IsHandled := true;
                 end;
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Certificate of Supply", 'OnPrint', '', false, false)]
+    local procedure CertificateofSupplyOnPrint(var CertificateOfSupply: Record "Certificate of Supply")
+    begin
+        if CertificateOfSupply."Document Type" = CertificateOfSupply."Document Type"::"Service Shipment" then
+            Report.RunModal(Report::"Service Certificate of Supply", true, false, CertificateOfSupply);
     end;
 }
