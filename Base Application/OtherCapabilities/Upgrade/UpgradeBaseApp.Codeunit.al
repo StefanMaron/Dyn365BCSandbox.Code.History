@@ -226,6 +226,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeVATSetup();
         UpgradeVATSetupAllowVATDate();
         CopyItemSalesBlockedToServiceBlocked();
+        UpgradeCountryVATSchemeDK();
     end;
 
     local procedure ClearTemporaryTables()
@@ -3826,6 +3827,22 @@ codeunit 104000 "Upgrade - BaseApp"
         end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCopyItemSalesBlockedToServiceBlockedUpgradeTag());
+    end;
+    
+    local procedure UpgradeCountryVATSchemeDK()
+    var
+        CountryRegion: Record "Country/Region";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCountryVATSchemeDKTag()) then
+            exit;
+
+        CountryRegion.SetRange("ISO Code", 'DK'); // ISO 3166 Country Codes
+        if not CountryRegion.IsEmpty() then
+            CountryRegion.ModifyAll("VAT Scheme", '0184'); // ISO 6523 ICD Codes
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCountryVATSchemeDKTag());
     end;
 
     [IntegrationEvent(false, false)]
