@@ -104,6 +104,9 @@ page 6489 "Serv. Check Credit Limit"
         ServiceHeader: Record "Service Header";
         ServiceLine: Record "Service Line";
         Cust2: Record Customer;
+#if not CLEAN25
+        CheckCreditLimit: Page "Check Credit Limit";
+#endif
         CustNo: Code[20];
         Heading: Text[250];
         SecondHeading: Text[250];
@@ -123,7 +126,6 @@ page 6489 "Serv. Check Credit Limit"
 
         Text000: Label '%1 Do you still want to record the amount?';
 
-    [Scope('OnPrem')]
     procedure ServiceHeaderShowWarning(ServHeader: Record "Service Header") Result: Boolean
     var
         ServSetup: Record "Service Mgt. Setup";
@@ -133,6 +135,9 @@ page 6489 "Serv. Check Credit Limit"
     begin
         IsHandled := false;
         OnBeforeServiceHeaderShowWarning(ServHeader, Result, IsHandled, Rec, DeltaAmount);
+#if not CLEAN25
+        CheckCreditLimit.RunOnBeforeServiceHeaderShowWarning(ServHeader, Result, IsHandled, Rec, DeltaAmount);
+#endif
         if IsHandled then
             exit;
 
@@ -171,7 +176,6 @@ page 6489 "Serv. Check Credit Limit"
         exit(ShowWarning(ServHeader."Bill-to Customer No.", NewOrderAmountLCY, 0, true));
     end;
 
-    [Scope('OnPrem')]
     procedure ServiceHeaderShowWarningAndGetCause(ServHeader: Record "Service Header"; var NotificationContextGuidOut: Guid): Boolean
     var
         Result: Boolean;
@@ -181,13 +185,15 @@ page 6489 "Serv. Check Credit Limit"
         exit(Result);
     end;
 
-    [Scope('OnPrem')]
     procedure ServiceLineShowWarning(ServLine: Record "Service Line") Result: Boolean
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeServiceLineShowWarning(ServLine, Result, IsHandled, Rec, DeltaAmount);
+#if not CLEAN25
+        CheckCreditLimit.RunOnBeforeServiceLineShowWarning(ServLine, Result, IsHandled, Rec, DeltaAmount);
+#endif
         if IsHandled then
             exit(Result);
 
@@ -214,7 +220,6 @@ page 6489 "Serv. Check Credit Limit"
         exit(ShowWarning(ServiceHeader."Bill-to Customer No.", NewOrderAmountLCY, OldOrderAmountLCY, false))
     end;
 
-    [Scope('OnPrem')]
     procedure ServiceLineShowWarningAndGetCause(ServLine: Record "Service Line"; var NotificationContextGuidOut: Guid): Boolean
     var
         Result: Boolean;
@@ -224,13 +229,15 @@ page 6489 "Serv. Check Credit Limit"
         exit(Result);
     end;
 
-    [Scope('OnPrem')]
     procedure ServiceContractHeaderShowWarning(ServiceContractHeader: Record "Service Contract Header") Result: Boolean
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeServiceContractHeaderShowWarning(ServiceContractHeader, Rec, Result, IsHandled);
+#if not CLEAN25
+        CheckCreditLimit.RunOnBeforeServiceContractHeaderShowWarning(ServiceContractHeader, Rec, Result, IsHandled);
+#endif
         if IsHandled then
             exit(Result);
 
