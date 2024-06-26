@@ -187,13 +187,20 @@ codeunit 5579 "Digital Voucher Impl."
     var
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
     begin
+        if not FilterIncomingDocumentRecordFromRecordRef(IncomingDocumentAttachment, IncomingDocument, MainRecordRef) then
+            exit(false);
+        exit(not IncomingDocumentAttachment.IsEmpty());
+    end;
+
+    local procedure FilterIncomingDocumentRecordFromRecordRef(var IncomingDocumentAttachment: Record "Incoming Document Attachment"; var IncomingDocument: Record "Incoming Document"; MainRecordRef: RecordRef): Boolean
+    begin
         Clear(IncomingDocument);
         if not IncomingDocument.FindFromIncomingDocumentEntryNo(MainRecordRef, IncomingDocument) then
             IncomingDocument.FindByDocumentNoAndPostingDate(MainRecordRef, IncomingDocument);
         if IncomingDocument."Entry No." = 0 then
             exit(false);
         IncomingDocumentAttachment.SetRange("Incoming Document Entry No.", IncomingDocument."Entry No.");
-        exit(not IncomingDocumentAttachment.IsEmpty());
+        exit(true);
     end;
 
     local procedure AttachGenJnlLinePDFToIncomingDocument(RecRef: RecordRef)
@@ -221,6 +228,33 @@ codeunit 5579 "Digital Voucher Impl."
         if ConnectedGenJnlLine.FindFirst() then
             exit;
         ConnectedGenJnlLine := CurrGenJnlLine;
+    end;
+
+    local procedure CopyDigitalVoucherToCorrectiveDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecordVar: Variant; DocNo: Code[20]; PostingDate: Date): Integer
+    var
+        DigitalVoucherEntrySetup: Record "Digital Voucher Entry Setup";
+        InvIncomingDocument: Record "Incoming Document";
+        InvIncomingDocumentAttachment: Record "Incoming Document Attachment";
+        ImportAttachmentIncDoc: Codeunit "Import Attachment - Inc. Doc.";
+        RecRef: RecordRef;
+    begin
+        if not DigitalVoucherFeature.IsFeatureEnabled() then
+            exit;
+        if not DigitalVoucherEntrySetup.Get(DigitalVoucherEntryType) then
+            exit;
+        if DigitalVoucherEntrySetup."Generate Automatically" then
+            exit;
+        RecRef.GetTable(RecordVar);
+        if not FilterIncomingDocumentRecordFromRecordRef(InvIncomingDocumentAttachment, InvIncomingDocument, RecRef) then
+            exit;
+        if not InvIncomingDocumentAttachment.FindFirst() then
+            exit;
+        InvIncomingDocumentAttachment.Reset();
+        InvIncomingDocumentAttachment.SetRange("Document No.", DocNo);
+        InvIncomingDocumentAttachment.SetRange("Posting Date", PostingDate);
+        ImportAttachmentIncDoc.CreateNewAttachment(InvIncomingDocumentAttachment);
+        InvIncomingDocumentAttachment.Insert(true);
+        exit(InvIncomingDocumentAttachment."Incoming Document Entry No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Guided Experience", 'OnRegisterAssistedSetup', '', true, true)]
@@ -427,6 +461,20 @@ codeunit 5579 "Digital Voucher Impl."
     local procedure CheckIfChangeIsAllowedOnDeleteDigitalVoucherSetup(var Rec: Record "Digital Voucher Setup"; RunTrigger: Boolean)
     begin
         DigitalVoucherFeature.CheckIfDigitalVoucherSetupChangeIsAllowed();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Correct Posted Purch. Invoice", 'OnAfterCreateCopyDocument', '', false, false)]
+    local procedure CopyDigitalVoucherOnAfterCreateCopyPurchDocument(var PurchaseHeader: Record "Purchase Header"; PurchInvHeader: Record "Purch. Inv. Header")
+    begin
+        PurchaseHeader."Incoming Document Entry No." :=
+            CopyDigitalVoucherToCorrectiveDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader, PurchaseHeader."No.", PurchaseHeader."Posting Date");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Correct Posted Sales Invoice", 'OnAfterCreateCorrectiveSalesCrMemo', '', false, false)]
+    local procedure CopyDigitalVoucherOnAfterCreateCorrectiveSalesCrMemo(SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header")
+    begin
+        SalesHeader."Incoming Document Entry No." :=
+            CopyDigitalVoucherToCorrectiveDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader, SalesHeader."No.", SalesHeader."Posting Date");
     end;
 
     [IntegrationEvent(false, false)]
