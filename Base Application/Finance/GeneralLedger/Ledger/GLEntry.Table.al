@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Finance.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.EServices.EDocument;
@@ -44,6 +44,7 @@ table 17 "G/L Entry"
         field(3; "G/L Account No."; Code[20])
         {
             Caption = 'G/L Account No.';
+            OptimizeForTextSearch = true;
             TableRelation = "G/L Account";
 
             trigger OnValidate()
@@ -63,6 +64,7 @@ table 17 "G/L Entry"
         field(6; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -74,6 +76,7 @@ table 17 "G/L Entry"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(10; "Bal. Account No."; Code[20])
         {
@@ -214,6 +217,7 @@ table 17 "G/L Entry"
         field(56; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(57; "Source Type"; Enum "Gen. Journal Source Type")
         {
@@ -438,6 +442,7 @@ table 17 "G/L Entry"
         field(5618; Comment; Text[250])
         {
             Caption = 'Comment';
+            OptimizeForTextSearch = true;
         }
         field(6200; "Non-Deductible VAT Amount"; Decimal)
         {
