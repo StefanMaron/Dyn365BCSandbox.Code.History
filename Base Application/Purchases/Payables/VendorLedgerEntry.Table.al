@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Purchases.Payables;
+namespace Microsoft.Purchases.Payables;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Team;
@@ -37,6 +37,7 @@ table 25 "Vendor Ledger Entry"
         field(3; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
+            OptimizeForTextSearch = true;
             TableRelation = Vendor;
         }
         field(4; "Posting Date"; Date)
@@ -50,6 +51,7 @@ table 25 "Vendor Ledger Entry"
         field(6; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -61,10 +63,12 @@ table 25 "Vendor Ledger Entry"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(8; "Vendor Name"; Text[100])
         {
             Caption = 'Vendor Name';
+            OptimizeForTextSearch = true;
         }
         field(11; "Currency Code"; Code[10])
         {
@@ -363,6 +367,7 @@ table 25 "Vendor Ledger Entry"
         field(63; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(64; "No. Series"; Code[20])
         {
@@ -548,6 +553,7 @@ table 25 "Vendor Ledger Entry"
         field(289; "Message to Recipient"; Text[140])
         {
             Caption = 'Message to Recipient';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -646,10 +652,12 @@ table 25 "Vendor Ledger Entry"
         field(32000001; "Invoice Message"; Text[250])
         {
             Caption = 'Invoice Message';
+            OptimizeForTextSearch = true;
         }
         field(32000002; "Invoice Message 2"; Text[250])
         {
             Caption = 'Invoice Message 2';
+            OptimizeForTextSearch = true;
         }
         field(32000003; "Payment Date"; Date)
         {

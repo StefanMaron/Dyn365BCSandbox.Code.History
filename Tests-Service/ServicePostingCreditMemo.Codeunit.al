@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -661,7 +661,7 @@ codeunit 136104 "Service Posting - Credit Memo"
     end;
 
     [Test]
-    [HandlerFunctions('InvoiceESConfirmHandler,ApplyCustEntrsModalFormHandler')]
+    [HandlerFunctions('InvoiceESConfirmHandler,ApplyServCustEntrsModalFormHandler')]
     [Scope('OnPrem')]
     procedure TestCreditMemoAppToFieldsCrdMm()
     var
@@ -705,7 +705,7 @@ codeunit 136104 "Service Posting - Credit Memo"
     end;
 
     [Test]
-    [HandlerFunctions('ApplyCustEntrsModalFormHandler,InvoiceESConfirmHandler')]
+    [HandlerFunctions('ApplyServCustEntrsModalFormHandler,InvoiceESConfirmHandler')]
     [Scope('OnPrem')]
     procedure TestCreditMemoAppToFieldsInv()
     var
@@ -748,7 +748,7 @@ codeunit 136104 "Service Posting - Credit Memo"
     end;
 
     [Test]
-    [HandlerFunctions('ApplyCustEntrsModalFormHandler,InvoiceESConfirmHandler')]
+    [HandlerFunctions('ApplyServCustEntrsModalFormHandler,InvoiceESConfirmHandler')]
     [Scope('OnPrem')]
     procedure TestCreditMemoAppToCrMm()
     var
@@ -790,7 +790,7 @@ codeunit 136104 "Service Posting - Credit Memo"
     end;
 
     [Test]
-    [HandlerFunctions('ApplyCustEntrsModalFormHandler,InvoiceESConfirmHandler')]
+    [HandlerFunctions('ApplyServCustEntrsModalFormHandler,InvoiceESConfirmHandler')]
     [Scope('OnPrem')]
     procedure TestCustLedgerEntryCorrection()
     var
@@ -1436,19 +1436,19 @@ codeunit 136104 "Service Posting - Credit Memo"
     local procedure ApplyCustLedgerEntries(var ServiceHeader: Record "Service Header"; SalesInvoiceHeaderNo: Code[20]; DocumentType: Enum "Gen. Journal Document Type")
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        ApplyCustomerEntries: Page "Apply Customer Entries";
+        ServApplyCustomerEntries: Page "Serv. Apply Customer Entries";
     begin
         CustLedgerEntry.SetRange("Document Type", DocumentType);
         CustLedgerEntry.SetRange("Document No.", SalesInvoiceHeaderNo);
         CustLedgerEntry.FindFirst();
 
-        Clear(ApplyCustomerEntries);
-        ApplyCustomerEntries.SetService(ServiceHeader, CustLedgerEntry, ServiceHeader.FieldNo("Applies-to Doc. No."));
-        ApplyCustomerEntries.SetTableView(CustLedgerEntry);
-        ApplyCustomerEntries.SetRecord(CustLedgerEntry);
-        ApplyCustomerEntries.LookupMode(true);
-        if ApplyCustomerEntries.RunModal() = ACTION::LookupOK then begin
-            ApplyCustomerEntries.GetCustLedgEntry(CustLedgerEntry);
+        Clear(ServApplyCustomerEntries);
+        ServApplyCustomerEntries.SetService(ServiceHeader, CustLedgerEntry, ServiceHeader.FieldNo("Applies-to Doc. No."));
+        ServApplyCustomerEntries.SetTableView(CustLedgerEntry);
+        ServApplyCustomerEntries.SetRecord(CustLedgerEntry);
+        ServApplyCustomerEntries.LookupMode(true);
+        if ServApplyCustomerEntries.RunModal() = ACTION::LookupOK then begin
+            ServApplyCustomerEntries.GetCustLedgEntry(CustLedgerEntry);
             ServiceHeader."Applies-to Doc. Type" := CustLedgerEntry."Document Type";
             ServiceHeader."Applies-to Doc. No." := CustLedgerEntry."Document No.";
             ServiceHeader.Modify(true);
@@ -2235,15 +2235,15 @@ codeunit 136104 "Service Posting - Credit Memo"
 
     [ModalPageHandler]
     [Scope('OnPrem')]
-    procedure ApplyCustEntrsModalFormHandler(var ApplyCustomerEntries: Page "Apply Customer Entries"; var Response: Action)
+    procedure ApplyServCustEntrsModalFormHandler(var ServApplyCustomerEntries: Page "Serv. Apply Customer Entries"; var Response: Action)
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         CustLedgerEntry.SetRange("Document Type", DocumentType);
         CustLedgerEntry.SetRange("Document No.", DocumentHeaderNo);
         CustLedgerEntry.FindFirst();
-        ApplyCustomerEntries.SetCustLedgEntry(CustLedgerEntry);
-        ApplyCustomerEntries.SetCustApplId(false);
+        ServApplyCustomerEntries.SetCustLedgEntry(CustLedgerEntry);
+        ServApplyCustomerEntries.SetCustApplId(false);
         Response := ACTION::LookupOK;
     end;
 
