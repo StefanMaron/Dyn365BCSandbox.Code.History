@@ -806,18 +806,17 @@ codeunit 136311 "Job Reports II"
     local procedure CollectDocEntries(JobLedgerEntry: Record "Job Ledger Entry"; var TempDocumentEntry: Record "Document Entry" temporary)
     var
         ResLedgerEntry: Record "Res. Ledger Entry";
-        Navigate: Page Navigate;
     begin
         ResLedgerEntry.Reset();
         ResLedgerEntry.SetCurrentKey("Document No.", "Posting Date");
         ResLedgerEntry.SetFilter("Document No.", JobLedgerEntry."Document No.");
         ResLedgerEntry.SetRange("Posting Date", JobLedgerEntry."Posting Date");
-        Navigate.InsertIntoDocEntry(TempDocumentEntry, DATABASE::"Res. Ledger Entry", ResLedgerEntry.TableCaption(), ResLedgerEntry.Count);
+        TempDocumentEntry.InsertIntoDocEntry(DATABASE::"Res. Ledger Entry", ResLedgerEntry.TableCaption(), ResLedgerEntry.Count);
         JobLedgerEntry.Reset();
         JobLedgerEntry.SetCurrentKey("Document No.", "Posting Date");
         JobLedgerEntry.SetFilter("Document No.", JobLedgerEntry."Document No.");
         JobLedgerEntry.SetRange("Posting Date", JobLedgerEntry."Posting Date");
-        Navigate.InsertIntoDocEntry(TempDocumentEntry, DATABASE::"Job Ledger Entry", JobLedgerEntry.TableCaption(), JobLedgerEntry.Count);
+        TempDocumentEntry.InsertIntoDocEntry(DATABASE::"Job Ledger Entry", JobLedgerEntry.TableCaption(), JobLedgerEntry.Count);
     end;
 
     local procedure CreateAndPostJobJournalLine(LineType: Enum "Job Line Type"; CurrencyCode: Code[10]): Code[20]
