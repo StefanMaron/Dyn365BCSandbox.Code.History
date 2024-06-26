@@ -174,8 +174,8 @@ page 511 "Change Exchange Rate"
         RefCurrencyCode2: Code[10];
         CurrencyCode3: Code[10];
         CurrencyFactor: Decimal;
-        Fix: Option;
-        Fix2: Option;
+        Fix: Enum "Fix Exch. Rate Amount Type";
+        Fix2: Enum "Fix Exch. Rate Amount Type";
         UseExchRate: Boolean;
         DynamicDataCaption: Text[50];
         CurrencyCode4: Code[10];
