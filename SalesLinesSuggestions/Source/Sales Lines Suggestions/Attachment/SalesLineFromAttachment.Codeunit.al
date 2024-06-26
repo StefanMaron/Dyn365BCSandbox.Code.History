@@ -26,7 +26,7 @@ codeunit 7292 "Sales Line From Attachment"
     internal procedure AttachAndSuggest(SalesHeader: Record "Sales Header"; NewMode: PromptMode)
     var
         AzureOpenAI: Codeunit "Azure OpenAI";
-        FileParserFactory: Codeunit "File Handler Factory";
+        FileHandlerFactory: Codeunit "File Handler Factory";
         TempBlob: Codeunit "Temp Blob";
         SalesLineFromAttachment: Page "Sales Line From Attachment";
         FileHandler: interface "File Handler";
@@ -39,7 +39,7 @@ codeunit 7292 "Sales Line From Attachment"
         if Upload(TempBlob, FileName) then begin
             if FileName = '' then
                 exit;
-            FileParserFactory.GetFileHandler(FileHandler, FileName);
+            FileHandlerFactory.GetFileHandler(FileHandler, FileName);
 
             SalesLineFromAttachment.LoadData(FileHandler, FileName, TempBlob, SalesHeader);
             SalesLineFromAttachment.SetPromptMode(NewMode);

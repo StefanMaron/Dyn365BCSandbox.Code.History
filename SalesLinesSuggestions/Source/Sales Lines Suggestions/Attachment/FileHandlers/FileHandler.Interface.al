@@ -4,9 +4,30 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Document.Attachment;
 
+/// <summary>
+/// Specifies the interface for File Handler implementations.
+/// </summary>
 interface "File Handler"
 {
     Access = Internal;
-    procedure Process(var FileInputStream: InStream): Variant
+
+    /// <summary>
+    /// Processes the  file input stream that is passed to the function.
+    /// </summary>
+    /// <param name="FileInputStream">InStream pointing to the file content.</param>
+    /// <returns>Result of the file processing.</returns>
+    procedure Process(var FileInputStream: InStream): Codeunit "File Handler Result"
+
+    /// <summary>
+    /// Gets the data as a table from the file based on the file handler result.
+    /// </summary>
+    /// <param name="FileHandlerResult">Result of the file processing.</param>
+    /// <returns>List of rows where each row is a list of columns.</returns>
     procedure GetFileData(FileHandlerResult: Codeunit "File Handler Result"): List of [List of [Text]]
+
+    /// <summary>
+    /// Finalizes the file handler.
+    /// </summary>
+    /// <param name="FileHandlerResult">Result of the file processing.</param>
+    procedure Finalize(FileHandlerResult: Codeunit "File Handler Result")
 }

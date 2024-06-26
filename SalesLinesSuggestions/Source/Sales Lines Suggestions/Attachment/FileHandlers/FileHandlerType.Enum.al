@@ -11,6 +11,6 @@ enum 7275 "File Handler Type" implements "File Handler"
 
     value(0; "CSV Handler")
     {
-        Implementation = "File Handler" = "CSV Handler";
+        Implementation = "File Handler" = "Csv Handler";
     }
 }
