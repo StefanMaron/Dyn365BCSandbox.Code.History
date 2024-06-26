@@ -162,12 +162,12 @@ table 167 Job
                     if xRec.Status = xRec.Status::Completed then begin
                         IsHandled := false;
                         OnValidateStatusOnBeforeConfirm(Rec, xRec, UndidCompleteStatus, IsHandled);
-                        if not IsHandled then begin
-                            if ConfirmManagement.GetResponseOrDefault(StatusChangeQst, true) then
+                        if not IsHandled then
+                            if ConfirmManagement.GetResponseOrDefault(StatusChangeQst, true) then begin
                                 Validate(Complete, false);
-                            UndidCompleteStatus := true;
-                        end else
-                            Status := xRec.Status;
+                                UndidCompleteStatus := true;
+                            end else
+                                Status := xRec.Status;
                     end;
                     Modify();
 
