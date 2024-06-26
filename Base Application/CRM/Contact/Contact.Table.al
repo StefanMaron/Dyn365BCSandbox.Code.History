@@ -1,4 +1,4 @@
-﻿namespace Microsoft.CRM.Contact;
+namespace Microsoft.CRM.Contact;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.BusinessRelation;
@@ -69,6 +69,7 @@ table 5050 Contact
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -89,6 +90,7 @@ table 5050 Contact
         field(2; Name; Text[100])
         {
             Caption = 'Name';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -103,18 +105,22 @@ table 5050 Contact
         field(4; "Name 2"; Text[50])
         {
             Caption = 'Name 2';
+            OptimizeForTextSearch = true;
         }
         field(5; Address; Text[100])
         {
             Caption = 'Address';
+            OptimizeForTextSearch = true;
         }
         field(6; "Address 2"; Text[50])
         {
             Caption = 'Address 2';
+            OptimizeForTextSearch = true;
         }
         field(7; City; Text[30])
         {
             Caption = 'City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
             else
             if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
@@ -144,6 +150,7 @@ table 5050 Contact
         field(9; "Phone No."; Text[30])
         {
             Caption = 'Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
 
             trigger OnValidate()
@@ -159,6 +166,7 @@ table 5050 Contact
         field(10; "Telex No."; Text[20])
         {
             Caption = 'Telex No.';
+            OptimizeForTextSearch = true;
         }
         field(15; "Territory Code"; Code[10])
         {
@@ -183,6 +191,7 @@ table 5050 Contact
         field(25; "Registration Number"; Text[50])
         {
             Caption = 'Registration No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -231,6 +240,7 @@ table 5050 Contact
         field(48; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
+            OptimizeForTextSearch = true;
             TableRelation = "Language Selection"."Language Tag";
         }
         field(54; "Last Date Modified"; Date)
@@ -241,14 +251,17 @@ table 5050 Contact
         field(84; "Fax No."; Text[30])
         {
             Caption = 'Fax No.';
+            OptimizeForTextSearch = true;
         }
         field(85; "Telex Answer Back"; Text[20])
         {
             Caption = 'Telex Answer Back';
+            OptimizeForTextSearch = true;
         }
         field(86; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -305,10 +318,12 @@ table 5050 Contact
         {
             CaptionClass = '5,1,' + "Country/Region Code";
             Caption = 'County';
+            OptimizeForTextSearch = true;
         }
         field(102; "E-Mail"; Text[80])
         {
             Caption = 'Email';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = EMail;
 
             trigger OnValidate()
@@ -333,6 +348,7 @@ table 5050 Contact
         field(103; "Home Page"; Text[80])
         {
             Caption = 'Home Page';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = URL;
             ObsoleteReason = 'Field length will be increased to 255.';
             ObsoleteState = Pending;
@@ -343,6 +359,7 @@ table 5050 Contact
         field(103; "Home Page"; Text[255])
         {
             Caption = 'Home Page';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = URL;
         }
 #pragma warning restore AS0086
@@ -448,6 +465,7 @@ table 5050 Contact
         field(5052; "Company Name"; Text[100])
         {
             Caption = 'Company Name';
+            OptimizeForTextSearch = true;
             TableRelation = Contact.Name where(Type = const(Company));
             ValidateTableRelation = false;
 
@@ -470,6 +488,7 @@ table 5050 Contact
         field(5054; "First Name"; Text[30])
         {
             Caption = 'First Name';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -480,6 +499,7 @@ table 5050 Contact
         field(5055; "Middle Name"; Text[30])
         {
             Caption = 'Middle Name';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -490,6 +510,7 @@ table 5050 Contact
         field(5056; Surname; Text[30])
         {
             Caption = 'Surname';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -500,18 +521,22 @@ table 5050 Contact
         field(5058; "Job Title"; Text[30])
         {
             Caption = 'Job Title';
+            OptimizeForTextSearch = true;
         }
         field(5059; Initials; Text[30])
         {
             Caption = 'Initials';
+            OptimizeForTextSearch = true;
         }
         field(5060; "Extension No."; Text[30])
         {
             Caption = 'Extension No.';
+            OptimizeForTextSearch = true;
         }
         field(5061; "Mobile Phone No."; Text[30])
         {
             Caption = 'Mobile Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
 
             trigger OnValidate()
@@ -527,6 +552,7 @@ table 5050 Contact
         field(5062; Pager; Text[30])
         {
             Caption = 'Pager';
+            OptimizeForTextSearch = true;
         }
         field(5063; "Organizational Level Code"; Code[10])
         {
@@ -618,6 +644,7 @@ table 5050 Contact
         field(5075; "Business Relation"; Text[50])
         {
             Caption = 'Business Relation';
+            OptimizeForTextSearch = true;
             Editable = false;
             ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by the Contact Business Relation field.';
@@ -839,6 +866,7 @@ table 5050 Contact
         field(5105; "E-Mail 2"; Text[80])
         {
             Caption = 'Email 2';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = EMail;
 
             trigger OnValidate()

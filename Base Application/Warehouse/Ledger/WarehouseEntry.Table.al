@@ -57,6 +57,7 @@ table 7312 "Warehouse Entry"
         field(8; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(9; "Item No."; Code[20])
         {
@@ -150,6 +151,7 @@ table 7312 "Warehouse Entry"
         field(50; "Whse. Document No."; Code[20])
         {
             Caption = 'Whse. Document No.';
+            OptimizeForTextSearch = true;
         }
         field(51; "Whse. Document Type"; Enum "Warehouse Journal Document Type")
         {

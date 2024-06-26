@@ -15,6 +15,7 @@ table 5777 "Item Reference"
         field(1; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            OptimizeForTextSearch = true;
             TableRelation = Item;
         }
         field(2; "Variant Code"; Code[10])
@@ -53,6 +54,7 @@ table 5777 "Item Reference"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(8; "Discontinue Bar Code"; Boolean)
         {
@@ -64,6 +66,7 @@ table 5777 "Item Reference"
         field(9; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(10; "Starting Date"; Date)
         {

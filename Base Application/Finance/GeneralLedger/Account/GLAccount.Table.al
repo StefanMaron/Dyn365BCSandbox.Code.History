@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Finance.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.CostAccounting.Account;
@@ -37,11 +37,13 @@ table 15 "G/L Account"
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
             NotBlank = true;
         }
         field(2; Name; Text[100])
         {
             Caption = 'Name';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -330,8 +332,6 @@ table 15 "G/L Account"
         field(34; Totaling; Text[250])
         {
             Caption = 'Totaling';
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
 
             trigger OnValidate()
             begin

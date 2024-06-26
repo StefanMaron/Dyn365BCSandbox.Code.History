@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Sales.Customer;
+namespace Microsoft.Sales.Customer;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.DirectDebit;
@@ -88,6 +88,7 @@ table 18 Customer
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -99,6 +100,7 @@ table 18 Customer
         field(2; Name; Text[100])
         {
             Caption = 'Name';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -113,18 +115,22 @@ table 18 Customer
         field(4; "Name 2"; Text[50])
         {
             Caption = 'Name 2';
+            OptimizeForTextSearch = true;
         }
         field(5; Address; Text[100])
         {
             Caption = 'Address';
+            OptimizeForTextSearch = true;
         }
         field(6; "Address 2"; Text[50])
         {
             Caption = 'Address 2';
+            OptimizeForTextSearch = true;
         }
         field(7; City; Text[30])
         {
             Caption = 'City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
             else
             if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
@@ -154,6 +160,7 @@ table 18 Customer
         field(8; Contact; Text[100])
         {
             Caption = 'Contact';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             begin
@@ -182,6 +189,7 @@ table 18 Customer
         field(9; "Phone No."; Text[30])
         {
             Caption = 'Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
 
             trigger OnValidate()
@@ -200,6 +208,7 @@ table 18 Customer
         field(10; "Telex No."; Text[20])
         {
             Caption = 'Telex No.';
+            OptimizeForTextSearch = true;
         }
         field(11; "Document Sending Profile"; Code[20])
         {
@@ -214,6 +223,7 @@ table 18 Customer
         field(14; "Our Account No."; Text[20])
         {
             Caption = 'Our Account No.';
+            OptimizeForTextSearch = true;
         }
         field(15; "Territory Code"; Code[10])
         {
@@ -292,6 +302,7 @@ table 18 Customer
         field(25; "Registration Number"; Text[50])
         {
             Caption = 'Registration No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -457,6 +468,7 @@ table 18 Customer
         field(48; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
+            OptimizeForTextSearch = true;
             TableRelation = "Language Selection"."Language Tag";
         }
         field(53; "Last Modified Date Time"; DateTime)
@@ -770,14 +782,17 @@ table 18 Customer
         field(84; "Fax No."; Text[30])
         {
             Caption = 'Fax No.';
+            OptimizeForTextSearch = true;
         }
         field(85; "Telex Answer Back"; Text[20])
         {
             Caption = 'Telex Answer Back';
+            OptimizeForTextSearch = true;
         }
         field(86; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -864,10 +879,12 @@ table 18 Customer
         {
             CaptionClass = '5,1,' + "Country/Region Code";
             Caption = 'County';
+            OptimizeForTextSearch = true;
         }
         field(93; "EORI Number"; Text[40])
         {
             Caption = 'EORI Number';
+            OptimizeForTextSearch = true;
         }
         field(95; "Use GLN in Electronic Document"; Boolean)
         {
@@ -934,6 +951,7 @@ table 18 Customer
         field(102; "E-Mail"; Text[80])
         {
             Caption = 'Email';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = EMail;
 
             trigger OnValidate()
@@ -945,6 +963,7 @@ table 18 Customer
         field(103; "Home Page"; Text[80])
         {
             Caption = 'Home Page';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = URL;
             ObsoleteReason = 'Field length will be increased to 255.';
             ObsoleteState = Pending;
@@ -955,6 +974,7 @@ table 18 Customer
         field(103; "Home Page"; Text[255])
         {
             Caption = 'Home Page';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = URL;
         }
 #pragma warning restore AS0086
@@ -1369,6 +1389,7 @@ table 18 Customer
         field(5061; "Mobile Phone No."; Text[30])
         {
             Caption = 'Mobile Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
 
             trigger OnValidate()
@@ -1669,6 +1690,7 @@ table 18 Customer
         {
             CalcFormula = lookup("Tax Area".Description where(Code = field("Tax Area Code")));
             Caption = 'Tax Area Display Name';
+            OptimizeForTextSearch = true;
             FieldClass = FlowField;
             ObsoleteReason = 'This field is not needed and it should not be used.';
             ObsoleteState = Removed;
@@ -1681,6 +1703,7 @@ table 18 Customer
         field(9006; "Contact Graph Id"; Text[250])
         {
             Caption = 'Contact Graph Id';
+            OptimizeForTextSearch = true;
         }
         field(5055250; "Liq. Payment Terms Code"; Code[10])
         {

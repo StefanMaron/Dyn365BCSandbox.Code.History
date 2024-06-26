@@ -17,6 +17,7 @@ table 225 "Post Code"
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            OptimizeForTextSearch = true;
             NotBlank = true;
 
             trigger OnValidate()
@@ -38,6 +39,7 @@ table 225 "Post Code"
         field(2; City; Text[30])
         {
             Caption = 'City';
+            OptimizeForTextSearch = true;
             NotBlank = true;
 
             trigger OnValidate()
@@ -71,6 +73,7 @@ table 225 "Post Code"
         field(5; County; Text[30])
         {
             Caption = 'County';
+            OptimizeForTextSearch = true;
         }
         field(30; "Time Zone"; Text[180])
         {
