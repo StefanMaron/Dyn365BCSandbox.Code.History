@@ -62,10 +62,12 @@ table 32 "Item Ledger Entry"
         field(6; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
         }
         field(7; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(8; "Location Code"; Code[10])
         {
@@ -152,6 +154,7 @@ table 32 "Item Ledger Entry"
         field(61; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(62; "Area"; Code[10])
         {
