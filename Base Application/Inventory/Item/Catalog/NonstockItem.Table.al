@@ -20,6 +20,7 @@ table 5718 "Nonstock Item"
         field(1; "Entry No."; Code[20])
         {
             Caption = 'Entry No.';
+            OptimizeForTextSearch = true;
             Editable = true;
 
             trigger OnValidate()
@@ -46,6 +47,7 @@ table 5718 "Nonstock Item"
         field(3; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
+            OptimizeForTextSearch = true;
             TableRelation = Vendor."No.";
 
             trigger OnValidate()
@@ -86,6 +88,7 @@ table 5718 "Nonstock Item"
         field(5; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
             Editable = true;
 
             trigger OnValidate()
@@ -227,6 +230,7 @@ table 5718 "Nonstock Item"
         field(11792; "Full Description"; Text[250])
         {
             Caption = 'Full Description';
+            OptimizeForTextSearch = true;
             ObsoleteState = Removed;
             ObsoleteReason = 'The functionality of Fields for Full Description will be removed and this field should not be used. Standard fields for Name are now 100. (Obsolete::Removed in release 01.2021)';
             ObsoleteTag = '18.0';

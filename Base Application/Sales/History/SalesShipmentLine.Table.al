@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Sales.History;
+namespace Microsoft.Sales.History;
 
 using Microsoft.Assembly.History;
 using Microsoft.Finance.Currency;
@@ -55,6 +55,7 @@ table 111 "Sales Shipment Line"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
             TableRelation = "Sales Shipment Header";
 
             trigger OnValidate()
@@ -104,14 +105,17 @@ table 111 "Sales Shipment Line"
         field(11; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(12; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
+            OptimizeForTextSearch = true;
         }
         field(15; Quantity; Decimal)
         {
@@ -597,6 +601,7 @@ table 111 "Sales Shipment Line"
         field(11791; "Package Tracking No."; Text[30])
         {
             Caption = 'Package Tracking No.';
+            OptimizeForTextSearch = true;
             ObsoleteReason = 'The functionality will be removed and this field should not be used.';
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
