@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Sales.Document;
+namespace Microsoft.Sales.Document;
 
 using Microsoft.Assembly.Document;
 using Microsoft.Bank.BankAccount;
@@ -224,6 +224,7 @@ table 36 "Sales Header"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -320,6 +321,7 @@ table 36 "Sales Header"
         field(5; "Bill-to Name"; Text[100])
         {
             Caption = 'Bill-to Name';
+            OptimizeForTextSearch = true;
             TableRelation = Customer.Name;
             ValidateTableRelation = false;
 
@@ -356,10 +358,12 @@ table 36 "Sales Header"
         field(6; "Bill-to Name 2"; Text[50])
         {
             Caption = 'Bill-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(7; "Bill-to Address"; Text[100])
         {
             Caption = 'Bill-to Address';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -369,6 +373,7 @@ table 36 "Sales Header"
         field(8; "Bill-to Address 2"; Text[50])
         {
             Caption = 'Bill-to Address 2';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -378,6 +383,7 @@ table 36 "Sales Header"
         field(9; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Bill-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Bill-to Country/Region Code"));
@@ -407,6 +413,7 @@ table 36 "Sales Header"
         field(10; "Bill-to Contact"; Text[100])
         {
             Caption = 'Bill-to Contact';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -427,6 +434,7 @@ table 36 "Sales Header"
         field(11; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
+            OptimizeForTextSearch = true;
         }
         field(12; "Ship-to Code"; Code[10])
         {
@@ -499,22 +507,27 @@ table 36 "Sales Header"
         field(13; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
+            OptimizeForTextSearch = true;
         }
         field(14; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(15; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
+            OptimizeForTextSearch = true;
         }
         field(16; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
@@ -543,6 +556,7 @@ table 36 "Sales Header"
         field(18; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(19; "Order Date"; Date)
         {
@@ -635,6 +649,7 @@ table 36 "Sales Header"
         field(22; "Posting Description"; Text[100])
         {
             Caption = 'Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(23; "Payment Terms Code"; Code[10])
         {
@@ -986,6 +1001,7 @@ table 36 "Sales Header"
         field(42; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
+            OptimizeForTextSearch = true;
             TableRelation = "Language Selection"."Language Tag";
         }
         field(43; "Salesperson Code"; Code[20])
@@ -1205,6 +1221,7 @@ table 36 "Sales Header"
         field(70; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -1270,6 +1287,7 @@ table 36 "Sales Header"
         field(72; "Registration Number"; Text[50])
         {
             Caption = 'Registration No.';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(73; "Reason Code"; Code[10])
@@ -1326,6 +1344,7 @@ table 36 "Sales Header"
         field(79; "Sell-to Customer Name"; Text[100])
         {
             Caption = 'Sell-to Customer Name';
+            OptimizeForTextSearch = true;
             TableRelation = Customer.Name;
             ValidateTableRelation = false;
 
@@ -1375,10 +1394,12 @@ table 36 "Sales Header"
         field(80; "Sell-to Customer Name 2"; Text[50])
         {
             Caption = 'Sell-to Customer Name 2';
+            OptimizeForTextSearch = true;
         }
         field(81; "Sell-to Address"; Text[100])
         {
             Caption = 'Sell-to Address';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1389,6 +1410,7 @@ table 36 "Sales Header"
         field(82; "Sell-to Address 2"; Text[50])
         {
             Caption = 'Sell-to Address 2';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1399,6 +1421,7 @@ table 36 "Sales Header"
         field(83; "Sell-to City"; Text[30])
         {
             Caption = 'Sell-to City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Sell-to Country/Region Code"));
@@ -1429,6 +1452,7 @@ table 36 "Sales Header"
         field(84; "Sell-to Contact"; Text[100])
         {
             Caption = 'Sell-to Contact';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -1489,6 +1513,7 @@ table 36 "Sales Header"
         {
             CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1547,6 +1572,7 @@ table 36 "Sales Header"
         {
             CaptionClass = '5,2,' + "Sell-to Country/Region Code";
             Caption = 'Sell-to County';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -1602,6 +1628,7 @@ table 36 "Sales Header"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
+            OptimizeForTextSearch = true;
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
         {
@@ -1653,6 +1680,7 @@ table 36 "Sales Header"
         field(100; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -1751,6 +1779,7 @@ table 36 "Sales Header"
         field(106; "Package Tracking No."; Text[30])
         {
             Caption = 'Package Tracking No.';
+            OptimizeForTextSearch = true;
             ObsoleteReason = 'Field length will be increased to 50.';
             ObsoleteState = Pending;
             ObsoleteTag = '24.0';
@@ -1760,6 +1789,7 @@ table 36 "Sales Header"
         field(106; "Package Tracking No."; Text[50])
         {
             Caption = 'Package Tracking No.';
+            OptimizeForTextSearch = true;
         }
 #pragma warning restore AS0086
 #endif
@@ -1995,6 +2025,7 @@ table 36 "Sales Header"
         field(127; "IC Reference Document No."; Code[20])
         {
             Caption = 'IC Reference Document No.';
+            OptimizeForTextSearch = true;
             Editable = false;
         }
         field(129; "IC Direction"; Enum "IC Direction Type")
@@ -2092,6 +2123,7 @@ table 36 "Sales Header"
         field(135; "Prepmt. Posting Description"; Text[100])
         {
             Caption = 'Prepmt. Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(138; "Prepmt. Pmt. Discount Date"; Date)
         {
@@ -2251,6 +2283,7 @@ table 36 "Sales Header"
         field(171; "Sell-to Phone No."; Text[30])
         {
             Caption = 'Sell-to Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
 
             trigger OnValidate()
@@ -2268,6 +2301,7 @@ table 36 "Sales Header"
         field(172; "Sell-to E-Mail"; Text[80])
         {
             Caption = 'Email';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = EMail;
 
             trigger OnValidate()
@@ -2336,6 +2370,7 @@ table 36 "Sales Header"
         field(210; "Ship-to Phone No."; Text[30])
         {
             Caption = 'Ship-to Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(300; "Amt. Ship. Not Inv. (LCY)"; Decimal)
@@ -2991,6 +3026,7 @@ table 36 "Sales Header"
         field(11310; "Enterprise No."; Text[50])
         {
             Caption = 'Enterprise No.';
+            OptimizeForTextSearch = true;
         }
     }
 

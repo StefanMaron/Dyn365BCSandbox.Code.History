@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Purchases.Archive;
+namespace Microsoft.Purchases.Archive;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
@@ -55,6 +55,7 @@ table 5109 "Purchase Header Archive"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
         }
         field(4; "Pay-to Vendor No."; Code[20])
         {
@@ -65,32 +66,39 @@ table 5109 "Purchase Header Archive"
         field(5; "Pay-to Name"; Text[100])
         {
             Caption = 'Pay-to Name';
+            OptimizeForTextSearch = true;
         }
         field(6; "Pay-to Name 2"; Text[50])
         {
             Caption = 'Pay-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(7; "Pay-to Address"; Text[100])
         {
             Caption = 'Pay-to Address';
+            OptimizeForTextSearch = true;
         }
         field(8; "Pay-to Address 2"; Text[50])
         {
             Caption = 'Pay-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(9; "Pay-to City"; Text[30])
         {
             Caption = 'Pay-to City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(10; "Pay-to Contact"; Text[100])
         {
             Caption = 'Pay-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(11; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
+            OptimizeForTextSearch = true;
         }
         field(12; "Ship-to Code"; Code[10])
         {
@@ -99,28 +107,34 @@ table 5109 "Purchase Header Archive"
         field(13; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
+            OptimizeForTextSearch = true;
         }
         field(14; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(15; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
+            OptimizeForTextSearch = true;
         }
         field(16; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(19; "Order Date"; Date)
         {
@@ -138,6 +152,7 @@ table 5109 "Purchase Header Archive"
         field(22; "Posting Description"; Text[100])
         {
             Caption = 'Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(23; "Payment Terms Code"; Code[10])
         {
@@ -213,6 +228,7 @@ table 5109 "Purchase Header Archive"
         field(42; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
+            OptimizeForTextSearch = true;
             TableRelation = "Language Selection"."Language Tag";
         }
         field(43; "Purchaser Code"; Code[20])
@@ -326,6 +342,7 @@ table 5109 "Purchase Header Archive"
         field(70; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
+            OptimizeForTextSearch = true;
         }
         field(72; "Sell-to Customer No."; Code[20])
         {
@@ -360,28 +377,34 @@ table 5109 "Purchase Header Archive"
         field(79; "Buy-from Vendor Name"; Text[100])
         {
             Caption = 'Buy-from Vendor Name';
+            OptimizeForTextSearch = true;
         }
         field(80; "Buy-from Vendor Name 2"; Text[50])
         {
             Caption = 'Buy-from Vendor Name 2';
+            OptimizeForTextSearch = true;
         }
         field(81; "Buy-from Address"; Text[100])
         {
             Caption = 'Buy-from Address';
+            OptimizeForTextSearch = true;
         }
         field(82; "Buy-from Address 2"; Text[50])
         {
             Caption = 'Buy-from Address 2';
+            OptimizeForTextSearch = true;
         }
         field(83; "Buy-from City"; Text[30])
         {
             Caption = 'Buy-from City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(84; "Buy-from Contact"; Text[100])
         {
             Caption = 'Buy-from Contact';
+            OptimizeForTextSearch = true;
         }
         field(85; "Pay-to Post Code"; Code[20])
         {
@@ -393,6 +416,7 @@ table 5109 "Purchase Header Archive"
         {
             CaptionClass = '5,6,' + "Pay-to Country/Region Code";
             Caption = 'Pay-to County';
+            OptimizeForTextSearch = true;
         }
         field(87; "Pay-to Country/Region Code"; Code[10])
         {
@@ -409,6 +433,7 @@ table 5109 "Purchase Header Archive"
         {
             CaptionClass = '5,5,' + "Buy-from Country/Region Code";
             Caption = 'Buy-from County';
+            OptimizeForTextSearch = true;
         }
         field(90; "Buy-from Country/Region Code"; Code[10])
         {
@@ -425,6 +450,7 @@ table 5109 "Purchase Header Archive"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
+            OptimizeForTextSearch = true;
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
         {
@@ -546,6 +572,7 @@ table 5109 "Purchase Header Archive"
         field(127; "IC Reference Document No."; Code[20])
         {
             Caption = 'IC Reference Document No.';
+            OptimizeForTextSearch = true;
             Editable = false;
         }
         field(129; "IC Direction"; Enum "IC Direction Type")
@@ -599,6 +626,7 @@ table 5109 "Purchase Header Archive"
         field(139; "Prepmt. Posting Description"; Text[100])
         {
             Caption = 'Prepmt. Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(142; "Prepmt. Pmt. Discount Date"; Date)
         {
@@ -645,6 +673,7 @@ table 5109 "Purchase Header Archive"
         field(210; "Ship-to Phone No."; Text[30])
         {
             Caption = 'Ship-to Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(480; "Dimension Set ID"; Integer)
@@ -802,6 +831,7 @@ table 5109 "Purchase Header Archive"
         field(11310; "Enterprise No."; Text[50])
         {
             Caption = 'Enterprise No.';
+            OptimizeForTextSearch = true;
         }
     }
 
