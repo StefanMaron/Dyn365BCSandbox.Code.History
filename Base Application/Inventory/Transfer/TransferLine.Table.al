@@ -1824,7 +1824,7 @@ table 5741 "Transfer Line"
                 SourceRecRef.GetTable(TransLine);
                 ReservMgt.SetReservSource(SourceRecRef);
                 TransLine.TestField("Shipment Date");
-                TransLine.CalcFields("Reserved Qty. Outbnd. (Base)");
+                TransLine.CalcFields("Reserved Quantity Outbnd.", "Reserved Qty. Outbnd. (Base)");
                 ReservMgt.AutoReserveToShip(
                   AutoReserved, '', TransLine."Shipment Date",
                   TransLine."Qty. to Ship" - TransLine."Reserved Quantity Outbnd.",

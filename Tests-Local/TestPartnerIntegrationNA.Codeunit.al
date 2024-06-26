@@ -1590,7 +1590,7 @@
     end;
 
     // replaces [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Amounts Mgt.", 'OnFillInvPostingBuffer', '', false, false)]
-    [EventSubscriber(ObjectType::Table, Database::"Invoice Posting Buffer", 'OnAfterPrepareService', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service Post Invoice Events", 'OnAfterPrepareInvoicePostingBuffer', '', false, false)]
     local procedure OnFillInvPostingBufferServAmtsMgt()
     begin
         InsertDataTypeBuffer(OnFillInvPostingBufferServAmtsMgtTxt);
