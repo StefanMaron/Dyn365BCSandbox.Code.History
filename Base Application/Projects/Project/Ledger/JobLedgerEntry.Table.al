@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Projects.Project.Ledger;
+namespace Microsoft.Projects.Project.Ledger;
 
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
@@ -47,6 +47,7 @@ table 169 "Job Ledger Entry"
         field(4; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
         }
         field(5; Type; Enum "Job Journal Line Type")
         {
@@ -64,6 +65,7 @@ table 169 "Job Ledger Entry"
         field(8; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(9; Quantity; Decimal)
         {
@@ -221,6 +223,7 @@ table 169 "Job Ledger Entry"
         field(84; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(85; "Area"; Code[10])
         {
@@ -382,6 +385,7 @@ table 169 "Job Ledger Entry"
         field(1016; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(1017; "Ledger Entry Type"; Enum "Job Ledger Entry Type")
         {
