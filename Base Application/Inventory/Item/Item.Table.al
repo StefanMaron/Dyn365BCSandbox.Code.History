@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Inventory.Item;
+namespace Microsoft.Inventory.Item;
 
 using Microsoft.Assembly.Document;
 using Microsoft.Assembly.Setup;
@@ -78,6 +78,7 @@ table 27 Item
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -110,6 +111,7 @@ table 27 Item
         field(3; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -134,6 +136,7 @@ table 27 Item
         field(5; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(6; "Assembly BOM"; Boolean)
         {
@@ -456,6 +459,7 @@ table 27 Item
         field(32; "Vendor Item No."; Text[50])
         {
             Caption = 'Vendor Item No.';
+            OptimizeForTextSearch = true;
         }
         field(33; "Lead Time Calculation"; DateFormula)
         {
@@ -618,6 +622,7 @@ table 27 Item
         field(56; "Block Reason"; Text[250])
         {
             Caption = 'Block Reason';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
