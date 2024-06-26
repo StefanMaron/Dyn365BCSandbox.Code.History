@@ -31,6 +31,7 @@ table 271 "Bank Account Ledger Entry"
         field(3; "Bank Account No."; Code[20])
         {
             Caption = 'Bank Account No.';
+            OptimizeForTextSearch = true;
             TableRelation = "Bank Account";
         }
         field(4; "Posting Date"; Date)
@@ -44,10 +45,12 @@ table 271 "Bank Account Ledger Entry"
         field(6; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
         }
         field(7; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(11; "Currency Code"; Code[10])
         {
@@ -208,6 +211,7 @@ table 271 "Bank Account Ledger Entry"
         field(63; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(64; Reversed; Boolean)
         {

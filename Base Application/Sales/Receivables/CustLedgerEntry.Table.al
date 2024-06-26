@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Sales.Receivables;
+namespace Microsoft.Sales.Receivables;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.DirectDebit;
@@ -42,6 +42,7 @@ table 21 "Cust. Ledger Entry"
         field(3; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
+            OptimizeForTextSearch = true;
             TableRelation = Customer;
         }
         field(4; "Posting Date"; Date)
@@ -55,6 +56,7 @@ table 21 "Cust. Ledger Entry"
         field(6; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -66,14 +68,17 @@ table 21 "Cust. Ledger Entry"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(8; "Customer Name"; Text[100])
         {
             Caption = 'Customer Name';
+            OptimizeForTextSearch = true;
         }
         field(10; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(11; "Currency Code"; Code[10])
@@ -400,6 +405,7 @@ table 21 "Cust. Ledger Entry"
         field(63; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(64; "Calculate Interest"; Boolean)
         {
@@ -605,6 +611,7 @@ table 21 "Cust. Ledger Entry"
         field(289; "Message to Recipient"; Text[140])
         {
             Caption = 'Message to Recipient';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -745,10 +752,12 @@ table 21 "Cust. Ledger Entry"
         field(10720; "Succeeded Company Name"; Text[250])
         {
             Caption = 'Succeeded Company Name';
+            OptimizeForTextSearch = true;
         }
         field(10721; "Succeeded VAT Registration No."; Text[20])
         {
             Caption = 'Succeeded VAT Registration No.';
+            OptimizeForTextSearch = true;
         }
         field(10722; "ID Type"; Enum "SII ID Type")
         {

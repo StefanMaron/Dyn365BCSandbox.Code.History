@@ -662,7 +662,7 @@ codeunit 134274 "Transformation Rules Tests"
         InputText: Text;
     begin
         Iniatialize();
-        TransformationRule.InsertRec(ROUNDTxt, ROUNDTxt, TransformationRule."Transformation Type"::Round.AsInteger(), 0, 0, '', '');
+        TransformationRule.InsertRec(ROUNDTxt, ROUNDTxt, TransformationRule."Transformation Type"::Round, 0, 0, '', '');
         TransformationRule.Get(ROUNDTxt);
         TransformationRule.Precision := 0.00001;
         TransformationRule.Direction := '=';
@@ -795,6 +795,7 @@ codeunit 134274 "Transformation Rules Tests"
         Assert.AreEqual(InputText, TransformationRule.TransformText(InputText), '');
     end;
 
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure TestUnixtimestamp()
@@ -819,6 +820,7 @@ codeunit 134274 "Transformation Rules Tests"
 
         Assert.AreEqual(Format(Testdate, 0, XmlFormat()), ResultText, '');
     end;
+#endif
 
     [Test]
     [Scope('OnPrem')]
