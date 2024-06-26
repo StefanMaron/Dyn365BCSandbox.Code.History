@@ -29,6 +29,7 @@ table 5401 "Item Variant"
         field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            OptimizeForTextSearch = true;
             NotBlank = true;
         }
         field(2; "Item No."; Code[20])
@@ -50,10 +51,12 @@ table 5401 "Item Variant"
         field(3; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(4; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(5; "Item Id"; Guid)
         {

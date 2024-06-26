@@ -20,6 +20,7 @@ table 5718 "Nonstock Item"
         field(1; "Entry No."; Code[20])
         {
             Caption = 'Entry No.';
+            OptimizeForTextSearch = true;
             Editable = true;
 
             trigger OnValidate()
@@ -46,6 +47,7 @@ table 5718 "Nonstock Item"
         field(3; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
+            OptimizeForTextSearch = true;
             TableRelation = Vendor."No.";
 
             trigger OnValidate()
@@ -86,6 +88,7 @@ table 5718 "Nonstock Item"
         field(5; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
             Editable = true;
 
             trigger OnValidate()

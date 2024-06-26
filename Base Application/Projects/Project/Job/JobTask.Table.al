@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -41,6 +41,7 @@ table 1001 "Job Task"
         field(1; "Job No."; Code[20])
         {
             Caption = 'Project No.';
+            OptimizeForTextSearch = true;
             Editable = false;
             NotBlank = true;
             TableRelation = Job;
@@ -72,6 +73,7 @@ table 1001 "Job Task"
         field(3; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(4; "Job Task Type"; Enum "Job Task Type")
         {
@@ -273,6 +275,7 @@ table 1001 "Job Task"
         field(21; Totaling; Text[250])
         {
             Caption = 'Totaling';
+            OptimizeForTextSearch = true;
             TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
             ValidateTableRelation = false;
 
@@ -467,6 +470,7 @@ table 1001 "Job Task"
         field(71; "Bill-to Name"; Text[100])
         {
             Caption = 'Bill-to Name';
+            OptimizeForTextSearch = true;
             TableRelation = Customer.Name;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
@@ -496,16 +500,19 @@ table 1001 "Job Task"
         field(72; "Bill-to Address"; Text[100])
         {
             Caption = 'Bill-to Address';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(73; "Bill-to Address 2"; Text[50])
         {
             Caption = 'Bill-to Address 2';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(74; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
             TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
             else
@@ -531,6 +538,7 @@ table 1001 "Job Task"
         {
             CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(76; "Bill-to Post Code"; Code[20])
@@ -574,6 +582,7 @@ table 1001 "Job Task"
         field(78; "Bill-to Name 2"; Text[50])
         {
             Caption = 'Bill-to Name 2';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(79; "Bill-to Contact No."; Code[20])
@@ -609,6 +618,7 @@ table 1001 "Job Task"
         field(80; "Bill-to Contact"; Text[100])
         {
             Caption = 'Bill-to Contact';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(90; "Sell-to Customer No."; Code[20])
@@ -628,6 +638,7 @@ table 1001 "Job Task"
         field(91; "Sell-to Customer Name"; Text[100])
         {
             Caption = 'Sell-to Customer Name';
+            OptimizeForTextSearch = true;
             TableRelation = Customer.Name;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
@@ -666,21 +677,25 @@ table 1001 "Job Task"
         field(92; "Sell-to Customer Name 2"; Text[50])
         {
             Caption = 'Sell-to Customer Name 2';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(93; "Sell-to Address"; Text[100])
         {
             Caption = 'Sell-to Address';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(94; "Sell-to Address 2"; Text[50])
         {
             Caption = 'Sell-to Address 2';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(95; "Sell-to City"; Text[30])
         {
             Caption = 'Sell-to City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Sell-to Country/Region Code"));
@@ -704,6 +719,7 @@ table 1001 "Job Task"
         field(96; "Sell-to Contact"; Text[100])
         {
             Caption = 'Sell-to Contact';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(97; "Sell-to Post Code"; Code[20])
@@ -719,6 +735,7 @@ table 1001 "Job Task"
         {
             CaptionClass = '5,2,' + "Sell-to Country/Region Code";
             Caption = 'Sell-to County';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(99; "Sell-to Country/Region Code"; Code[10])
@@ -778,26 +795,31 @@ table 1001 "Job Task"
         field(111; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(112; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(113; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(114; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(115; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
@@ -821,6 +843,7 @@ table 1001 "Job Task"
         field(116; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(117; "Ship-to Post Code"; Code[20])
@@ -843,6 +866,7 @@ table 1001 "Job Task"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
         }
         field(119; "Ship-to Country/Region Code"; Code[10])
@@ -854,6 +878,7 @@ table 1001 "Job Task"
         field(130; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -877,6 +902,7 @@ table 1001 "Job Task"
         field(133; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
+            OptimizeForTextSearch = true;
             DataClassification = CustomerContent;
 
             trigger OnValidate()
