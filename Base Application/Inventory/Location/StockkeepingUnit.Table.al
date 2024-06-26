@@ -39,6 +39,7 @@ table 5700 "Stockkeeping Unit"
         field(1; "Item No."; Code[20])
         {
             Caption = 'Item No.';
+            OptimizeForTextSearch = true;
             NotBlank = true;
             TableRelation = Item where(Type = const(Inventory));
 
@@ -88,6 +89,7 @@ table 5700 "Stockkeeping Unit"
         {
             CalcFormula = lookup(Item.Description where("No." = field("Item No.")));
             Caption = 'Description';
+            OptimizeForTextSearch = true;
             Editable = false;
             FieldClass = FlowField;
         }
@@ -95,6 +97,7 @@ table 5700 "Stockkeeping Unit"
         {
             CalcFormula = lookup(Item."Description 2" where("No." = field("Item No.")));
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
             Editable = false;
             FieldClass = FlowField;
         }
@@ -182,6 +185,7 @@ table 5700 "Stockkeeping Unit"
         field(32; "Vendor Item No."; Text[50])
         {
             Caption = 'Vendor Item No.';
+            OptimizeForTextSearch = true;
         }
         field(33; "Lead Time Calculation"; DateFormula)
         {
