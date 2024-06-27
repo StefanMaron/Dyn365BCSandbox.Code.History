@@ -8188,6 +8188,57 @@
         Assert.AreEqual(ItemRefNoBefore, ItemReferenceNoAfter, StrSubstNo(ItemRefrenceNoErr, ItemRefNoBefore));
     end;
 
+    [Test]
+    [HandlerFunctions('PostOrderStrMenuHandler')]
+    procedure PurchaseOrderPostingFromVendorCard()
+    var
+        Vendor: Record Vendor;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        VendorCard: TestPage "Vendor Card";
+        PurchaseOrder: TestPage "Purchase Order";
+        PurchaseOrderNo: Code[20];
+    begin
+        // [SCENARIO 537495] After Posting a Purchase Order created from the Vendor Card no error is displayed
+        Initialize();
+
+        // [GIVEN] Create Vendor
+        LibraryPurchase.CreateVendorWithAddress(Vendor);
+
+        // [WHEN] Open Vendor Card and create new Purchase Document
+        VendorCard.OpenEdit();
+        VendorCard.GotoRecord(Vendor);
+        PurchaseOrder.Trap();
+        VendorCard.NewPurchaseOrder.Invoke();
+
+        // [GIVEN] Set Vendor Invoice No. and create new purchase line
+        PurchaseOrder."Vendor Invoice No.".SetValue(LibraryRandom.RandText(35));
+        PurchaseOrder.PurchLines.New();
+        PurchaseOrder.PurchLines.Type.SetValue(PurchaseLine.Type::Item);
+        PurchaseOrder.PurchLines."No.".SetValue(LibraryInventory.CreateItemNo());
+        PurchaseOrder.PurchLines.Quantity.SetValue(LibraryRandom.RandIntInRange(1, 1));
+        PurchaseOrder.PurchLines."Direct Unit Cost".SetValue(LibraryRandom.RandDecInRange(1, 100, 2));
+        PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, PurchaseOrder."No.".Value);
+        PurchaseOrder.Close();
+        PurchaseHeader.CalcFields("Amount Including VAT");
+        PurchaseHeader.Validate("Check Total", PurchaseHeader."Amount Including VAT");
+        PurchaseHeader.Modify(true);
+        PurchaseOrder.OpenEdit();
+        PurchaseOrder.GoToRecord(PurchaseHeader);
+
+        // [GIVEN] Save the Purchase Order NO in a Variable
+        PurchaseOrderNo := PurchaseOrder."No.".Value();
+
+        // [WHEN] Release and post Purchase Document
+        PurchaseOrder.Release.Invoke();
+        LibraryVariableStorage.Enqueue(3);
+        PurchaseOrder.Post.Invoke();
+
+        // [THEN] Verify the  Purchase Order Posted Succsessfully without any error and system doesn't found the current Purchase Order
+        asserterror PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, PurchaseOrderNo);
+        Assert.AssertRecordNotFound();
+    end;
+
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";
