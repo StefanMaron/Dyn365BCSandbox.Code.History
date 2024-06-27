@@ -8,6 +8,7 @@ using Microsoft.FixedAssets.Ledger;
 report 4413 "EXR Fixed Asset Projected"
 {
     ApplicationArea = All;
+    AdditionalSearchTerms = 'FA Projected Value, FA Projected Value Excel';
     Caption = 'Fixed Asset Projected Value Excel (Preview)';
     DataAccessIntent = ReadOnly;
     DefaultRenderingLayout = FixedAssetProjectedValueExcel;
@@ -20,12 +21,15 @@ report 4413 "EXR Fixed Asset Projected"
         dataitem(FixedAssetData; "Fixed Asset")
         {
             DataItemTableView = sorting("No.");
+            RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code";
             PrintOnlyIfDetail = true;
             column(AssetNumber; "No.") { IncludeCaption = true; }
             column(AssetDescription; Description) { IncludeCaption = true; }
             column(FixedAssetClassCode; "FA Class Code") { IncludeCaption = true; }
             column(FixedAssetSubclassCode; "FA Subclass Code") { IncludeCaption = true; }
             column(FixedAssetLocationCode; "FA Location Code") { IncludeCaption = true; }
+            column(GlobalDimension1Code; "Global Dimension 1 Code") { IncludeCaption = true; }
+            column(GlobalDimension2Code; "Global Dimension 2 Code") { IncludeCaption = true; }
             dataitem(FixedAssetLedgerEntries; "FA Ledger Entry")
             {
                 DataItemLink = "FA No." = field("No.");
@@ -55,8 +59,9 @@ report 4413 "EXR Fixed Asset Projected"
             }
             trigger OnAfterGetRecord()
             begin
+                Clear(GlobalFADepreciationBook);
                 GlobalFADepreciationBook.SetAutoCalcFields("Book Value", "Custom 1");
-                GlobalFADepreciationBook.Get(FixedAssetData."No.", GlobalDepreciationBook.Code);
+                if not GlobalFADepreciationBook.Get(FixedAssetData."No.", GlobalDepreciationBook.Code) then;
 
                 if ShouldFixedAssetBeSkipped(FixedAssetData) then
                     CurrReport.Skip();
@@ -96,7 +101,7 @@ report 4413 "EXR Fixed Asset Projected"
                     field(SecondDepreciationDateField; EndDateProjection)
                     {
                         ApplicationArea = All;
-                        Caption = 'Second Depreciation Date';
+                        Caption = 'Last Depreciation Date';
                         ToolTip = 'Specifies the Fixed Asset posting date of the last posted depreciation.';
                         ShowMandatory = true;
                     }
@@ -202,6 +207,8 @@ report 4413 "EXR Fixed Asset Projected"
 
     local procedure ShouldFixedAssetBeSkipped(FixedAsset: Record "Fixed Asset"): Boolean
     begin
+        if GlobalDepreciationBook.Code = '' then
+            exit(true);
         if FixedAsset.Inactive then
             exit(true);
         if (GlobalFADepreciationBook."Acquisition Date" = 0D) or (GlobalFADepreciationBook."Acquisition Date" > EndDateProjection) then
