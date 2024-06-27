@@ -1193,6 +1193,8 @@ codeunit 1255 "Match Bank Payments"
                         BankAccReconciliationLine."Statement Line No.", EntryNo,
                         Score, AccountType, AccountNo);
 
+                    OnFindTextMappingsOnAfterTextMapperMatched(BankAccReconciliationLine, TextToAccMapping, TempBankStatementMatchingBuffer);
+
                     if (TrackApplicableRules) then begin
                         TempTextToAccMapping.TransferFields(TextToAccMapping, true);
                         TempTextToAccMapping.Insert();
@@ -1280,6 +1282,8 @@ codeunit 1255 "Match Bank Payments"
         end;
 
         Session.LogMessage('0000DKA', StrSubstNo(AppliedEntriesToBankStatementLineTxt, BankAccReconciliationLine.SystemId, TempBankStatementMatchingBuffer."Account Type", TempBankStatementMatchingBuffer."One to Many Match", TempBankStatementMatchingBuffer.Quality), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PaymentRecPreformanceCategoryLbl);
+
+        OnApplyRecordsOnAfterSendTraceTag(BankAccReconciliationLine, TempBankStatementMatchingBuffer);
 
         exit(true);
     end;
@@ -2609,6 +2613,16 @@ codeunit 1255 "Match Bank Payments"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferDiffToAccountOnBeforeInsertBankAccReconciliationLine(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; TempGenJournalLine: Record "Gen. Journal Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyRecordsOnAfterSendTraceTag(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFindTextMappingsOnAfterTextMapperMatched(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TextToAccountMapping: Record "Text-to-Account Mapping"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary);
     begin
     end;
 }
