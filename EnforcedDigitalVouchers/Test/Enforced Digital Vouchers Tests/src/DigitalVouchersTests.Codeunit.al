@@ -25,6 +25,8 @@ codeunit 139515 "Digital Vouchers Tests"
         DetachQst: Label 'Do you want to remove the reference from this incoming document to posted document';
         RemovePostedRecordManuallyMsg: Label 'The reference to the posted record has been removed.\\Remember to correct the posted record if needed.';
         DoYouWantToPostQst: Label 'Do you want to post the journal lines?';
+        PaymentLineAppliedMsg: Label '%1 payment lines out of 1 are applied.\\', Comment = '%1 - number';
+        DoYouWantTPostPmtQst: Label 'Do you want to post the payments?';
 
     trigger OnRun()
     begin
@@ -491,6 +493,49 @@ codeunit 139515 "Digital Vouchers Tests"
         UnbindSubscription(DigVouchersDisableEnforce);
     end;
 
+    [Test]
+    [HandlerFunctions('MessageHandler,ConfirmHandler')]
+    procedure PaymentReconciliationDoesNotRequireDigitalVoucher()
+    var
+        BankAccReconciliation: Record "Bank Acc. Reconciliation";
+        VendLedgEntry: Record "Vendor Ledger Entry";
+        PostedPmtReconHdr: Record "Posted Payment Recon. Hdr";
+        BankAccReconPostYesNo: Codeunit "Bank Acc. Recon. Post (Yes/No)";
+        DigVouchersDisableEnforce: Codeunit "Dig. Vouchers Disable Enforce";
+        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
+        BankAccountNo: Code[20];
+    begin
+        // [SCENARIO 539186] Stan can post a payment reconciliation without a digital voucher
+
+        Initialize();
+        BindSubscription(DigVouchersDisableEnforce);
+        // [GIVEN] Digital voucher feature is enabled for purchase document and purchase journal
+        EnableDigitalVoucherFeature();
+        InitSetupCheckOnly("Digital Voucher Entry Type"::"Purchase Document", "Digital Voucher Check Type"::Attachment);
+        InitSetupCheckOnly("Digital Voucher Entry Type"::"Purchase Journal", "Digital Voucher Check Type"::Attachment);
+
+        // [GIVEN] Payment account reconciliation with the purchase invoice
+        BankAccountNo := CreateBankAccForPaymentReconciliation();
+        LibraryERM.FindVendorLedgerEntry(
+            VendLedgEntry, VendLedgEntry."Document Type"::Invoice, ReceiveAndInvoicePurchaseDocumentWithIncDoc());
+        CreatePmtReconForVendor(BankAccReconciliation, VendLedgEntry, BankAccountNo);
+        LibraryVariableStorage.Enqueue(StrSubstNo(PaymentLineAppliedMsg, 1));
+        LibraryVariableStorage.Enqueue(DoYouWantTPostPmtQst);
+        LibraryVariableStorage.Enqueue(true);
+        CODEUNIT.Run(CODEUNIT::"Match Bank Pmt. Appl.", BankAccReconciliation);
+
+        // [WHEN] Post payment account reconciliation
+        Assert.IsTrue(BankAccReconPostYesNo.BankAccReconPostYesNo(BankAccReconciliation), 'Not all payments posted.');
+
+        // [THEN] Payment Acc. Reconciliation has been posted
+        PostedPmtReconHdr.Get(BankAccReconciliation."Bank Account No.", BankAccReconciliation."Statement No.");
+
+        LibraryVariableStorage.AssertEmpty();
+
+        UnbindSubscription(DigVouchersDisableEnforce);
+        NotificationLifecycleMgt.RecallAllNotifications();
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -502,6 +547,7 @@ codeunit 139515 "Digital Vouchers Tests"
 
         LibraryERMCountryData.UpdateSalesReceivablesSetup();
         LibraryERMCountryData.UpdatePurchasesPayablesSetup();
+        LibraryERMCountryData.UpdateJournalTemplMandatory(false);
         IsInitialized := true;
         Commit();
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"Digital Vouchers Tests");
@@ -578,6 +624,30 @@ codeunit 139515 "Digital Vouchers Tests"
         ReportSelections.Usage := Usage;
         ReportSelections."Report ID" := Report::"Standard Sales - Invoice";
         ReportSelections.Insert();
+    end;
+
+    local procedure CreateBankAccForPaymentReconciliation(): Code[20]
+    var
+        BankAccount: Record "Bank Account";
+    begin
+        LibraryERM.CreateBankAccount(BankAccount);
+        BankAccount.Validate("Last Statement No.", Format(LibraryRandom.RandInt(10)));
+        BankAccount.Modify(true);
+        exit(BankAccount."No.");
+    end;
+
+    local procedure CreatePmtReconForVendor(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; VendLedgEntry: Record "Vendor Ledger Entry"; BankAccountNo: Code[20])
+    var
+        BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
+    begin
+        VendLedgEntry.CalcFields("Remaining Amount");
+        LibraryERM.CreateBankAccReconciliation(
+          BankAccReconciliation, BankAccountNo, BankAccReconciliation."Statement Type"::"Payment Application");
+        CreateBankAccReconciliationLine(
+            BankAccReconciliation, BankAccReconciliationLine, BankAccReconciliationLine."Account Type"::Vendor,
+            VendLedgEntry."Vendor No.", VendLedgEntry."Remaining Amount", WorkDate());
+        BankAccReconciliation.Validate("Post Payments Only", true);
+        BankAccReconciliationLine.Modify(true);
     end;
 
     local procedure MockIncomingDocument(PostingDate: Date; DocNo: Code[20]): Integer
@@ -673,6 +743,18 @@ codeunit 139515 "Digital Vouchers Tests"
             exit;
         BindSubscription(ActiveDirectoryMockEvents);
         ActiveDirectoryMockEvents.Enable();
+    end;
+
+    local procedure CreateBankAccReconciliationLine(BankAccReconciliation: Record "Bank Acc. Reconciliation"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; Amount: Decimal; Date: Date)
+    begin
+        LibraryERM.CreateBankAccReconciliationLn(BankAccReconciliationLine, BankAccReconciliation);
+        BankAccReconciliationLine.Validate("Account Type", AccountType);
+        BankAccReconciliationLine.Validate("Account No.", AccountNo);
+        BankAccReconciliationLine.Validate("Document No.", LibraryUtility.GenerateGUID());
+        BankAccReconciliationLine.Validate("Statement Amount", Amount);
+        BankAccReconciliationLine.Validate("Transaction Date", Date);
+        BankAccReconciliationLine.Validate(Description, AccountNo);
+        BankAccReconciliationLine.Modify(true);
     end;
 
     local procedure VerifyIncomingDocumentWithAttachmentsExists(PostingDate: Date; DocNo: Code[20]; AttachmentsCount: Integer)
