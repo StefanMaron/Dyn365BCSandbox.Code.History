@@ -174,7 +174,7 @@ codeunit 5579 "Digital Voucher Impl."
         IncomingDocumentAttachment.Modify();
     end;
 
-    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef) Checked: Boolean
+    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef): Boolean
     var
         DigitalVoucherEntrySetup: Record "Digital Voucher Entry Setup";
         IncomingDocument: Record "Incoming Document";
