@@ -102,7 +102,7 @@ report 4413 "EXR Fixed Asset Projected"
                     }
                     field(PeriodLengthField; GlobalPeriodLength)
                     {
-                        ApplicationArea = FixedAssets;
+                        ApplicationArea = All;
                         BlankZero = true;
                         Caption = 'Number of Days';
                         MinValue = 0;
@@ -136,9 +136,15 @@ report 4413 "EXR Fixed Asset Projected"
                     }
                     field(UseAccountingPeriodField; GlobalUseAccountingPeriod)
                     {
-                        ApplicationArea = FixedAssets;
+                        ApplicationArea = All;
                         Caption = 'Use Accounting Period';
                         ToolTip = 'Specifies if you want the periods between the starting date and the ending date to correspond to the accounting periods you have specified in the Accounting Period table. When you select this field, the Number of Days field is cleared.';
+
+                        trigger OnValidate()
+                        begin
+                            if GlobalUseAccountingPeriod then
+                                GlobalPeriodLength := 0;
+                        end;
                     }
                 }
             }

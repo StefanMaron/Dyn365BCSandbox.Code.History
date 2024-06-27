@@ -7,7 +7,7 @@ namespace Microsoft.Sales.Document;
 using System;
 using System.AI;
 using System.Telemetry;
-//using System.Environment;
+using System.Environment;
 using Microsoft.Sales.Document.Attachment;
 
 codeunit 7275 "Sales Lines Suggestions Impl."
@@ -239,12 +239,12 @@ codeunit 7275 "Sales Lines Suggestions Impl."
     procedure RegisterCapability()
     var
         CopilotCapability: Codeunit "Copilot Capability";
-        //EnvironmentInformation: Codeunit "Environment Information";
+        EnvironmentInformation: Codeunit "Environment Information";
         DocUrlLbl: Label 'https://go.microsoft.com/fwlink/?linkid=2261665', Locked = true;
     begin
-        //if EnvironmentInformation.IsSaaSInfrastructure() then
-        if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Sales Lines Suggestions") then
-            CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Sales Lines Suggestions", DocUrlLbl);
+        if EnvironmentInformation.IsSaaSInfrastructure() then
+            if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Sales Lines Suggestions") then
+                CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Sales Lines Suggestions", DocUrlLbl);
 
     end;
 
