@@ -702,7 +702,7 @@ report 1306 "Standard Sales - Invoice"
                     TotalInvDiscAmount -= "Inv. Discount Amount";
                     TotalAmount += Amount;
                     TotalAmountVAT += "Amount Including VAT" - Amount;
-                    TotalECAmount += VATAmountLine."EC Amount";
+                    TotalECAmount := VATAmountLine."EC Amount";
                     TotalAmountInclVAT += "Amount Including VAT";
                     TotalPaymentDiscOnVAT += -("Line Amount" - "Inv. Discount Amount" - "Amount Including VAT");
 
