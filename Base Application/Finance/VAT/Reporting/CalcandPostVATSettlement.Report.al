@@ -979,8 +979,6 @@ report 20 "Calc. and Post VAT Settlement"
         GLSetup: Record "General Ledger Setup";
         ActivityCode: Record "Activity Code";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
-        EntrdStartDate: Date;
-        EndDateReq: Date;
         PrintVATEntries: Boolean;
         NextVATEntryNo: Integer;
         LastVATEntryNo: Integer;
@@ -1077,6 +1075,8 @@ report 20 "Calc. and Post VAT Settlement"
     protected var
         GLAccSettle: Record "G/L Account";
         PostSettlement: Boolean;
+        EntrdStartDate: Date;
+        EndDateReq: Date;
 
     procedure InitializeRequest(NewStartDate: Date; NewEndDate: Date; NewPostingDate: Date; NewDocNo: Code[20]; NewSettlementAcc: Code[20]; NewPosRoundAcc: Code[20]; NewNegRoundAcc: Code[20]; ShowVATEntries: Boolean; Post: Boolean)
     begin
