@@ -102,7 +102,7 @@ codeunit 139769 "Bank Deposit Posting Tests"
         GLEntry: Record "G/L Entry";
         TransactionNo: Integer;
     begin
-        // Verify G/L Entry after post Deposit with Unchecked Force Doc. Balance.
+        // Verify that when bank deposit has multiple lines, and 'Post as Lump Sum' is checked - it posts it as lump sum
 
         // Setup: Create GL Account and Vendor, create Bank Deposit with Account Type GL, Vendor.
         Initialize();
@@ -155,7 +155,7 @@ codeunit 139769 "Bank Deposit Posting Tests"
         GLEntry: Record "G/L Entry";
         TransactionNo: Integer;
     begin
-        // Verify G/L Entry after post Deposit with Unchecked Force Doc. Balance.
+        // Bug 539413: Verify that when bank deposit has one line, and 'Post as Lump Sum' is checked - it posts it as lump sum
 
         // Setup: Create GL Account and Vendor, create Bank Deposit with Account Type GL, Vendor.
         Initialize();
