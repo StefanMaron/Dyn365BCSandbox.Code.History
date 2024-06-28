@@ -31,7 +31,7 @@ codeunit 7276 "SLS Prompts"
         BCSLSTaskPrompt: Text;
     begin
         GetAzureKeyVaultSecret(BCSLSMetaPrompt, 'BCSLSMetaPrompt');
-        GetAzureKeyVaultSecret(BCSLSTaskPrompt, 'BCSLSTaskPrompt');
+        GetAzureKeyVaultSecret(BCSLSTaskPrompt, 'BCSLSTaskPrompt-V250');
 
         exit(BCSLSMetaPrompt + StrSubstNo(BCSLSTaskPrompt, Format(Today, 0, 4)));
     end;
@@ -113,7 +113,7 @@ codeunit 7276 "SLS Prompts"
     var
         BCSLSGetProductFromCsvTemplateUserInputPrompt: Text;
     begin
-        GetAzureKeyVaultSecret(BCSLSGetProductFromCsvTemplateUserInputPrompt, 'BCSLSParseCsvTemplateUserInputPrompt');
+        GetAzureKeyVaultSecret(BCSLSGetProductFromCsvTemplateUserInputPrompt, 'BCSLSGetProductFromCsvTemplateUserInputPrompt');
 
         exit(BCSLSGetProductFromCsvTemplateUserInputPrompt);
     end;
