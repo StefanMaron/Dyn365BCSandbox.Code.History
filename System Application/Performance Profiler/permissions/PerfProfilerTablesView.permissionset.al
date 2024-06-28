@@ -5,15 +5,13 @@
 
 namespace System.Tooling;
 
-permissionset 1921 "Performance Profiler - Objects"
+using System.PerformanceProfile;
+
+permissionset 1922 "Perf. Profiler Tables - View"
 {
     Access = Internal;
     Assignable = false;
 
-    Permissions = codeunit "Sampling Performance Profiler" = X,
-                  codeunit "Scheduled Perf. Profiler" = X,
-                  page "Performance Profiler" = X,
-                  page "Perf. Profiler Schedules List" = X,
-                  page "Perf. Profiler Schedule Card" = X,
-                  page "Performance Profile List" = X;
+    Permissions = tabledata "Performance Profile Scheduler" = R,
+              tabledata "Performance Profiles" = R;
 }
