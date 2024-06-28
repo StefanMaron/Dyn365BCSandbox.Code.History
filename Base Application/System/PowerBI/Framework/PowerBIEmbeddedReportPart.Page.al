@@ -106,11 +106,6 @@ page 6325 "Power BI Embedded Report Part"
                     trigger ControlAddInReady()
                     begin
                         AddInReady := true;
-                        if not (ClientTypeManagement.GetCurrentClientType() in [ClientType::Phone, ClientType::Windows]) then begin
-                            if ReportFrameRatio = '' then
-                                ReportFrameRatio := PowerBiServiceMgt.GetMainPageRatio();
-                            CurrPage.PowerBIAddin.InitializeFrame(FullPageMode, ReportFrameRatio);
-                        end;
 
 #if not CLEAN23
                         if not PowerBIDisplayedElement.IsEmpty() then
@@ -645,7 +640,6 @@ page 6325 "Power BI Embedded Report Part"
         MediaResources: Record "Media Resources";
         PowerBiServiceMgt: Codeunit "Power BI Service Mgt.";
         PowerBiFilterHelper: Codeunit "Power BI Filter Helper";
-        ClientTypeManagement: Codeunit "Client Type Management";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         ErrorNotificationMsg: Label 'An error occurred while loading Power BI. Your Power BI embedded content might not work. Here are the error details: "%1:%2"', Comment = '%1: A short error code. %2: The tecnical details of the error.';
         ResetReportsQst: Label 'This action will clear some or all of the Power BI report setup for all users in the company you''re currently working with. Note: This action doesn''t delete reports in Power BI workspaces.';
@@ -766,27 +760,31 @@ page 6325 "Power BI Embedded Report Part"
 #if not CLEAN23
         PowerBIContextSettings.CreateOrUpdateSelectedElement(PowerBIDisplayedElement);
         ClearNotifications();
+
+        CurrPage.PowerBIAddin.SetSettings(false, PowerBIDisplayedElement.ShowPanesInNormalMode, PowerBIDisplayedElement.ShowPanesInNormalMode,
+            false, true, false, false);
+        CurrPage.PowerBIAddin.SetToken(AccessToken);
+
         case PowerBIDisplayedElement.ElementType of
             "Power BI Element Type"::"Report":
                 begin
                     PowerBIDisplayedElement.ParseReportKey(ReportId);
-                    CurrPage.PowerBIAddin.EmbedReportWithOptions(PowerBIDisplayedElement.ElementEmbedUrl, ReportId,
-                            AccessToken, PowerBIDisplayedElement.ReportPage, PowerBIDisplayedElement.ShowPanesInNormalMode);
+                    CurrPage.PowerBIAddin.EmbedPowerBIReport(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PowerBIDisplayedElement.ReportPage);
                 end;
             "Power BI Element Type"::"Report Visual":
                 begin
                     PowerBIDisplayedElement.ParseReportVisualKey(ReportId, PageName, VisualName);
-                    CurrPage.PowerBIAddin.EmbedReportVisual(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PageName, VisualName, AccessToken);
+                    CurrPage.PowerBIAddin.EmbedPowerBIReportVisual(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PageName, VisualName);
                 end;
             "Power BI Element Type"::Dashboard:
                 begin
                     PowerBIDisplayedElement.ParseDashboardKey(DashboardId);
-                    CurrPage.PowerBIAddin.EmbedDashboard(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, AccessToken);
+                    CurrPage.PowerBIAddin.EmbedPowerBIDashboard(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId);
                 end;
             "Power BI Element Type"::"Dashboard Tile":
                 begin
                     PowerBIDisplayedElement.ParseDashboardTileKey(DashboardId, TileId);
-                    CurrPage.PowerBIAddin.EmbedDashboardTile(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, TileId, AccessToken);
+                    CurrPage.PowerBIAddin.EmbedPowerBIDashboardTile(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, TileId);
                 end;
             else
                 ShowError('UnsupportedElementType', StrSubstNo(UnsupportedElementTypeErr, PowerBIDisplayedElement.ElementType));
@@ -794,27 +792,31 @@ page 6325 "Power BI Embedded Report Part"
 #else
         PowerBIContextSettings.CreateOrUpdateSelectedElement(Rec);
         ClearNotifications();
+
+        CurrPage.PowerBIAddin.SetSettings(false, Rec.ShowPanesInNormalMode, Rec.ShowPanesInNormalMode,
+            false, true, false, false);
+        CurrPage.PowerBIAddin.SetToken(AccessToken);
+
         case Rec.ElementType of
             "Power BI Element Type"::"Report":
                 begin
                     Rec.ParseReportKey(ReportId);
-                    CurrPage.PowerBIAddin.EmbedReportWithOptions(Rec.ElementEmbedUrl, ReportId,
-                            AccessToken, Rec.ReportPage, Rec.ShowPanesInNormalMode);
+                    CurrPage.PowerBIAddin.EmbedPowerBIReport(Rec.ElementEmbedUrl, ReportId, Rec.ReportPage);
                 end;
             "Power BI Element Type"::"Report Visual":
                 begin
                     Rec.ParseReportVisualKey(ReportId, PageName, VisualName);
-                    CurrPage.PowerBIAddin.EmbedReportVisual(Rec.ElementEmbedUrl, ReportId, PageName, VisualName, AccessToken);
+                    CurrPage.PowerBIAddin.EmbedPowerBIReportVisual(Rec.ElementEmbedUrl, ReportId, PageName, VisualName);
                 end;
             "Power BI Element Type"::Dashboard:
                 begin
                     Rec.ParseDashboardKey(DashboardId);
-                    CurrPage.PowerBIAddin.EmbedDashboard(Rec.ElementEmbedUrl, DashboardId, AccessToken);
+                    CurrPage.PowerBIAddin.EmbedPowerBIDashboard(Rec.ElementEmbedUrl, DashboardId);
                 end;
             "Power BI Element Type"::"Dashboard Tile":
                 begin
                     Rec.ParseDashboardTileKey(DashboardId, TileId);
-                    CurrPage.PowerBIAddin.EmbedDashboardTile(Rec.ElementEmbedUrl, DashboardId, TileId, AccessToken);
+                    CurrPage.PowerBIAddin.EmbedPowerBIDashboardTile(Rec.ElementEmbedUrl, DashboardId, TileId);
                 end;
             else
                 ShowError('UnsupportedElementType', StrSubstNo(UnsupportedElementTypeErr, Rec.ElementType));
