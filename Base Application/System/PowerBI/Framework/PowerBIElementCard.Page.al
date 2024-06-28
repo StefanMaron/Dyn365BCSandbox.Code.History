@@ -177,30 +177,31 @@ page 6323 "Power BI Element Card"
             exit;
         end;
 
-        CurrPage.PowerBIManagement.InitializeFrame(true, '');
+        CurrPage.PowerBIManagement.SetSettings(false, PowerBIDisplayedElement.ShowPanesInExpandedMode, PowerBIDisplayedElement.ShowPanesInExpandedMode,
+            false, true, false, true);
+        CurrPage.PowerBIManagement.SetToken(AccessToken);
 
         if PowerBIDisplayedElement.ElementEmbedUrl <> '' then
             case PowerBIDisplayedElement.ElementType of
                 "Power BI Element Type"::"Report":
                     begin
                         PowerBIDisplayedElement.ParseReportKey(ReportId);
-                        CurrPage.PowerBIManagement.EmbedReportWithOptions(PowerBIDisplayedElement.ElementEmbedUrl, ReportId,
-                                AccessToken, PowerBIDisplayedElement.ReportPage, PowerBIDisplayedElement.ShowPanesInExpandedMode);
+                        CurrPage.PowerBIManagement.EmbedPowerBIReport(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PowerBIDisplayedElement.ReportPage);
                     end;
                 "Power BI Element Type"::"Report Visual":
                     begin
                         PowerBIDisplayedElement.ParseReportVisualKey(ReportId, PageName, VisualName);
-                        CurrPage.PowerBIManagement.EmbedReportVisual(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PageName, VisualName, AccessToken);
+                        CurrPage.PowerBIManagement.EmbedPowerBIReportVisual(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PageName, VisualName);
                     end;
                 "Power BI Element Type"::Dashboard:
                     begin
                         PowerBIDisplayedElement.ParseDashboardKey(DashboardId);
-                        CurrPage.PowerBIManagement.EmbedDashboard(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, AccessToken);
+                        CurrPage.PowerBIManagement.EmbedPowerBIDashboard(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId);
                     end;
                 "Power BI Element Type"::"Dashboard Tile":
                     begin
                         PowerBIDisplayedElement.ParseDashboardTileKey(DashboardId, TileId);
-                        CurrPage.PowerBIManagement.EmbedDashboardTile(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, TileId, AccessToken);
+                        CurrPage.PowerBIManagement.EmbedPowerBIDashboardTile(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, TileId);
                     end;
                 else
                     ShowError('UnsupportedElementType', StrSubstNo(UnsupportedElementTypeErr, PowerBIDisplayedElement.ElementType));
