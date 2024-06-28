@@ -1,3 +1,27 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Test.Integration.DynamicsFieldService;
+
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.DynamicsFieldService;
+using System.TestLibraries.Utilities;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Foundation.UOM;
+using Microsoft.Integration.SyncEngine;
+using System.Threading;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Finance.Currency;
+using System.TestLibraries.Environment.Configuration;
+using System.Security.Encryption;
+using Microsoft.CRM.Contact;
+using Microsoft.Sales.Customer;
+using Microsoft.CRM.Team;
+using Microsoft.Purchases.Vendor;
+using System.Security.AccessControl;
+using Microsoft.TestLibraries.DynamicsFieldService;
+
 codeunit 139204 "FS Integration Test"
 {
     Subtype = Test;
@@ -12,6 +36,7 @@ codeunit 139204 "FS Integration Test"
         CRMProductName: Codeunit "CRM Product Name";
         CRMSetupTest: Codeunit "CRM Setup Test";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
+        FSIntegrationTestLibrary: Codeunit "FS Integration Test Library";
         Assert: Codeunit Assert;
         LibraryCRMIntegration: Codeunit "Library - CRM Integration";
         ConnectionErr: Label 'The connection setup cannot be validated. Verify the settings and try again.';
@@ -32,7 +57,7 @@ codeunit 139204 "FS Integration Test"
         Initialize();
 
         ConnectionName := 'No. 1';
-        UnregisterTableConnection(TABLECONNECTIONTYPE::CRM, ConnectionName);
+        UnregisterTableConnection(TableConnectionType::CRM, ConnectionName);
 
         // Get a disabled and unregistered connection
         CreateFSConnectionSetup(ConnectionName, 'invalid.dns.int', false);
@@ -46,9 +71,9 @@ codeunit 139204 "FS Integration Test"
         AssertConnectionNotRegistered(ConnectionName);
 
         // Register
-        FSConnectionSetup.RegisterConnection();
+        FSIntegrationTestLibrary.RegisterConnection(FSConnectionSetup);
         // Second attempt of registration skips registration if it exists
-        FSConnectionSetup.RegisterConnection();
+        FSIntegrationTestLibrary.RegisterConnection(FSConnectionSetup);
     end;
 
     [Test]
@@ -61,15 +86,15 @@ codeunit 139204 "FS Integration Test"
         Initialize();
 
         ConnectionName := 'No. 1';
-        UnregisterTableConnection(TABLECONNECTIONTYPE::CRM, ConnectionName);
+        UnregisterTableConnection(TableConnectionType::CRM, ConnectionName);
 
         // Get an enabled and registered connection
         CreateFSConnectionSetup(ConnectionName, 'invalid.dns.int', true);
         FSConnectionSetup.Get(ConnectionName);
-        FSConnectionSetup.RegisterConnection();
+        FSIntegrationTestLibrary.RegisterConnection(FSConnectionSetup);
 
         // Unregister and check
-        FSConnectionSetup.UnregisterConnection();
+        FSIntegrationTestLibrary.UnregisterConnection(FSConnectionSetup);
         AssertConnectionNotRegistered(ConnectionName);
     end;
 
@@ -78,13 +103,15 @@ codeunit 139204 "FS Integration Test"
     procedure JournalTemplateNameRequiredToEnable()
     var
         FSConnectionSetup: Record "FS Connection Setup";
+        DummyPassword: Text;
     begin
         // [FEATURE] [UT]
         Initialize();
 
+        DummyPassword := 'T3sting!';
         FSConnectionSetup.Init();
         FSConnectionSetup."User Name" := 'tester@domain.net';
-        FSConnectionSetup.SetPassword('T3sting!');
+        FSIntegrationTestLibrary.SetPassword(FSConnectionSetup, DummyPassword);
         FSConnectionSetup.Insert();
 
         asserterror FSConnectionSetup.Validate("Is Enabled", true);
@@ -98,14 +125,16 @@ codeunit 139204 "FS Integration Test"
         FSConnectionSetup: Record "FS Connection Setup";
         JobJournalTemplate: Record "Job Journal Template";
         LibraryJob: Codeunit "Library - Job";
+        DummyPassword: Text;
     begin
         // [FEATURE] [UT]
         Initialize();
         LibraryJob.CreateJobJournalTemplate(JobJournalTemplate);
         JobJournalTemplate.Insert();
+        DummyPassword := 'T3sting!';
         FSConnectionSetup.Init();
         FSConnectionSetup."Server Address" := '@@test@@';
-        FSConnectionSetup.SetPassword('T3sting!');
+        FSIntegrationTestLibrary.SetPassword(FSConnectionSetup, DummyPassword);
         FSConnectionSetup."Job Journal Template" := JobJournalTemplate.Name;
         FSConnectionSetup.Insert();
 
@@ -123,16 +152,18 @@ codeunit 139204 "FS Integration Test"
         JobJournalTemplate: Record "Job Journal Template";
         JobJournalBatch: Record "Job Journal Batch";
         LibraryJob: Codeunit "Library - Job";
+        DummyPassword: Text;
     begin
         // [FEATURE] [UT]
         Initialize();
         LibraryCRMIntegration.RegisterTestTableConnection();
         LibraryJob.CreateJobJournalTemplate(JobJournalTemplate);
         LibraryJob.CreateJobJournalBatch(JobJournalTemplate.Name, JobJournalBatch);
+        DummyPassword := 'T3sting!';
 
         FSConnectionSetup.Init();
         FSConnectionSetup."Server Address" := '@@test@@';
-        FSConnectionSetup.SetPassword('T3sting!');
+        FSIntegrationTestLibrary.SetPassword(FSConnectionSetup, DummyPassword);
         FSConnectionSetup."Job Journal Template" := JobJournalTemplate.Name;
         FSConnectionSetup."Job Journal Batch" := JobJournalBatch.Name;
         FSConnectionSetup.Insert();
@@ -155,6 +186,7 @@ codeunit 139204 "FS Integration Test"
         UnitOfMeasure: Record "Unit of Measure";
         LibraryJob: Codeunit "Library - Job";
         LibraryInventory: Codeunit "Library - Inventory";
+        DummyPassword: Text;
     begin
         // [FEATURE] [UT]
         Initialize();
@@ -163,12 +195,13 @@ codeunit 139204 "FS Integration Test"
         LibraryJob.CreateJobJournalBatch(JobJournalTemplate.Name, JobJournalBatch);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryCRMIntegration.UnbindMockConnection();
+        DummyPassword := 'T3sting!';
 
         // Enter details in the page and enable the connection
         FSConnectionSetup.Init();
         FSConnectionSetup."Server Address" := 'https://nocrmhere.gov';
         FSConnectionSetup.Validate("User Name", 'tester@domain.net');
-        FSConnectionSetup.SetPassword('T3sting!');
+        FSIntegrationTestLibrary.SetPassword(FSConnectionSetup, DummyPassword);
         FSConnectionSetup."Job Journal Template" := JobJournalTemplate.Name;
         FSConnectionSetup."Job Journal Batch" := JobJournalBatch.Name;
         FSConnectionSetup."Hour Unit of Measure" := UnitOfMeasure.Code;
@@ -197,7 +230,7 @@ codeunit 139204 "FS Integration Test"
         LibraryJob.CreateJobJournalBatch(JobJournalTemplate.Name, JobJournalBatch);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         // [GIVEN] Table Mapping is empty
-        Assert.TableIsEmpty(DATABASE::"Integration Table Mapping");
+        Assert.TableIsEmpty(Database::"Integration Table Mapping");
 
         // [GIVEN] Connection is disabled
         FSConnectionSetup.DeleteAll();
@@ -211,7 +244,7 @@ codeunit 139204 "FS Integration Test"
         FSConnectionSetup.Validate("Is Enabled", true);
 
         // [THEN] Table Mapping is filled
-        Assert.TableIsNotEmpty(DATABASE::"Integration Table Mapping");
+        Assert.TableIsNotEmpty(Database::"Integration Table Mapping");
     end;
 
     [Test]
@@ -220,6 +253,7 @@ codeunit 139204 "FS Integration Test"
     procedure CanTestConnectionWhenNotIsEnabled()
     var
         FSConnectionSetup: Record "FS Connection Setup";
+        DummyPassword: Text;
     begin
         Initialize();
         LibraryCRMIntegration.RegisterTestTableConnection();
@@ -228,10 +262,11 @@ codeunit 139204 "FS Integration Test"
         FSConnectionSetup.Init();
         FSConnectionSetup."Server Address" := '@@test@@';
         FSConnectionSetup.Validate("User Name", 'tester@domain.net');
-        FSConnectionSetup.SetPassword('value');
+        DummyPassword := 'value';
+        FSIntegrationTestLibrary.SetPassword(FSConnectionSetup, DummyPassword);
         FSConnectionSetup.Insert();
 
-        FSConnectionSetup.PerformTestConnection();
+        FSIntegrationTestLibrary.PerformTestConnection(FSConnectionSetup);
     end;
 
     [Test]
@@ -449,8 +484,8 @@ codeunit 139204 "FS Integration Test"
     [HandlerFunctions('FSAssistedSetupModalHandler,ConfirmYes')]
     procedure RunAssistedSetupFromFSConnectionSetup()
     var
-        FSConnectionSetupPage: TestPage "FS Connection Setup";
         CRMConnectionSetup: Record "CRM Connection Setup";
+        FSConnectionSetupPage: TestPage "FS Connection Setup";
     begin
         // [SCENARIO 266927] FS Connection Assisted Setup can be opened from FS Connection Setup page
         Initialize();
@@ -486,10 +521,10 @@ codeunit 139204 "FS Integration Test"
         Assert.IsFalse(EncryptionEnabled(), 'Encryption should be disabled');
 
         Clear(CRMSetupTest);
-        UnregisterTableConnection(TABLECONNECTIONTYPE::CRM, '');
-        UnregisterTableConnection(TABLECONNECTIONTYPE::CRM, GetDefaultTableConnection(TABLECONNECTIONTYPE::CRM));
+        UnregisterTableConnection(TableConnectionType::CRM, '');
+        UnregisterTableConnection(TableConnectionType::CRM, GetDefaultTableConnection(TableConnectionType::CRM));
         Assert.AreEqual(
-          '', GetDefaultTableConnection(TABLECONNECTIONTYPE::CRM),
+          '', GetDefaultTableConnection(TableConnectionType::CRM),
           'DEFAULTTABLECONNECTION should not be registered');
 
         AssistedSetupTestLibrary.DeleteAll();
@@ -513,6 +548,7 @@ codeunit 139204 "FS Integration Test"
     local procedure InitializeCDSConnectionSetup()
     var
         CDSConnectionSetup: Record "CDS Connection Setup";
+        ClientSecret: Text;
     begin
         CDSConnectionSetup.DeleteAll();
         CDSConnectionSetup."Is Enabled" := true;
@@ -522,7 +558,8 @@ codeunit 139204 "FS Integration Test"
         CDSConnectionSetup."Proxy Version" := LibraryCRMIntegration.GetLastestSDKVersion();
         CDSConnectionSetup.Validate("Client Id", 'ClientId');
         CDSConnectionSetup.Validate("Redirect URL", 'RedirectURL');
-        CDSConnectionSetup.SetClientSecret('ClientSecret');
+        ClientSecret := 'ClientSecret';
+        CDSConnectionSetup.SetClientSecret(ClientSecret);
     end;
 
     local procedure AssertConnectionNotRegistered(ConnectionName: Code[10])
@@ -530,8 +567,8 @@ codeunit 139204 "FS Integration Test"
         FSConnectionSetup: Record "FS Connection Setup";
     begin
         FSConnectionSetup.Get(ConnectionName);
-        FSConnectionSetup.RegisterConnection();
-        FSConnectionSetup.UnregisterConnection();
+        FSIntegrationTestLibrary.RegisterConnection(FSConnectionSetup);
+        FSIntegrationTestLibrary.UnregisterConnection(FSConnectionSetup);
     end;
 
     local procedure CreateTableMapping()
@@ -539,21 +576,19 @@ codeunit 139204 "FS Integration Test"
         CRMTransactioncurrency: Record "CRM Transactioncurrency";
         IntegrationTableMapping: Record "Integration Table Mapping";
     begin
-        with IntegrationTableMapping do begin
-            Init();
-            "Table ID" := DATABASE::Currency;
-            "Integration Table ID" := DATABASE::"CRM Transactioncurrency";
-            Validate("Integration Table UID Fld. No.", CRMTransactioncurrency.FieldNo(TransactionCurrencyId));
-            "Synch. Codeunit ID" := CODEUNIT::"CRM Integration Table Synch.";
+        IntegrationTableMapping.Init();
+        IntegrationTableMapping."Table ID" := Database::Currency;
+        IntegrationTableMapping."Integration Table ID" := Database::"CRM Transactioncurrency";
+        IntegrationTableMapping.Validate("Integration Table UID Fld. No.", CRMTransactioncurrency.FieldNo(TransactionCurrencyId));
+        IntegrationTableMapping."Synch. Codeunit ID" := Codeunit::"CRM Integration Table Synch.";
 
-            Name := 'FIRST';
-            Direction := Direction::FromIntegrationTable;
-            Insert();
+        IntegrationTableMapping.Name := 'FIRST';
+        IntegrationTableMapping.Direction := IntegrationTableMapping.Direction::FromIntegrationTable;
+        IntegrationTableMapping.Insert();
 
-            Name := 'SECOND';
-            Direction := Direction::Bidirectional;
-            Insert();
-        end;
+        IntegrationTableMapping.Name := 'SECOND';
+        IntegrationTableMapping.Direction := IntegrationTableMapping.Direction::Bidirectional;
+        IntegrationTableMapping.Insert();
     end;
 
     local procedure CreateIntTableMappingWithJobQueueEntries()
@@ -586,13 +621,15 @@ codeunit 139204 "FS Integration Test"
         UnitOfMeasure: Record "Unit of Measure";
         LibraryJob: Codeunit "Library - Job";
         LibraryInventory: Codeunit "Library - Inventory";
+        DummyPassword: Text;
     begin
         FSConnectionSetup.Init();
         FSConnectionSetup."Is Enabled" := Enable;
         FSConnectionSetup."Is FS Solution Installed" := Enable;
         FSConnectionSetup."Server Address" := '@@test@@';
         FSConnectionSetup.Validate("User Name", 'tester@domain.net');
-        FSConnectionSetup.SetPassword('Password');
+        DummyPassword := 'Password';
+        FSIntegrationTestLibrary.SetPassword(FSConnectionSetup, DummyPassword);
         FSConnectionSetup."FS Version" := Version;
         if Enable then begin
             LibraryJob.CreateJobJournalTemplate(JobJournalTemplate);
@@ -605,7 +642,7 @@ codeunit 139204 "FS Integration Test"
         FSConnectionSetup.Insert();
 
         if FSConnectionSetup."Is Enabled" then
-            FSConnectionSetup.RegisterConnection();
+            FSIntegrationTestLibrary.RegisterConnection(FSConnectionSetup);
     end;
 
     local procedure InsertJobQueueEntries()
@@ -613,16 +650,16 @@ codeunit 139204 "FS Integration Test"
         JobQueueEntry: Record "Job Queue Entry";
     begin
         JobQueueEntry.DeleteAll();
-        InsertJobQueueEntry(CODEUNIT::"Integration Synch. Job Runner", JobQueueEntry.Status::Ready);
-        InsertJobQueueEntry(CODEUNIT::"Integration Synch. Job Runner", JobQueueEntry.Status::"In Process");
-        InsertJobQueueEntry(CODEUNIT::"CRM Statistics Job", JobQueueEntry.Status::Ready);
+        InsertJobQueueEntry(Codeunit::"Integration Synch. Job Runner", JobQueueEntry.Status::Ready);
+        InsertJobQueueEntry(Codeunit::"Integration Synch. Job Runner", JobQueueEntry.Status::"In Process");
+        InsertJobQueueEntry(Codeunit::"CRM Statistics Job", JobQueueEntry.Status::Ready);
     end;
 
     local procedure InsertJobQueueEntriesWithError()
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
-        InsertJobQueueEntry(CODEUNIT::"CRM Statistics Job", JobQueueEntry.Status::Error);
+        InsertJobQueueEntry(Codeunit::"CRM Statistics Job", JobQueueEntry.Status::Error);
     end;
 
     local procedure InsertJobQueueEntry(ID: Integer; Status: Option)
@@ -637,24 +674,9 @@ codeunit 139204 "FS Integration Test"
         JobQueueEntry.Insert();
     end;
 
-    local procedure PrepareNewConnectionSetup()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        IntegrationTableMapping: Record "Integration Table Mapping";
-    begin
-        LibraryCRMIntegration.DisableTaskOnBeforeJobQueueScheduleTask();
-        LibraryCRMIntegration.ConfigureCRM();
-
-        IntegrationTableMapping.DeleteAll(true);
-        JobQueueEntry.DeleteAll();
-
-        CreateFSConnectionSetup('', '@@test@@', true);
-    end;
-
     local procedure VerifyJobQueueEntriesStatusIsReady()
     var
         JobQueueEntry: Record "Job Queue Entry";
-        CRMProductName: Codeunit "CRM Product Name";
     begin
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"Integration Synch. Job Runner");
         JobQueueEntry.FindSet();

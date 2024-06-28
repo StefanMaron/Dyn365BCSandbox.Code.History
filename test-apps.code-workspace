@@ -13,6 +13,12 @@
       "path": "./ReviewGLEntries/Test/_Exclude_Review_General_Ledger_Entries_Tests"
     },
     {
+      "path": "./FieldServiceIntegration/Test/Field Service Integration Test"
+    },
+    {
+      "path": "./FieldServiceIntegration/Test Library/Field Service Integration Test Library"
+    },
+    {
       "path": "./EmailLogging/Test/_Exclude_Email Logging Using Graph API Tests"
     },
     {
