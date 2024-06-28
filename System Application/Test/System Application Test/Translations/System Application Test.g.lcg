@@ -1400,6 +1400,24 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Page 3793281682 - Control 284764054 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the Record ID]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List - Control Country/Region Code - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 3793281682 - Control 995090288 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the Record ID]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List - Control Date Filter - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Page 3793281682 - Control 415504711 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Specifies the Record ID]]></Val>
@@ -1409,6 +1427,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List - Control Id - Property ToolTip)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Page 3793281682 - Control 949215307 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the Record ID]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List - Control No - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Page 3793281682 - Control 599309684 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Specifies if Edit in Excel should use centralized deployments]]></Val>
@@ -1416,6 +1443,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List - Control Use Centralized deployments - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 1577615232 - Property 2879900210" ItemType=";Page - Page" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Edit in Excel List 2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List 2 - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 1577615232 - Control 599309684 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies if Edit in Excel should use centralized deployments]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Page Edit in Excel List 2 - Control Use Centralized deployments - Property ToolTip)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2118529092 - NamedType 2865018819" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -2811,6 +2856,42 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Tooling)(LookupHint=Codeunit Sampling Perf. Profiler Test - NamedType ProfilingNodeNotMatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 467190306 - NamedType 2195253740" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[A schedule cannot be set to run in the past.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Tooling)(LookupHint=Codeunit Scheduled Perf. Profiling Test - NamedType ProfileCannotBeInThePastErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 467190306 - NamedType 607267753" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Only one performance profile session can be scheduled for a given activity type for a given user for a given period.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Tooling)(LookupHint=Codeunit Scheduled Perf. Profiling Test - NamedType ProfileHasAlreadyBeenScheduledErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 467190306 - NamedType 1090225929" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The performance profile starting date must be set before the ending date.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Tooling)(LookupHint=Codeunit Scheduled Perf. Profiling Test - NamedType ProfileStartingDateLessThenEndingDateErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 467190306 - NamedType 1576450168" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The performance profile schedule duration cannot exceed the retention period.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Tooling)(LookupHint=Codeunit Scheduled Perf. Profiling Test - NamedType ScheduleDurationCannotExceedRetentionPeriodErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1008664390 - NamedType 2781414266" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
