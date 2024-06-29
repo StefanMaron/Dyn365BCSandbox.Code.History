@@ -2550,7 +2550,7 @@ codeunit 10145 "E-Invoice Mgt."
 
                 XMLCurrNode := XMLCurrNode.ParentNode;
 
-                    CalcComercioExteriorLine(TempDocumentLineCCE, TempDocumentLine, TempDocumentHeader."Foreign Trade", false);
+                CalcComercioExteriorLine(TempDocumentLineCCE, TempDocumentLine, TempDocumentHeader."Foreign Trade", false);
             until TempDocumentLine.Next() = 0;
         XMLCurrNode := XMLCurrNode.ParentNode;
 
@@ -3219,24 +3219,6 @@ codeunit 10145 "E-Invoice Mgt."
         AddStrComercioExterior(TempDocumentLineCCE, TempDocumentHeader, OutStream);
 
         WriteOutStrAllowOneCharacter(OutStream, '|');
-    end;
-
-    [Obsolete('Replaced with CreateOriginalStr33AdvanceSettleDetailed', '19.0')]
-    procedure CreateOriginalStr33AdvanceSettle(var TempDocumentHeader: Record "Document Header" temporary; var TempDocumentLine: Record "Document Line" temporary; DateTimeFirstReqSent: Text; SubTotal: Decimal; RetainAmt: Decimal; var TempBlob: Codeunit "Temp Blob"; UUID: Text[50])
-    var
-        TempDocumentLineRetention: Record "Document Line" temporary;
-        TempVATAmountLine: Record "VAT Amount Line" temporary;
-        TotalTax: Decimal;
-        TotalRetention: Decimal;
-        TotalDiscount: Decimal;
-    begin
-        SubTotal := 0;
-        TotalTax := 0;
-        TotalRetention := 0;
-        TotalDiscount := 0;
-        CreateOriginalStr33AdvanceSettleDetailed(
-          TempDocumentHeader, TempDocumentLine, TempDocumentLineRetention, TempVATAmountLine,
-          DateTimeFirstReqSent, TempBlob, UUID, SubTotal, TotalTax, TotalRetention, TotalDiscount);
     end;
 
     procedure CreateOriginalStr33AdvanceSettleDetailed(var TempDocumentHeader: Record "Document Header" temporary; var TempDocumentLine: Record "Document Line" temporary; var TempDocumentLineRetention: Record "Document Line" temporary; var TempVATAmountLine: Record "VAT Amount Line" temporary; DateTimeFirstReqSent: Text; var TempBlob: Codeunit "Temp Blob"; UUID: Text[50]; SubTotal: Decimal; TotalTax: Decimal; TotalRetention: Decimal; TotalDiscount: Decimal)
@@ -4434,21 +4416,6 @@ codeunit 10145 "E-Invoice Mgt."
         QRCodeProvider.GetBarcodeStream(QRCodeInput, BlobOutStr);
     end;
 
-    [Obsolete('Replaced with CreateTempDocument', '19.0')]
-    procedure CreateAbstractDocument(DocumentHeaderVariant: Variant; var TempDocumentHeader: Record "Document Header" temporary; var TempDocumentLine: Record "Document Line" temporary; AdvanceSettle: Boolean)
-    var
-        TempDocumentLineRetention: Record "Document Line" temporary;
-        TempVATAmountLine: Record "VAT Amount Line" temporary;
-        SubTotal: Decimal;
-        TotalTax: Decimal;
-        TotalRetention: Decimal;
-        TotalDiscount: Decimal;
-    begin
-        CreateTempDocument(
-          DocumentHeaderVariant, TempDocumentHeader, TempDocumentLine, TempDocumentLineRetention, TempVATAmountLine,
-          SubTotal, TotalTax, TotalRetention, TotalDiscount, AdvanceSettle);
-    end;
-
     procedure CreateTempDocument(DocumentHeaderVariant: Variant; var TempDocumentHeader: Record "Document Header" temporary; var TempDocumentLine: Record "Document Line" temporary; var TempDocumentLineRetention: Record "Document Line" temporary; var TempVATAmountLine: Record "VAT Amount Line" temporary; var SubTotal: Decimal; var TotalTax: Decimal; var TotalRetention: Decimal; var TotalDiscount: Decimal; AdvanceSettle: Boolean)
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -5390,7 +5357,7 @@ codeunit 10145 "E-Invoice Mgt."
                 AddAttribute(XMLDoc, XMLCurrNode, 'MonedaDR', ConvertCurrency(CustLedgerEntry2."Currency Code"));
 
                 EquivalenciaDR := TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                    AddAttribute(XMLDoc, XMLCurrNode, 'EquivalenciaDR', FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()));
+                AddAttribute(XMLDoc, XMLCurrNode, 'EquivalenciaDR', FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()));
 
                 SumStampedPayments(CustLedgerEntry2, SumOfStamped, PaymentNo);
                 AddAttribute(XMLDoc, XMLCurrNode, 'NumParcialidad', Format(PaymentNo));
@@ -5404,7 +5371,7 @@ codeunit 10145 "E-Invoice Mgt."
 
                 AddNodePagoImpuestosDR(TempVATAmountLine, XMLDoc, XMLCurrNode, XMLNewChild);
 
-                    XMLCurrNode := XMLCurrNode.ParentNode; // DoctoRelacionado
+                XMLCurrNode := XMLCurrNode.ParentNode; // DoctoRelacionado
             until TempDetailedCustLedgEntry.Next() = 0;
         // ImpuestosP
         AddNodePagoImpuestosP(XMLDoc, XMLCurrNode, XMLNewChild, TempVATAmountLinePmt);
@@ -5522,7 +5489,7 @@ codeunit 10145 "E-Invoice Mgt."
                 WriteOutStr(OutStream, ConvertCurrency(CustLedgerEntry2."Currency Code") + '|');
                 // MonedaDR
                 EquivalenciaDR := TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                    WriteOutStr(OutStream, FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()) + '|');
+                WriteOutStr(OutStream, FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()) + '|');
 
                 SumStampedPayments(CustLedgerEntry2, SumOfStamped, PaymentNo);
                 WriteOutStr(OutStream, Format(PaymentNo) + '|');// NumParcialidad
@@ -7165,12 +7132,12 @@ IsVATExemptLine(TempDocumentLine));
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("Insurer Policy Number"), TempErrorMessage."Message Type"::Error);
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("Vehicle Code"), TempErrorMessage."Message Type"::Error);
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("SAT Weight Unit Of Measure"), TempErrorMessage."Message Type"::Error);
-            if DocumentHeader."Foreign Trade" then begin
-                TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("SAT International Trade Term"), TempErrorMessage."Message Type"::Error);
-                TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("SAT Customs Regime"), TempErrorMessage."Message Type"::Error);
-                TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("SAT Transfer Reason"), TempErrorMessage."Message Type"::Error);
-                TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("Exchange Rate USD"), TempErrorMessage."Message Type"::Error);
-            end;
+        if DocumentHeader."Foreign Trade" then begin
+            TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("SAT International Trade Term"), TempErrorMessage."Message Type"::Error);
+            TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("SAT Customs Regime"), TempErrorMessage."Message Type"::Error);
+            TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("SAT Transfer Reason"), TempErrorMessage."Message Type"::Error);
+            TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("Exchange Rate USD"), TempErrorMessage."Message Type"::Error);
+        end;
         CFDITransportOperator.SetRange("Document Table ID", DocumentHeader."Document Table ID");
         CFDITransportOperator.SetRange("Document No.", DocumentHeader."No.");
         if not CFDITransportOperator.FindSet() then
@@ -7180,8 +7147,8 @@ IsVATExemptLine(TempDocumentLine));
                 Employee.Get(CFDITransportOperator."Operator Code");
                 TempErrorMessage.LogIfEmpty(Employee, Employee.FieldNo("RFC No."), TempErrorMessage."Message Type"::Error);
                 TempErrorMessage.LogIfEmpty(Employee, Employee.FieldNo("License No."), TempErrorMessage."Message Type"::Error);
-                    if Employee.FullName() = '' then
-                        TempErrorMessage.LogSimpleMessage(TempErrorMessage."Message Type"::Error, StrSubstNo(ValueIsNotDefinedErr, 'Full Name', Employee.RecordId));
+                if Employee.FullName() = '' then
+                    TempErrorMessage.LogSimpleMessage(TempErrorMessage."Message Type"::Error, StrSubstNo(ValueIsNotDefinedErr, 'Full Name', Employee.RecordId));
             until CFDITransportOperator.Next() = 0;
         CheckAutotransport(TempErrorMessage, DocumentHeader."Vehicle Code", false);
         CheckAutotransport(TempErrorMessage, DocumentHeader."Trailer 1", true);
@@ -7225,7 +7192,7 @@ IsVATExemptLine(TempDocumentLine));
             if (DocumentLine.Type = DocumentLine.Type::Item) and Item.Get(DocumentLine."No.") then
                 TempErrorMessage.LogIfEmpty(Item, Item.FieldNo("SAT Item Classification"), TempErrorMessage."Message Type"::Error);
             if not IsPrepayment then
-                 if (DocumentLine.Type = DocumentLine.Type::"G/L Account") and GLAccount.Get(DocumentLine."No.") then
+                if (DocumentLine.Type = DocumentLine.Type::"G/L Account") and GLAccount.Get(DocumentLine."No.") then
                     TempErrorMessage.LogIfEmpty(GLAccount, GLAccount.FieldNo("SAT Classification Code"), TempErrorMessage."Message Type"::Error);
             if (DocumentLine.Type = DocumentLine.Type::"Charge (Item)") and ItemCharge.Get(DocumentLine."No.") then
                 TempErrorMessage.LogIfEmpty(ItemCharge, ItemCharge.FieldNo("SAT Classification Code"), TempErrorMessage."Message Type"::Error);
@@ -7412,7 +7379,7 @@ IsVATExemptLine(TempDocumentLine));
             TempErrorMessage.LogIfEmpty(FixedAsset, FixedAsset.FieldNo("SAT Trailer Type"), TempErrorMessage."Message Type"::Error)
         else begin
             TempErrorMessage.LogIfEmpty(FixedAsset, FixedAsset.FieldNo("Vehicle Year"), TempErrorMessage."Message Type"::Error);
-                TempErrorMessage.LogIfEmpty(FixedAsset, FixedAsset.FieldNo("Vehicle Gross Weight"), TempErrorMessage."Message Type"::Error);
+            TempErrorMessage.LogIfEmpty(FixedAsset, FixedAsset.FieldNo("Vehicle Gross Weight"), TempErrorMessage."Message Type"::Error);
             TempErrorMessage.LogIfEmpty(FixedAsset, FixedAsset.FieldNo("SAT Federal Autotransport"), TempErrorMessage."Message Type"::Error);
             TempErrorMessage.LogIfEmpty(FixedAsset, FixedAsset.FieldNo("SCT Permission Type"), TempErrorMessage."Message Type"::Error);
             TempErrorMessage.LogIfEmpty(FixedAsset, FixedAsset.FieldNo("SCT Permission No."), TempErrorMessage."Message Type"::Error);
