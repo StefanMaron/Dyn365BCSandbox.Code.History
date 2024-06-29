@@ -9686,7 +9686,8 @@ table 37 "Sales Line"
     begin
         ItemTempl.Get(NonstockItem."Item Templ. Code");
         ItemTempl.TestField("Gen. Prod. Posting Group");
-        ItemTempl.TestField("Inventory Posting Group");
+        if ItemTempl.Type = ItemTempl.Type::Inventory then
+            ItemTempl.TestField("Inventory Posting Group");
     end;
 
     local procedure CheckQuoteCustomerTemplateCode(SalesHeader: Record "Sales Header")
