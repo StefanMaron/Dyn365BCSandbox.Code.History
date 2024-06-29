@@ -112,8 +112,13 @@ table 5769 "Warehouse Setup"
             Caption = 'Last Whse. Posting Ref. No.';
             Editable = false;
             ObsoleteReason = 'Replaced by Last Whse. Posting Ref. Seq. field.';
+#if CLEAN25
+            ObsoleteState = Removed;
+            ObsoleteTag = '28.0';
+#else
             ObsoleteState = Pending;
             ObsoleteTag = '19.0';
+#endif
         }
         field(18; "Receipt Posting Policy"; Option)
         {
@@ -216,8 +221,10 @@ table 5769 "Warehouse Setup"
     procedure GetCurrentReference(): Integer
     begin
         Rec.Get();
+#if not CLEAN25
         if Rec."Last Whse. Posting Ref. Seq." = '' then
             exit(Rec."Last Whse. Posting Ref. No.");
+#endif
         EnsureSequenceExists();
         exit(NumberSequence.Current(Rec."Last Whse. Posting Ref. Seq.") mod MaxInt());
     end;
@@ -242,7 +249,9 @@ table 5769 "Warehouse Setup"
         end;
         if NumberSequence.Exists("Last Whse. Posting Ref. Seq.") then
             exit;
+#if not CLEAN25
         NumberSequence.Insert(Rec."Last Whse. Posting Ref. Seq.", Rec."Last Whse. Posting Ref. No.", 1);
+#endif
         // Simulate that a number was used - init issue with number sequences.
         if NumberSequence.next(Rec."Last Whse. Posting Ref. Seq.") = 0 then;
     end;
