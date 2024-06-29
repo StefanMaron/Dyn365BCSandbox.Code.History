@@ -174,23 +174,6 @@ page 5469 "API Setup"
                 end;
             }
 
-            action(FixSalesCrMemoReasonCode)
-            {
-                ApplicationArea = All;
-                Caption = 'Fix Sales Credit Memo API Records Reason Codes';
-                Image = Setup;
-                ToolTip = 'Updates reason codes of the records that are used by the salesCreditMemos API';
-                ObsoleteReason = 'This action will be removed together with the upgrade code.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '19.0';
-
-                trigger OnAction()
-                var
-                    GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
-                begin
-                    GraphMgtGeneralTools.ScheduleUpdateAPIRecordsJob(Codeunit::"API Fix Sales Cr. Memo");
-                end;
-            }
 #if not CLEAN23
             action(FixSalesInvoiceShortcutDimension)
             {
