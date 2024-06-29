@@ -1191,6 +1191,94 @@ codeunit 141008 "ERM - Miscellaneous APAC"
                 TempVATAmountLine.TableCaption()));
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure VerifyAmountACYOfSalesLineInVATAmountLine()
+    var
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
+        VATPostingSetup: Record "VAT Posting Setup";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        Currency: Record Currency;
+        ExpectedAmountACY: Decimal;
+        NewExchRate: Decimal;
+    begin
+        // [SCENARIO 539558] The "Amount (ACY)" value Sales Invoice Statistics is same as in Sales Header when 
+        // Currency Code of Sales Header and Additional Reporting Currency of General Ledger Setup are same.
+        Initialize();
+
+        // [GIVEN] Create a Currency.
+        LibraryERM.CreateCurrency(Currency);
+
+        // [GIVEN] Set Reporting Currency in the General Ledger Setup.
+        LibraryERM.SetAddReportingCurrency(Currency.Code);
+
+        // [GIVEN] Create an Exchange Rate.
+        NewExchRate := LibraryRandom.RandDecInRange(10, 20, 2);
+        LibraryERM.CreateExchangeRate(
+            Currency.Code,
+            WorkDate(),
+            NewExchRate,
+            NewExchRate);
+
+        // [GIVEN] Create a VAT Posting Setup with Accounts.
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 0);
+
+        // [GIVEN] Create a Sales Header.
+        LibrarySales.CreateSalesHeader(
+            SalesHeader,
+            SalesHeader."Document Type"::Invoice,
+            LibrarySales.CreateCustomerWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+
+        // [GIVEN] Validate Currency Code in Sales Header.
+        SalesHeader.Validate("Currency Code", Currency.Code);
+        SalesHeader.Modify();
+
+        // [GIVEN] Create a Sales Line with a VAT Product Posting Group.
+        LibrarySales.CreateSalesLine(
+            SalesLine,
+            SalesHeader,
+            SalesLine.Type::Item,
+            LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group"),
+            LibraryRandom.RandInt(100));
+
+        // [GIVEN] Update Unit Price in Sales Line.
+        SalesLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        SalesLine.Modify(true);
+
+        // [GIVEN] Generate and save Expected "Amount ACY" in a Variable.
+        ExpectedAmountACY := Round(SalesLine."VAT Base Amount");
+
+        // [GIVEN] Create another Sales Line with a VAT Product Posting Group.
+        LibrarySales.CreateSalesLine(
+            SalesLine,
+            SalesHeader,
+            SalesLine.Type::Item,
+            LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group"),
+            LibraryRandom.RandInt(100));
+
+        // [GIVEN] Update Unit Price in Sales Line.
+        SalesLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        SalesLine.Modify(true);
+
+        // [GIVEN] Generate and save Expected "Amount ACY".
+        ExpectedAmountACY += Round(SalesLine."VAT Base Amount");
+
+        // [WHEN] Calculate VAT Amount Line.
+        TempVATAmountLine.DeleteAll();
+        SalesLine.CalcVATAmountLines(0, SalesHeader, SalesLine, TempVATAmountLine);
+
+        // [THEN] "Amount (ACY)" in VAT Amount Line is equal to ExpectedAmountACY.
+        Assert.AreEqual(
+            ExpectedAmountACY,
+            TempVATAmountLine."Amount (ACY)",
+            StrSubstNo(
+                ValueMustBeEqualErr,
+                TempVATAmountLine.FieldCaption("Amount (ACY)"),
+                ExpectedAmountACY,
+                TempVATAmountLine.TableCaption()));
+    end;
+
     local procedure Initialize()
     var
         LibraryApplicationArea: Codeunit "Library - Application Area";
