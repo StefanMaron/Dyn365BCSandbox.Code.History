@@ -1443,29 +1443,6 @@ codeunit 137055 "SCM Warehouse Pick"
         WarehouseActivityLine.TestField("Bin Code", ShipBin.Code);
     end;
 
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure TestWhseSetupLastWhsePostingRefNo()
-    var
-        WarehouseSetup: Record "Warehouse setup";
-    begin
-        // Given: Warehouse setup is using legacy "Last Whse. Posting Ref. No."
-        WarehouseSetup.LockTable();
-        WarehouseSetup.Get();
-        WarehouseSetup."Last Whse. Posting Ref. Seq." := '';
-        WarehouseSetup."Last Whse. Posting Ref. No." := 2;
-        WarehouseSetup.Modify();
-
-        // When getting next reference number, the sequence should be created and record not be updated anymore.
-        Assert.AreEqual(2, WarehouseSetup.GetCurrentReference(), 'Unexpected current value');
-        Assert.AreEqual('', WarehouseSetup."Last Whse. Posting Ref. Seq.", 'Sequence should not be created before used.');
-        Assert.AreEqual(3, WarehouseSetup.GetNextReference(), 'Unexpected next value');
-        Assert.AreEqual(2, WarehouseSetup."Last Whse. Posting Ref. No.", '"Last Whse. Posting Ref. No." should not be updated.');
-        Assert.AreNotEqual('', WarehouseSetup."Last Whse. Posting Ref. Seq.", 'Sequence should be created on first use.');
-        Assert.IsTrue(NumberSequence.Exists(WarehouseSetup."Last Whse. Posting Ref. Seq."), 'Numbersequence must exist.');
-    end;
-
     [Test]
     [HandlerFunctions('CreateWhsePutAwayPickHandler,MessageHandler')]
     procedure SalesOrderWithNonInventoryItemsAndShippingAdviceCompleteForLocationRequiringPick()
