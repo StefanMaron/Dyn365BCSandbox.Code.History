@@ -26,10 +26,10 @@ permissionset 1001 "LOCAL"
                   tabledata "MTD-Liability" = RIMD,
                   tabledata "MTD-Payment" = RIMD,
                   tabledata "MTD-Return Details" = RIMD,
-#endif
                   tabledata "MTD-Missing Fraud Prev. Hdr" = RIMD,
                   tabledata "MTD-Session Fraud Prev. Hdr" = RIMD,
                   tabledata "MTD-Default Fraud Prev. Hdr" = RIMD,
+#endif
 #if not CLEAN23
                   tabledata "Payment Application Buffer" = RIMD,
                   tabledata "Payment Period Setup" = RIMD,
