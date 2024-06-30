@@ -21,7 +21,7 @@ codeunit 136353 "UT T Job Planning Line"
         LibraryResource: Codeunit "Library - Resource";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         IsInitialized: Boolean;
@@ -486,7 +486,7 @@ codeunit 136353 "UT T Job Planning Line"
         Assert.ExpectedError(CannotRemoveJobPlanningLineErr);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountPctInJobPlanningLineWhenAllowLineDiscDefinedInCustPriceGroup()
@@ -1017,7 +1017,7 @@ codeunit 136353 "UT T Job Planning Line"
         JobPlanningLine.TestField("Description 2", ItemVariant."Description 2");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure NoLineDiscountInJobPlanningLineWhenNoAllowLineDiscInSalesPriceForAllCustomersAndVariant()
@@ -1520,13 +1520,13 @@ codeunit 136353 "UT T Job Planning Line"
         Item: Record Item;
         Job: Record Job;
         JobTask: Record "Job Task";
-#if not CLEAN23
+#if not CLEAN25
         JobItemPrice: Record "Job Item Price";
 #else
         PriceListLine: Record "Price List Line";
 #endif
         JobPlanningLine: Record "Job Planning Line";
-#if CLEAN23        
+#if CLEAN25        
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
 #endif
         CostFactor: Decimal;
@@ -1543,7 +1543,7 @@ codeunit 136353 "UT T Job Planning Line"
         // [GIVEN] Price line for Job and Item, where "Cost Factor" is set
         CostFactor := LibraryRandom.RandDec(10, 1);
         Item.Get(JobPlanningLine."No.");
-#if not CLEAN23
+#if not CLEAN25
         LibraryJob.CreateJobItemPrice(
             JobItemPrice, Job."No.", JobTask."Job Task No.", JobPlanningLine."No.", '', '', Item."Base Unit of Measure");
         JobItemPrice.Validate("Unit Cost Factor", CostFactor);
@@ -1730,7 +1730,7 @@ codeunit 136353 "UT T Job Planning Line"
         JobCard.Close();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
 #pragma warning disable AS0072
     [Test]
     [Obsolete('Not used.', '23.0')]
@@ -1884,7 +1884,7 @@ codeunit 136353 "UT T Job Planning Line"
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"UT T Job Planning Line");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscScenario(var JobPlanningLine: Record "Job Planning Line"; var SalesLineDiscount: Record "Sales Line Discount"; JobTask: Record "Job Task"; CustNo: Code[20]; CustomerPriceGroupCode: Code[10])
     var
         Item: Record Item;
@@ -2037,7 +2037,7 @@ codeunit 136353 "UT T Job Planning Line"
         ArrAmount[9] := JobPlanningLine."Line Amount";
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateJobGLAccPrice(var JobGLAccountPrice: Record "Job G/L Account Price"; JobNo: Code[20]; JobTaskNo: Code[20]; GLAccountNo: Code[20])
     begin
         LibraryJob.CreateJobGLAccountPrice(
@@ -2066,7 +2066,7 @@ codeunit 136353 "UT T Job Planning Line"
         MockJobLedgEntry(Job."No.", ArrAmount[11], -ArrAmount[12], JobLedgerEntry.Type::"G/L Account", JobLedgerEntry."Entry Type"::Sale);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateLineDiscForCustomer(var SalesLineDiscount: Record "Sales Line Discount"; Item: Record Item; CustNo: Code[20])
     begin
         LibraryERM.CreateLineDiscForCustomer(

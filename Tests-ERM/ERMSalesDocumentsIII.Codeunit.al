@@ -30,7 +30,7 @@ codeunit 134387 "ERM Sales Documents III"
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
         LibraryResource: Codeunit "Library - Resource";
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         isInitialized: Boolean;
@@ -539,7 +539,7 @@ codeunit 134387 "ERM Sales Documents III"
         UpdateGeneralLedgerVATSetup(VATRoundingType);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure StartingDateAsWorkDateOnSalesPrice()
@@ -1857,7 +1857,7 @@ codeunit 134387 "ERM Sales Documents III"
         VATPostingSetup.Delete(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('GetSalesPricePageHandler')]
     [Scope('OnPrem')]
@@ -2930,7 +2930,7 @@ codeunit 134387 "ERM Sales Documents III"
         VerifyTransactionTypeWhenInsertSalesDocument(SalesHeader."Document Type"::Order);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PostedSalesDocumentLinesHandler')]
     [Scope('OnPrem')]
@@ -3480,7 +3480,7 @@ codeunit 134387 "ERM Sales Documents III"
         LibraryApplicationArea.DisableApplicationAreaSetup();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('ConfirmHandlerTrue')]
     [Scope('OnPrem')]
@@ -4332,7 +4332,7 @@ codeunit 134387 "ERM Sales Documents III"
         Customer.TestField("Tax Area Code", '');
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PostedSalesDocumentLinesHandler')]
     [Scope('OnPrem')]
@@ -5488,7 +5488,7 @@ codeunit 134387 "ERM Sales Documents III"
         VerifyQtyToAssignInDocumentLineForChargeItem(SalesHeaderInvoice, SalesLineChargeItem."No.", QtyToAssign);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PostedSalesDocumentLinesHandler')]
     [Scope('OnPrem')]
@@ -6245,7 +6245,7 @@ codeunit 134387 "ERM Sales Documents III"
         SalesLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesLineDiscount(var SalesLineDiscount: Record "Sales Line Discount"; ItemNo: Code[20]; CustomerNo: Code[20]; MinQty: Decimal; DiscountPct: Decimal)
     begin
         LibraryERM.CreateLineDiscForCustomer(
@@ -6328,7 +6328,7 @@ codeunit 134387 "ERM Sales Documents III"
         LibrarySales.PostSalesDocument(SalesHeader, true, PostInvoice);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesPriceForItemAndAllCustomers(var SalesPrice: Record "Sales Price")
     var
         Item: Record Item;
@@ -6835,7 +6835,7 @@ codeunit 134387 "ERM Sales Documents III"
         exit(CustomerNo);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure OpenSalesPricesPage(SalesPrices: TestPage "Sales Prices"; CustomerNo: Code[20]; StartingDateFilter: Text[30])
     var
         CustomerList: TestPage "Customer List";
@@ -7505,7 +7505,7 @@ codeunit 134387 "ERM Sales Documents III"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure GetSalesPricePageHandler(var GetSalesPrice: TestPage "Get Sales Price") // V15

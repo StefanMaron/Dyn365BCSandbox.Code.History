@@ -239,7 +239,7 @@ codeunit 138014 "O365 Item Price Including VAT"
         Assert.AreEqual(BusPostingGroupValCPG, CustomerPriceGroup."VAT Bus. Posting Gr. (Price)", 'Wrong "VAT Bus. Posting Gr. (Price)"');
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure TestForAllCustomersValidateItemNo()

@@ -26,7 +26,7 @@
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
         ArchiveManagement: Codeunit ArchiveManagement;
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         LibraryMarketing: Codeunit "Library - Marketing";
@@ -369,7 +369,7 @@
         VerifyValueEntries(SalesHeader."No.", SalesHeader.Amount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnCreditMemo()
@@ -2044,6 +2044,7 @@
         LibrarySales.CreateCustomer(Customer);
         Customer.Validate("Location Code", Location.Code);
         Customer.Modify(true);
+
         // [WHEN] Create Sales Order with Customer.
         SalesHeader.Init();
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
@@ -3865,6 +3866,7 @@
 
         // [GIVEN] "Inv. Rounding Precision (LCY)" = 1 in General Ledger Setup
         LibraryERM.SetInvRoundingPrecisionLCY(1);
+        LibrarySales.SetInvoiceRounding(true);
 
         // [GIVEN] Created Vendor with new Vendor Posting Group
         LibrarySales.CreateCustomer(Customer);
@@ -4306,7 +4308,7 @@
 
         // [GIVEN] Add GL Accounts with Share in Fixed Account Distribution.
         for i := 1 to ArrayLen(GLAccount) do
-            AddGLDestinationAccountForFixedDistribution(AllocationAccountCode, GLAccount[i], Share[i]);
+            CreateGLAccountAllocationForFixedDistrubution(AllocationAccountCode, GLAccount[i], Share[i]);
 
         // [GIVEN] Create Sales Invoice with Allocation Account.
         CreateSalesInvoiceWithAllocationAccount(SalesHeader, SalesLine, AllocationAccountCode);
@@ -5175,7 +5177,7 @@
         CustInvoiceDisc.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscount(var SalesLineDiscount: Record "Sales Line Discount")
     var
         Item: Record Item;
@@ -6053,7 +6055,7 @@
         exit(AllocationAccount."No.");
     end;
 
-    local procedure AddGLDestinationAccountForFixedDistribution(AllocationAccountNo: Code[20]; var GLAccount: Record "G/L Account"; Shape: Decimal)
+    local procedure CreateGLAccountAllocationForFixedDistrubution(AllocationAccountNo: Code[20]; var GLAccount: Record "G/L Account"; Shape: Decimal)
     var
         AllocAccountDistribution: Record "Alloc. Account Distribution";
     begin

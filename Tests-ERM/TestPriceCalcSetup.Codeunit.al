@@ -114,7 +114,7 @@ codeunit 134158 "Test Price Calc. Setup"
         PriceCalculationMgt.Run();
 
         PriceCalculationSetup.SetRange(Method, PriceCalculationSetup.Method::"Lowest Price");
-#if not CLEAN23
+#if not CLEAN25
         Assert.RecordCount(PriceCalculationSetup, 6);
 #else
         Assert.RecordCount(PriceCalculationSetup, 4);
