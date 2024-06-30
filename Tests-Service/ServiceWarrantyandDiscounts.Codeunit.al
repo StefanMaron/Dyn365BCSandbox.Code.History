@@ -10,7 +10,7 @@ using Microsoft.Inventory.Item;
 using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Sales.Pricing;
 #else
 using Microsoft.Pricing.Asset;
@@ -675,7 +675,7 @@ codeunit 136120 "Service Warranty and Discounts"
         LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure UpdateItemDiscount(var Item: Record Item; CustomerNo: Code[20]; LineDiscountPercentage: Decimal)
     var
         SalesLineDiscount: Record "Sales Line Discount";

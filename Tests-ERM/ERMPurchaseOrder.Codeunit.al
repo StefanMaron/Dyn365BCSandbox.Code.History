@@ -24,7 +24,7 @@
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryDimension: Codeunit "Library - Dimension";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
-#if not CLEAN23
+#if not CLEAN25
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
 #endif
         LibraryRandom: Codeunit "Library - Random";
@@ -33,7 +33,7 @@
         LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryManufacturing: Codeunit "Library - Manufacturing";
         LibraryPlanning: Codeunit "Library - Planning";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         LibraryResource: Codeunit "Library - Resource";
@@ -52,7 +52,7 @@
         IncorrectFieldValueErr: Label 'Incorrect %1 field value.';
         IncorrectDimSetIDErr: Label 'Incorrect Dimension Set ID in %1.';
         WrongQtyToReceiveErr: Label 'Qty. to Receive should not be non zero because Quantity was not changed.';
-#if not CLEAN23
+#if not CLEAN25
         JobUnitPriceErr: Label 'Job Unit Price is incorrect.';
 #endif
         WrongDimValueErr: Label 'Wrong dimension value in Sales Header %1.';
@@ -524,7 +524,7 @@
         Assert.IsTrue(PurchaseOrder."Pay-to Post Code".Editable(), PayToAddressFieldsEditableErr);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnPurhcaseOrder()
@@ -1321,7 +1321,7 @@
           StrSubstNo(AmountError, PurchaseLine.FieldCaption("Job Unit Price"), PurchaseLine."Job Unit Price", PurchaseLine.TableCaption()));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchaseOrderWithJobUnitCostFactor()
@@ -2630,7 +2630,7 @@
         VerifyRemainingAmountLCY(PurchaseHeader."Buy-from Vendor No.", AmountLCY);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CombinedDimOnPurchInvoiceWithItemChargeAssignedOnReceipt()
@@ -6718,7 +6718,7 @@
         LibraryVariableStorage.AssertEmpty();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Obsolete('Not Used', '23.0')]
     [Scope('OnPrem')]
@@ -8717,7 +8717,7 @@
         ModifyPurchaseLineJobNo(PurchaseLine, Job."No.", JobTask."Job Task No.", UnitOfMeasureCode);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchOrderWithJobAndJobItemPrice(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; ItemNo: Code[20]; UnitOfMeasureCode: Code[10]; var UnitCostFactor: Decimal)
     var
         Job: Record Job;
@@ -9861,7 +9861,7 @@
         LibraryERM.ClearGenJournalLines(GenJournalBatch)
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount")
     var
         Item: Record Item;
@@ -11559,7 +11559,7 @@
         ItemChargeAssignmentPurch.TestField("Qty. Assigned", ItemChargeAssignmentPurch."Qty. Assigned");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateStandardCostWorksheet(var StandardCostWorksheetPage: TestPage "Standard Cost Worksheet"; ResourceNo: Code[20]; StandardCost: Decimal; NewStandardCost: Decimal)
     var
         StandardCostWorksheet: Record "Standard Cost Worksheet";

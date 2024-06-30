@@ -5,13 +5,13 @@ using Microsoft.Projects.Project.Archive;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
 #endif
 using Microsoft.Projects.Project.WIP;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -75,7 +75,7 @@ codeunit 1765 "Projects-Data Classification"
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job Task Dimension");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job WIP Method");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job WIP Warning");
-#if not CLEAN23
+#if not CLEAN25
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job Resource Price");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job Item Price");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job G/L Account Price");
@@ -88,7 +88,7 @@ codeunit 1765 "Projects-Data Classification"
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job WIP Entry");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job WIP G/L Entry");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Job Entry No.");
-#if not CLEAN23
+#if not CLEAN25
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Resource Price");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Resource Cost");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Resource Price Change");

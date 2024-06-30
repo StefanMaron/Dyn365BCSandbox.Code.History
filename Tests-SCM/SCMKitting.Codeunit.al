@@ -92,7 +92,7 @@ codeunit 137101 "SCM Kitting"
         Assert.ExpectedTestFieldError(BOMComponent.FieldCaption(Type), Format(BOMComponent.Type::Resource));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CalculateStandardCostAfterCopyAssemblyBOM()
@@ -222,7 +222,7 @@ codeunit 137101 "SCM Kitting"
         VerifyBOMComponentAfterExplodeBOM(Item."No.", Item2."No.", QuantityPer);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CalculateStandardCostWithResourcePrice()
@@ -634,7 +634,7 @@ codeunit 137101 "SCM Kitting"
         LibraryAssembly.PostAssemblyHeader(AssemblyHeader, StrSubstNo(DocumentErrorsMgt.GetNothingToPostErrorMsg()));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CalculateStandardCostWithSalesDiscount()
@@ -2729,7 +2729,7 @@ codeunit 137101 "SCM Kitting"
           BOMComponent.Type::Item, AssemblyComponentItem."No.", AssemblyItemNo, '', BOMComponent."Resource Usage Type", Quantity, true);  // Use Base Unit of Measure as True.
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure AddItemToAssemblyBOM(Item: Record Item; WithSalesPrice: Boolean)
     var
         BOMComponent: Record "BOM Component";
@@ -3047,7 +3047,7 @@ codeunit 137101 "SCM Kitting"
         LibraryAssembly.AddEntityDimensions(AssemblyLine.Type::Item, Item."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateItemWithSalesLineDiscount(var Item2: Record Item; Item: Record Item)
     var
         SalesLineDiscount: Record "Sales Line Discount";

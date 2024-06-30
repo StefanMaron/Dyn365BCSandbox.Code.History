@@ -1987,7 +1987,7 @@ page 31 "Item List"
             {
                 Caption = 'S&ales';
                 Image = Sales;
-#if not CLEAN23
+#if not CLEAN25
                 action(Sales_Prices)
                 {
                     ApplicationArea = Suite;
@@ -2067,7 +2067,7 @@ page 31 "Item List"
                     RunPageView = sorting("Item No.");
                     ToolTip = 'View the list of vendors who can supply the item, and at which lead time.';
                 }
-#if not CLEAN23
+#if not CLEAN25
                 action(Prices)
                 {
                     ApplicationArea = Advanced;
@@ -2277,7 +2277,7 @@ page 31 "Item List"
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 5.';
 
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Prices_Prices_Promoted; Prices_Prices)
                 {
                     ObsoleteState = Pending;
@@ -2291,7 +2291,7 @@ page 31 "Item List"
                 actionref(PurchPriceLists_Promoted; PurchPriceLists)
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref(PricesDiscountsOverview_Promoted; PricesDiscountsOverview)
                 {
                     ObsoleteState = Pending;
@@ -2299,7 +2299,7 @@ page 31 "Item List"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Prices_LineDiscounts_Promoted; Prices_LineDiscounts)
                 {
                     ObsoleteState = Pending;
@@ -2307,7 +2307,7 @@ page 31 "Item List"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref(PurchPricesDiscountsOverview_Promoted; PurchPricesDiscountsOverview)
                 {
                     ObsoleteState = Pending;
@@ -2321,7 +2321,7 @@ page 31 "Item List"
                 actionref(PurchPriceListsDiscounts_Promoted; PurchPriceListsDiscounts)
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Set Special Prices_Promoted"; "Set Special Prices")
                 {
                     ObsoleteState = Pending;
@@ -2329,7 +2329,7 @@ page 31 "Item List"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Sales Price Worksheet_Promoted"; "Sales Price Worksheet")
                 {
                     Visible = false;
@@ -2338,7 +2338,7 @@ page 31 "Item List"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Set Special Discounts_Promoted"; "Set Special Discounts")
                 {
                     ObsoleteState = Pending;
@@ -2373,7 +2373,7 @@ page 31 "Item List"
             group(Category_Report)
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Price List_Promoted"; "Price List")
                 {
                     ObsoleteState = Pending;
@@ -2662,7 +2662,7 @@ page 31 "Item List"
             until TempItemFilteredFromPickItem.Next() = 0;
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     local procedure ShowLineDiscounts()
     var
