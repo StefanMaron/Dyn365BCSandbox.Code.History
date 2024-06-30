@@ -1039,7 +1039,7 @@ codeunit 139162 "CRM Integration Mgt Test"
           'VERSION(1) SORTING(Field1) WHERE(Field38=1(0))', ExpectedIntTableFilter, true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure DefaultTableMappingCustPriceGroup()
@@ -2298,7 +2298,7 @@ codeunit 139162 "CRM Integration Mgt Test"
           ' SALESPEOPLE - Dataverse synchronization job.');
         VerifyJobQueueEntriesInactivityTimeoutPeriod(30, 1440,
           ' ITEM-PRODUCT - Dynamics 365 Sales synchronization job.');
-#if not CLEAN23
+#if not CLEAN25
         VerifyJobQueueEntriesInactivityTimeoutPeriod(30, 1440,
           ' CUSTPRCGRP-PRICE - Dynamics 365 Sales synchronization job.');
         VerifyJobQueueEntriesInactivityTimeoutPeriod(30, 1440,

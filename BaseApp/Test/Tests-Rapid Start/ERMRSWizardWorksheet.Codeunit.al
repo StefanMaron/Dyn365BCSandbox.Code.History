@@ -555,7 +555,7 @@ codeunit 136606 "ERM RS Wizard & Worksheet"
         CheckPage(DATABASE::"Purch. Rcpt. Header", PAGE::"Posted Purchase Receipts");
         CheckPage(DATABASE::"Purch. Inv. Header", PAGE::"Posted Purchase Invoices");
         CheckPage(DATABASE::"Purch. Cr. Memo Hdr.", PAGE::"Posted Purchase Credit Memos");
-#if not CLEAN23
+#if not CLEAN25
         CheckPage(DATABASE::"Sales Price", PAGE::"Sales Prices");
         CheckPage(DATABASE::"Purchase Price", PAGE::"Purchase Prices");
 #endif

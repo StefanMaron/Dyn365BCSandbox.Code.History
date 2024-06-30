@@ -20,7 +20,7 @@ codeunit 137008 "SCM Planning Options"
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryRandom: Codeunit "Library - Random";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         Initialized: Boolean;
@@ -532,7 +532,7 @@ codeunit 137008 "SCM Planning Options"
         PurchPayablesSetup.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure RequisitionLineValidateDueDateUpdatesUnitCost()
@@ -999,7 +999,7 @@ codeunit 137008 "SCM Planning Options"
         SKU.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateItemPurchasePrice(ItemNo: Code[20]; VendorNo: Code[20]; StartingDate: Date; EndingDate: Date; UnitCost: Decimal)
     var
         PurchPrice: Record "Purchase Price";

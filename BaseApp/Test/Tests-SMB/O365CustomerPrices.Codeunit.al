@@ -9,18 +9,18 @@ codeunit 138020 "O365 Customer Prices"
     end;
 
     var
-#if not CLEAN23
+#if not CLEAN25
         LibrarySales: Codeunit "Library - Sales";
         LibraryInventory: Codeunit "Library - Inventory";
 #endif
         LibraryFiscalYear: Codeunit "Library - Fiscal Year";
         LibraryRandom: Codeunit "Library - Random";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
-#if not CLEAN23
+#if not CLEAN25
         LibraryUtility: Codeunit "Library - Utility";
 #endif
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-#if not CLEAN23
+#if not CLEAN25
         Assert: Codeunit Assert;
 #endif
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
@@ -65,7 +65,7 @@ codeunit 138020 "O365 Customer Prices"
         LibraryLowerPermissions.SetO365Full();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('ShowItemPage')]
     [Scope('OnPrem')]
@@ -1739,7 +1739,7 @@ codeunit 138020 "O365 Customer Prices"
         Customer.Insert(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure InitCustomerAndDiscAndPrices(var Customer: Record Customer)
     begin
         CreateBlankCustomer(Customer);
@@ -1930,7 +1930,7 @@ codeunit 138020 "O365 Customer Prices"
         exit(CopyStr('P_GR_' + CustomerNo, 1, 10))
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetBufferOnlyToSLDiscounts(var TempSalesPriceAndLineDiscBuff: Record "Sales Price and Line Disc Buff" temporary)
     begin
         TempSalesPriceAndLineDiscBuff.SetRange("Line Type", TempSalesPriceAndLineDiscBuff."Line Type"::"Sales Line Discount");
@@ -1998,7 +1998,7 @@ codeunit 138020 "O365 Customer Prices"
         ItemDiscGroupsPage.OK().Invoke();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure VerifyFieldVisibilityOnSalesPriceAndLineDiscountsPageHandler(var SalesPrLineDisc: TestPage "Sales Price and Line Discounts")

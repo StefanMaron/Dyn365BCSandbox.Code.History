@@ -2138,7 +2138,7 @@ codeunit 134341 "UT Page Actions & Controls"
         PurchaseOrderListTestPage."No.".AssertEquals(PurchaseHeader."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     [HandlerFunctions('VerifyMinimumQuantityInSalesPriceAndLineDiscountsPageHandler')]
@@ -4358,7 +4358,7 @@ codeunit 134341 "UT Page Actions & Controls"
         MockThreeRecordsAndOpenSecondOnFilteredPage(ItemLedgerEntry, PAGE::"Item Ledger Entries");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
 #pragma warning disable AS0072
     [Test]
     [Obsolete('Not used.', '23.0')]
@@ -4802,7 +4802,7 @@ codeunit 134341 "UT Page Actions & Controls"
         ToDo.Insert();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateItemWithSalesLineDiscount(var SalesLineDiscount: Record "Sales Line Discount")
     begin
         SalesLineDiscount.Init();
@@ -5527,7 +5527,7 @@ codeunit 134341 "UT Page Actions & Controls"
         TimeZones.OK().Invoke();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure VerifyMinimumQuantityInSalesPriceAndLineDiscountsPageHandler(var SalesPrLineDisc: TestPage "Sales Price and Line Discounts")
