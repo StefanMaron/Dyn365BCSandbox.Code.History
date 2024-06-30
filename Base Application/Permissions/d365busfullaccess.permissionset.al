@@ -120,7 +120,7 @@ using Microsoft.Projects.Project.WIP;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -131,7 +131,7 @@ using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Purchases.Pricing;
 #endif
 using Microsoft.Purchases.RoleCenters;
@@ -144,7 +144,7 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Sales.Pricing;
 #endif
 using Microsoft.Sales.Reminder;
@@ -723,7 +723,7 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Purch. Cr. Memo Hdr." = IM,
                   tabledata "Purch. Inv. Entity Aggregate" = RIMD,
                   tabledata "Purch. Inv. Line Aggregate" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purch. Price Line Disc. Buff." = RIMD,
 #endif
                   tabledata "Purch. Rcpt. Header" = IM,
@@ -769,12 +769,12 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Reservation Worksheet Log" = RIMD,
                   tabledata "Resolution Code" = RIMD,
                   tabledata Resource = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Resource Cost" = IM,
 #endif
                   tabledata "Resource Group" = RIMD,
                   tabledata "Resource Location" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Resource Price" = IM,
                   tabledata "Resource Price Change" = RIMD,
 #endif
@@ -799,7 +799,7 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Sales Invoice Entity Aggregate" = RIMD,
                   tabledata "Sales Invoice Line Aggregate" = RIMD,
                   tabledata "Sales Order Entity Buffer" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price and Line Disc Buff" = RIMD,
 #endif
                   tabledata "Sales Quote Entity Buffer" = RIMD,
