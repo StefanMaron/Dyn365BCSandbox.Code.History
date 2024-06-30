@@ -25,7 +25,7 @@
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryDimension: Codeunit "Library - Dimension";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
-#if not CLEAN23
+#if not CLEAN25
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
 #endif
         LibraryRandom: Codeunit "Library - Random";
@@ -34,13 +34,13 @@
         LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryManufacturing: Codeunit "Library - Manufacturing";
         LibraryPlanning: Codeunit "Library - Planning";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         LibraryResource: Codeunit "Library - Resource";
         LibraryTemplates: Codeunit "Library - Templates";
-        LibraryItemReference: Codeunit "Library - Item Reference";
         LibraryReportDataset: Codeunit "Library - Report Dataset";
+        LibraryItemReference: Codeunit "Library - Item Reference";
         isInitialized: Boolean;
         FieldError: Label 'Number of Lines for %1 and %2  must be Equal.';
         CurrencyError: Label '%1 must be Equal in %2.';
@@ -53,7 +53,7 @@
         IncorrectFieldValueErr: Label 'Incorrect %1 field value.';
         IncorrectDimSetIDErr: Label 'Incorrect Dimension Set ID in %1.';
         WrongQtyToReceiveErr: Label 'Qty. to Receive should not be non zero because Quantity was not changed.';
-#if not CLEAN23
+#if not CLEAN25
         JobUnitPriceErr: Label 'Job Unit Price is incorrect.';
 #endif
         WrongDimValueErr: Label 'Wrong dimension value in Sales Header %1.';
@@ -88,7 +88,6 @@
         GenProdPostingGroupErr: Label '%1 is not set for the %2 G/L account with no. %3.', Comment = '%1 - caption Gen. Prod. Posting Group; %2 - G/L Account Description; %3 - G/L Account No.';
         DisposedErr: Label '%1 is disposed.';
         RoundingTo0Err: Label 'Rounding of the field';
-        ItemRefrenceNoErr: Label 'Item Reference No. should be %1.', Comment = '%1 - old reference no.';
         RemitToCodeShouldNotBeEditableErr: Label 'Remit-to code should not be editable when vendor is not selected.';
         RemitToCodeShouldBeEditableErr: Label 'Remit-to code should be editable when vendor is selected.';
         PrePaymentPerErr: Label 'Prepayment% are not equal on Purchase Header and Purchase Line';
@@ -97,6 +96,7 @@
         DescriptionErr: Label 'The purchase line description (%1) should be the same as the random generated description (%2).', Comment = '%1 - Purchase Line Description; %2 - Random Generated Description';
         QtyReceivedBaseErr: Label 'Qty. Received (Base) is not as expected.';
         InteractionLogErr: Label 'Interaction log must be enabled.';
+        ItemRefrenceNoErr: Label 'Item Reference No. should be %1.', Comment = '%1 - old reference no.';
 
     [Test]
     [Scope('OnPrem')]
@@ -527,7 +527,7 @@
         Assert.IsTrue(PurchaseOrder."Pay-to Post Code".Editable(), PayToAddressFieldsEditableErr);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnPurhcaseOrder()
@@ -1324,7 +1324,7 @@
           StrSubstNo(AmountError, PurchaseLine.FieldCaption("Job Unit Price"), PurchaseLine."Job Unit Price", PurchaseLine.TableCaption()));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchaseOrderWithJobUnitCostFactor()
@@ -2680,7 +2680,7 @@
         VerifyRemainingAmountLCY(PurchaseHeader."Buy-from Vendor No.", AmountLCY);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CombinedDimOnPurchInvoiceWithItemChargeAssignedOnReceipt()
@@ -6752,7 +6752,7 @@
         LibraryVariableStorage.AssertEmpty();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Obsolete('Not Used', '23.0')]
     [Scope('OnPrem')]
@@ -8302,7 +8302,7 @@
         PurchaseHeader.SetRange("No.", PurchaseHeader."No.");
         Commit();
         Report.Run(Report::"Standard Purchase - Order", true, false, PurchaseHeader);
-    end;    
+    end;
 
     [Test]
     procedure ReleasingOfPurchaseOrderHavingPurchaseLineWithoutUOMGivesError()
@@ -8841,7 +8841,7 @@
         ModifyPurchaseLineJobNo(PurchaseLine, Job."No.", JobTask."Job Task No.", UnitOfMeasureCode);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchOrderWithJobAndJobItemPrice(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; ItemNo: Code[20]; UnitOfMeasureCode: Code[10]; var UnitCostFactor: Decimal)
     var
         Job: Record Job;
@@ -9985,7 +9985,7 @@
         LibraryERM.ClearGenJournalLines(GenJournalBatch)
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount")
     var
         Item: Record Item;
@@ -11256,7 +11256,7 @@
         ReturnShipmentLine.Type := ReturnShipmentLine.Type::Resource;
         ReturnShipmentLine."No." := LibraryResource.CreateResourceNo();
         ReturnShipmentLine.Insert();
-    end;       
+    end;
 
     local procedure CreateItemWithBOMComponent(): Code[20]
     var
@@ -11668,7 +11668,7 @@
         ItemChargeAssignmentPurch.TestField("Qty. Assigned", ItemChargeAssignmentPurch."Qty. Assigned");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateStandardCostWorksheet(var StandardCostWorksheetPage: TestPage "Standard Cost Worksheet"; ResourceNo: Code[20]; StandardCost: Decimal; NewStandardCost: Decimal)
     var
         StandardCostWorksheet: Record "Standard Cost Worksheet";

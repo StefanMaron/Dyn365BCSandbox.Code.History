@@ -8,7 +8,7 @@ using Microsoft.Sales.Customer;
 table 7004 "Sales Line Discount"
 {
     Caption = 'Sales Line Discount';
-#if not CLEAN23
+#if not CLEAN25
     LookupPageID = "Sales Line Discounts";
     ObsoleteState = Pending;
     ObsoleteTag = '16.0';
