@@ -1,6 +1,6 @@
 namespace System.IO;
 
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Purchases.Pricing;
 #endif
 using Microsoft.Sales.Pricing;
@@ -625,7 +625,7 @@ codeunit 8616 "Config. Management"
                 exit(Page::Microsoft.Purchases.History."Posted Purchase Invoices");
             Database::Microsoft.Purchases.History."Purch. Cr. Memo Hdr.":
                 exit(Page::Microsoft.Purchases.History."Posted Purchase Credit Memos");
-#if not CLEAN23
+#if not CLEAN25
             Database::"Sales Price":
                 exit(Page::"Sales Prices");
             Database::"Purchase Price":

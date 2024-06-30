@@ -27,7 +27,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         LibraryPlanning: Codeunit "Library - Planning";
         LibraryJob: Codeunit "Library - Job";
         LibraryRandom: Codeunit "Library - Random";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         TrackingOption: Option AssignSerialNo,AssignLotNo,SelectEntries,SetLotNo;
@@ -705,7 +705,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         VerifyGLEntries(DocumentNo, GeneralPostingSetup."Purch. Account", PurchaseLine."Line Amount");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesPriceForCustomer()
@@ -1577,7 +1577,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         CalcPlanAfterCreateSalesReturnOrderWithIT(true, false, true, TrackingOption::AssignSerialNo, CreateReturnOrderMethod::CopyDocument);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CheckSalesLineDiscountPageforCustomerDiscountGroup()
@@ -2156,7 +2156,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         exit(Customer."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateAndUpdateSalesPrice(var SalesPrice: Record "Sales Price"; VATBusPostingGrPrice: Code[20]; ItemNo: Code[20]; SalesType: Enum "Sales Price Type"; SalesCode: Code[20])
     begin
         CreateSalesPrice(SalesPrice, ItemNo, SalesType, SalesCode, LibraryRandom.RandDec(10, 2), '');  // Take random for Quantity.
@@ -2176,7 +2176,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         exit(ItemTrackingCode.Code);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateLineDiscForCustomer(var SalesLineDiscount: Record "Sales Line Discount"; SalesType: Option; SalesCode: Code[20])
     var
         Item: Record Item;
@@ -2356,7 +2356,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         GetPostedDocToReverseOnPurchReturnOrder(PurchaseHeader."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesOrderWithSalesPriceOnCustomer(var SalesLine: Record "Sales Line"; PostingDate: Date)
     var
         Item: Record Item;
@@ -2432,7 +2432,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, Quantity);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesPrice(var SalesPrice: Record "Sales Price"; ItemNo: Code[20]; SalesType: Enum "Sales Price Type"; SalesCode: Code[20]; Quantity: Decimal; CurrencyCode: Code[10])
     begin
         LibraryCosting.CreateSalesPrice(SalesPrice, SalesType, SalesCode, ItemNo, WorkDate(), CurrencyCode, '', '', Quantity);
@@ -2764,7 +2764,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         RollUpStandardCost.Run();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SalesPriceForPriceInclVAT(VATPostingSetup: Record "VAT Posting Setup"; SalesType: Enum "Sales Price Type"; SalesCode: Code[20]; CusomerNo: Code[20])
     var
         SalesLine: Record "Sales Line";
@@ -2897,7 +2897,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         exit(CustomerPriceGroup.Code);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure UpdateDiscOnSalesLineDiscount(SalesLineDiscount: Record "Sales Line Discount"): Decimal
     begin
         SalesLineDiscount.Validate("Line Discount %", SalesLineDiscount."Line Discount %" + LibraryRandom.RandDec(10, 2));  // Take random for update Line Discount Pct.
@@ -2925,7 +2925,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         SalesReceivablesSetup.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure UpdateUnitPriceOnSalesPrice(SalesPrice: Record "Sales Price"): Decimal
     begin
         SalesPrice.Validate("Unit Price", SalesPrice."Unit Price" + LibraryRandom.RandDec(10, 2));  // Take random fo update Unit Price.
@@ -3048,7 +3048,7 @@ codeunit 137295 "SCM Inventory Misc. III"
         PurchaseLine.OpenItemTrackingLines(); // Verify Appl.-to Item Entry on ItemTrackingLinesPageHandler.
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure VerifySalesLineDiscountsOnPage(CustomerDiscountGroup: Record "Customer Discount Group"; SalesLineDiscountType: Enum "Sales Line Discount Type")
     var
         CustomerDiscGroups: TestPage "Customer Disc. Groups";
