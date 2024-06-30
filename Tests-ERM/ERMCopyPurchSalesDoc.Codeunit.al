@@ -23,7 +23,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryWarehouse: Codeunit "Library - Warehouse";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         LibraryResource: Codeunit "Library - Resource";
@@ -37,7 +37,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         AddrChangedErr: Label 'field on the purchase order %1 must be the same as on sales order %2.', Comment = '%1: Purchase Order No., %2: Sales Order No.';
         ValueMustBeEqualErr: Label '%1 must be equal to %2 in the %3.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Table Caption';
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CopyPurchOrdCopyHeadRecalcLine()
@@ -353,7 +353,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         VerifyPurchaseLinesAreEqual(OriginalPurchHeader, DestinationPurchHeader);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CopySalesOrdCopyHeadRecalcLine()
@@ -7342,7 +7342,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         Item.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateVendorItemDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount"; VendorCode: Code[20]; Item: Record Item)
     begin
         // Create a random discount without item quantity limitation (to be sure it is applied when recalculating lines)

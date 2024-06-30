@@ -35,10 +35,6 @@ using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-//using Microsoft.Service.Document;
-//using Microsoft.Service.Item;
-//using Microsoft.Service.Maintenance;
-//using Microsoft.Service.Resources;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.ADCS;
 using Microsoft.Warehouse.Ledger;
@@ -509,7 +505,7 @@ page 30 "Item Card"
                             UpdateSpecialPriceListsTxt(PriceType::Purchase);
                         end;
                     }
-#if not CLEAN23
+#if not CLEAN25
                     field(SpecialPurchPricesAndDiscountsTxt; SpecialPurchPricesAndDiscountsTxt)
                     {
                         ApplicationArea = Suite;
@@ -676,7 +672,7 @@ page 30 "Item Card"
                         UpdateSpecialPriceListsTxt(PriceType::Sale);
                     end;
                 }
-#if not CLEAN23
+#if not CLEAN25
                 field(SpecialPricesAndDiscountsTxt; SpecialPricesAndDiscountsTxt)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1200,7 +1196,7 @@ page 30 "Item Card"
             group(PricesandDiscounts)
             {
                 Caption = 'Sales Prices & Discounts';
-#if not CLEAN23
+#if not CLEAN25
                 action("Set Special Prices")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1302,7 +1298,7 @@ page 30 "Item Card"
             group(PurchPricesandDiscounts)
             {
                 Caption = 'Purchase Prices & Discounts';
-#if not CLEAN23
+#if not CLEAN25
                 action(Action86)
                 {
                     ApplicationArea = Suite;
@@ -2707,7 +2703,7 @@ page 30 "Item Card"
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 5.';
 
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Set Special Prices_Promoted"; "Set Special Prices")
                 {
                     ObsoleteState = Pending;
@@ -2721,7 +2717,7 @@ page 30 "Item Card"
                 actionref(PurchPriceLists_Promoted; PurchPriceLists)
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref(PricesDiscountsOverview_Promoted; PricesDiscountsOverview)
                 {
                     ObsoleteState = Pending;
@@ -2729,7 +2725,7 @@ page 30 "Item Card"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Set Special Discounts_Promoted"; "Set Special Discounts")
                 {
                     ObsoleteState = Pending;
@@ -2737,7 +2733,7 @@ page 30 "Item Card"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref(PurchPricesDiscountsOverview_Promoted; PurchPricesDiscountsOverview)
                 {
                     ObsoleteState = Pending;
@@ -2751,7 +2747,7 @@ page 30 "Item Card"
                 actionref(PurchPriceListsDiscounts_Promoted; PurchPriceListsDiscounts)
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Action86_Promoted; Action86)
                 {
                     ObsoleteState = Pending;
@@ -2759,7 +2755,7 @@ page 30 "Item Card"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Action85_Promoted; Action85)
                 {
                     ObsoleteState = Pending;
@@ -2940,7 +2936,7 @@ page 30 "Item Card"
         MarketingTextPlaceholderTxt: Label '[Create draft]() based on this item''s attributes.', Comment = 'Text contained in [here]() will be clickable to invoke the generate action';
         ViewExistingTxt: Label 'View Existing Prices and Discounts...';
         ShowVariantMandatoryDefaultYes: Boolean;
-#if not CLEAN23
+#if not CLEAN25
         SpecialPricesAndDiscountsTxt: Text;
         CreateNewSpecialPriceTxt: Label 'Create New Special Price...';
         CreateNewSpecialDiscountTxt: Label 'Create New Special Discount...';
@@ -3002,7 +2998,7 @@ page 30 "Item Card"
         EnablePlanningControls();
         EnableCostingControls();
 
-#if not CLEAN23
+#if not CLEAN25
         if not ExtendedPriceEnabled then
             UpdateSpecialPricesAndDiscountsTxt();
 #endif
@@ -3126,7 +3122,7 @@ page 30 "Item Card"
         OnAfterInitControls();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     local procedure UpdateSpecialPricesAndDiscountsTxt()
     var

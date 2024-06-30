@@ -6,7 +6,7 @@ using Microsoft.Utilities;
 table 202 "Resource Cost"
 {
     Caption = 'Resource Cost';
-#if not CLEAN23
+#if not CLEAN25
     ObsoleteState = Pending;
     ObsoleteTag = '16.0';
 #else

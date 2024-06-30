@@ -987,7 +987,7 @@ page 95 "Sales Quote Subform"
             {
                 Caption = 'F&unctions';
                 Image = "Action";
-#if not CLEAN23
+#if not CLEAN25
                 action("Get &Price")
                 {
                     AccessByPermission = TableData "Sales Price" = R;
