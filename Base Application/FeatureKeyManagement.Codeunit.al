@@ -5,10 +5,8 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Purchases.Posting;
 using Microsoft.Sales.Posting;
-using System.Apps;
-using System.Environment;
-using System.Telemetry;
-using System.Reflection;
+#endif
+#if not CLEAN25
 using Microsoft.Pricing.Calculation;
 #endif
 
@@ -155,9 +153,9 @@ codeunit 265 "Feature Key Management"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Feature Management Facade", 'OnAfterFeatureEnableConfirmed', '', false, false)]
     local procedure HandleOnAfterFeatureEnableConfirmed(var FeatureKey: Record "Feature Key")
-#if not CLEAN23
+#if not CLEAN24
     var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
+        FeatureTelemetry: Codeunit System.Telemetry."Feature Telemetry";
 #endif
     begin
 #if not CLEAN23
@@ -171,27 +169,27 @@ codeunit 265 "Feature Key Management"
         // Log feature uptake
         case FeatureKey.ID of
             ExtensibleExchangeRateAdjustmentLbl:
-                FeatureTelemetry.LogUptake('0000JR9', ExtensibleExchangeRateAdjustmentLbl, Enum::"Feature Uptake Status"::Discovered);
+                FeatureTelemetry.LogUptake('0000JR9', ExtensibleExchangeRateAdjustmentLbl, Enum::System.Telemetry."Feature Uptake Status"::Discovered);
             ExtensibleInvoicePostingEngineLbl:
-                FeatureTelemetry.LogUptake('0000JRA', ExtensibleInvoicePostingEngineLbl, Enum::"Feature Uptake Status"::Discovered);
+                FeatureTelemetry.LogUptake('0000JRA', ExtensibleInvoicePostingEngineLbl, Enum::System.Telemetry."Feature Uptake Status"::Discovered);
             EU3PartyTradePurchaseTxt:
-                FeatureTelemetry.LogUptake('0000JRC', EU3PartyTradePurchaseTxt, Enum::"Feature Uptake Status"::Discovered);
+                FeatureTelemetry.LogUptake('0000JRC', EU3PartyTradePurchaseTxt, Enum::System.Telemetry."Feature Uptake Status"::Discovered);
         end;
 #endif
 #if not CLEAN24
         // Log feature uptake
         case FeatureKey.ID of
             GLCurrencyRevaluationTxt:
-                FeatureTelemetry.LogUptake('0000JRR', GLCurrencyRevaluationTxt, Enum::"Feature Uptake Status"::Discovered);
+                FeatureTelemetry.LogUptake('0000JRR', GLCurrencyRevaluationTxt, Enum::System.Telemetry."Feature Uptake Status"::Discovered);
         end;
 #endif
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Feature Management Facade", 'OnAfterUpdateData', '', false, false)]
     local procedure HandleOnAfterUpdateData(var FeatureDataUpdateStatus: Record "Feature Data Update Status")
     var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
+        FeatureTelemetry: Codeunit System.Telemetry."Feature Telemetry";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
     begin
         // Log feature uptake
@@ -199,7 +197,7 @@ codeunit 265 "Feature Key Management"
             exit;
         case FeatureDataUpdateStatus."Feature Key" of
             PriceCalculationMgt.GetFeatureKey():
-                FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::Discovered);
+                FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::System.Telemetry."Feature Uptake Status"::Discovered);
         end;
     end;
 #endif
@@ -207,10 +205,10 @@ codeunit 265 "Feature Key Management"
 #if not CLEAN23
     local procedure CheckAdjustExchangeRatesEventSubscribers()
     var
-        EventSubscription: Record "Event Subscription";
-        TempOldEventSubscription: Record "Event Subscription" temporary;
-        TempNewEventSubscription: Record "Event Subscription" temporary;
-        TempPublishedApplication: Record "Published Application" temporary;
+        EventSubscription: Record System.Environment."Event Subscription";
+        TempOldEventSubscription: Record System.Environment."Event Subscription" temporary;
+        TempNewEventSubscription: Record System.Environment."Event Subscription" temporary;
+        TempPublishedApplication: Record System.Apps."Published Application" temporary;
     begin
         // add all subscribers to events from report 595 Adjust Exchange Rates
         EventSubscription.Reset();
@@ -249,11 +247,11 @@ codeunit 265 "Feature Key Management"
 #if not CLEAN23
     local procedure CheckInvoicePostingEventSubscribers()
     var
-        EventSubscription: Record "Event Subscription";
-        TempPublisherForEventSubscription: Record "Event Subscription" temporary;
-        TempOldEventSubscription: Record "Event Subscription" temporary;
-        TempNewEventSubscription: Record "Event Subscription" temporary;
-        TempPublishedApplication: Record "Published Application" temporary;
+        EventSubscription: Record System.Environment."Event Subscription";
+        TempPublisherForEventSubscription: Record System.Environment."Event Subscription" temporary;
+        TempOldEventSubscription: Record System.Environment."Event Subscription" temporary;
+        TempNewEventSubscription: Record System.Environment."Event Subscription" temporary;
+        TempPublishedApplication: Record System.Apps."Published Application" temporary;
     begin
         // add all subscribers to events from table 49 "Invoice Post. Buffer"
         EventSubscription.Reset();
@@ -326,9 +324,9 @@ codeunit 265 "Feature Key Management"
         end;
     end;
 
-    local procedure BuildPublishedApplicationList(var TempPublishedApplication: Record "Published Application"; var TempOldEventSubscription: Record "Event Subscription" temporary; var TempNewEventSubscription: Record "Event Subscription" temporary)
+    local procedure BuildPublishedApplicationList(var TempPublishedApplication: Record System.Apps."Published Application"; var TempOldEventSubscription: Record System.Environment."Event Subscription" temporary; var TempNewEventSubscription: Record System.Environment."Event Subscription" temporary)
     var
-        PublishedApplication: Record "Published Application";
+        PublishedApplication: Record System.Apps."Published Application";
         OldEventExists: Boolean;
         NewEventExists: Boolean;
     begin
@@ -347,9 +345,9 @@ codeunit 265 "Feature Key Management"
             until PublishedApplication.Next() = 0;
     end;
 
-    local procedure ShowEventSubscriptionBuffers(var TempEventSubscription: Record "Event Subscription" temporary; var TempNewEventSubscription: Record "Event Subscription" temporary)
+    local procedure ShowEventSubscriptionBuffers(var TempEventSubscription: Record System.Environment."Event Subscription" temporary; var TempNewEventSubscription: Record System.Environment."Event Subscription" temporary)
     var
-        EventSubscriptions: Page "Event Subscriptions";
+        EventSubscriptions: Page System.Reflection."Event Subscriptions";
     begin
         if TempNewEventSubscription.FindFirst() then
             repeat
@@ -363,7 +361,7 @@ codeunit 265 "Feature Key Management"
         Clear(EventSubscriptions);
     end;
 
-    local procedure BuildInvoicePostingCheckList(var TempPublisherForEventSubscription: Record "Event Subscription" temporary)
+    local procedure BuildInvoicePostingCheckList(var TempPublisherForEventSubscription: Record System.Environment."Event Subscription" temporary)
     begin
         // Sales
         AddEvent(Codeunit::"Sales-Post", 'OnAfterCreatePostedDeferralScheduleFromSalesDoc', TempPublisherForEventSubscription);
@@ -467,7 +465,7 @@ codeunit 265 "Feature Key Management"
         AddEvent(Codeunit::Microsoft.Service.Posting."Serv-Amounts Mgt.", 'OnBeforeUpdateInvPostBuffer', TempPublisherForEventSubscription);
     end;
 
-    local procedure AddEvent(ObjectID: Integer; EventName: Text[250]; var TempPublisherForEventSubscription: Record "Event Subscription" temporary)
+    local procedure AddEvent(ObjectID: Integer; EventName: Text[250]; var TempPublisherForEventSubscription: Record System.Environment."Event Subscription" temporary)
     begin
         TempPublisherForEventSubscription.Init();
         TempPublisherForEventSubscription."Publisher Object Type" := TempPublisherForEventSubscription."Publisher Object Type"::Codeunit;

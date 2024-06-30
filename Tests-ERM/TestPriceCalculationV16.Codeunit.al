@@ -1160,7 +1160,7 @@ codeunit 134159 "Test Price Calculation - V16"
         VerifyJobSources(Job, PurchaseLinePrice, 0, 0, 0);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
 #pragma warning disable AS0072
     [Test]
     [Obsolete('Not Used.', '23.0')]
@@ -5483,7 +5483,7 @@ codeunit 134159 "Test Price Calculation - V16"
         PriceListLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateCustomerItemDiscount(var SalesLineDiscount: Record "Sales Line Discount"; CustomerCode: Code[20]; Item: Record Item; Discount: Decimal)
     begin
         LibraryERM.CreateLineDiscForCustomer(

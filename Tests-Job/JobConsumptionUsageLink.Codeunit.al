@@ -19,11 +19,11 @@ codeunit 136303 "Job Consumption - Usage Link"
         LibraryJob: Codeunit "Library - Job";
         LibraryRandom: Codeunit "Library - Random";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         Initialized: Boolean;
-#if not CLEAN23
+#if not CLEAN25
         UnitPriceErr: Label 'Unit Price is not correct, please refer setup in Project Resource Price.';
 #endif
         ConfirmUsageWithBlankLineTypeQst: Label 'Usage will not be linked to the project planning line because the Line Type field is empty.\\Do you want to continue?';
@@ -1794,7 +1794,7 @@ codeunit 136303 "Job Consumption - Usage Link"
 
     local procedure Initialize()
     var
-#if not CLEAN23
+#if not CLEAN25
         PurchasePrice: Record "Purchase Price";
         SalesPrice: Record "Sales Price";
         SalesLineDiscount: Record "Sales Line Discount";
@@ -1808,7 +1808,7 @@ codeunit 136303 "Job Consumption - Usage Link"
             exit;
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(CODEUNIT::"Job Consumption - Usage Link");
 
-#if not CLEAN23
+#if not CLEAN25
         // Removing special prices, discounts
         PurchasePrice.DeleteAll(true);
         SalesPrice.DeleteAll(true);
@@ -2086,7 +2086,7 @@ codeunit 136303 "Job Consumption - Usage Link"
         exit(JobPlanningLine.Count - LineCount)
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure ResourcePriceWhenWorkTypeCodeMatched()
@@ -2299,7 +2299,7 @@ codeunit 136303 "Job Consumption - Usage Link"
             JobPlanningLine2.TableCaption()));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateJobResourcePriceWithUnitPrice(JobTask: Record "Job Task"; JobResourcePriceType: Option; "Code": Code[20]; WorkTypeCode: Code[10]; UnitPrice: Decimal)
     var
         JobResourcePrice: Record "Job Resource Price";

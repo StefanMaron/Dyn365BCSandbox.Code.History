@@ -695,19 +695,19 @@ permissionset 207 "D365 BASIC"
                   tabledata "Purch. Cr. Memo Entity Buffer" = RIMD,
                   tabledata "Purch. Inv. Entity Aggregate" = RIMD,
                   tabledata "Purch. Inv. Line Aggregate" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purch. Price Line Disc. Buff." = RIMD,
 #endif
                   tabledata "Purchase Cue" = RIMD,
                   tabledata "Purchase Discount Access" = Rim,
                   tabledata "Purchase Header" = Rim,
                   tabledata "Purchase Line" = Rim,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purchase Line Discount" = Rim,
 #endif
                   tabledata "Purchase Order Entity Buffer" = RIMD,
                   tabledata "Purchase Prepayment %" = Rim,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purchase Price" = Rim,
 #endif
                   tabledata "Purchase Price Access" = Rim,
@@ -781,16 +781,16 @@ permissionset 207 "D365 BASIC"
                   tabledata "Sales Invoice Header" = rm,
                   tabledata "Sales Invoice Line Aggregate" = RIMD,
                   tabledata "Sales Line" = Rim,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Line Discount" = Rim,
 #endif
                   tabledata "Sales Order Entity Buffer" = RIMD,
                   tabledata "Sales Prepayment %" = Rim,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price" = Rim,
 #endif
                   tabledata "Sales Price Access" = Rim,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price and Line Disc Buff" = RIMD,
 #endif
                   tabledata "Sales Quote Entity Buffer" = RIMD,

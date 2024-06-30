@@ -14,7 +14,7 @@ codeunit 134386 "ERM Sales Documents II"
         Assert: Codeunit Assert;
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
-#if not CLEAN23
+#if not CLEAN25
         LibraryCosting: Codeunit "Library - Costing";
 #endif
         LibraryERM: Codeunit "Library - ERM";
@@ -31,7 +31,7 @@ codeunit 134386 "ERM Sales Documents II"
         LibraryResource: Codeunit "Library - Resource";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
         LibraryNotificationMgt: Codeunit "Library - Notification Mgt.";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         LibraryTemplates: Codeunit "Library - Templates";
@@ -48,13 +48,13 @@ codeunit 134386 "ERM Sales Documents II"
         BlankSellToCustomerFieldErr: Label 'Sell-to Customer No. field must be empty.';
         RecurrentDocumentDateErr: Label 'Document Date must be the same as in Create Recurring Sales Inv. report.';
         RecurrentExpiredDateErr: Label 'No sales invoice must be created for expired Valid To Date in Standard Customer Sales Code.';
-#if not CLEAN23
+#if not CLEAN25
         IncorrectSalesTypeToCopyPricesErr: Label 'To copy sales prices, The Sales Type Filter field must contain Customer.';
         MultipleCustomersSelectedErr: Label 'More than one customer uses these sales prices. To copy prices, the Sales Code Filter field must contain one customer only.';
 #endif
         NotExistingFreightGLAccNoErr: Label 'The field %1 of table Sales & Receivables Setup contains a value (%2) that cannot be found in the related table', Comment = '%1 - caption of "Freight G/L Acc. No.", %2 - G/L Account No.';
         ShipToAdressTestValueTxt: Label 'ShipToAdressTestValue';
-#if not CLEAN23
+#if not CLEAN25
         EmptyStartingDateRecIsNotFoundErr: Label 'The record with empty starting date field is not found.';
         WorkStartingDateRecIsNotFoundErr: Label 'The record with specified starting date (%1) is not found.';
         EmptyStartingDateIsFoundErr: Label 'The record''s starting date (%1) is not equal to date within filter field (%2).';
@@ -521,7 +521,7 @@ codeunit 134386 "ERM Sales Documents II"
         VerifySalesInvoice(GetSalesInvoiceHeaderNoOrder(SalesHeader."No."), SalesLine);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesInvoiceWithItemSalesPrices()
@@ -790,7 +790,7 @@ codeunit 134386 "ERM Sales Documents II"
         VerifyVATEntry(PostedDocumentNo, SalesInvoiceHeader.Amount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesUnitPriceAndLineDiscount()
@@ -1464,7 +1464,7 @@ codeunit 134386 "ERM Sales Documents II"
         AssemblyHeader.TestField(Quantity, StandardSalesLine.Quantity);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure UT_DeleteCustomerPriceGroupWithSalesPrice()
@@ -2041,7 +2041,7 @@ codeunit 134386 "ERM Sales Documents II"
         NotificationLifecycleMgt.RecallAllNotifications();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesPriceMinimumQuantityWithMaxValue()
@@ -2669,7 +2669,7 @@ codeunit 134386 "ERM Sales Documents II"
         Assert.ExpectedTestFieldError(GLAccount.FieldCaption(Blocked), Format(false));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure UI_CannotCopyPricesWhenSalesTypeFilterNotCustomer()
@@ -3358,7 +3358,7 @@ codeunit 134386 "ERM Sales Documents II"
         VerifyShipToOptionWithContactOnSalesDocument(SalesHeader, ContactNew);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure AllowInvoiceDiscIsFalseOnOverviewPageWhenFalseInSalesPrice()
@@ -3650,7 +3650,7 @@ codeunit 134386 "ERM Sales Documents II"
         SalesHeaderArchive.TestField("Sell-to E-Mail", SalesHeader."Sell-to E-Mail");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
 #pragma warning disable AS0072
     [Test]
     [Obsolete('Not Used.', '23.0')]
@@ -4971,7 +4971,7 @@ codeunit 134386 "ERM Sales Documents II"
         LibrarySales.CreateCustomerSalesCode(StandardCustomerSalesCode, Customer."No.", StandardSalesCode.Code);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesPriceWithUnitPrice(var SalesPrice: Record "Sales Price"; CustomerNo: Code[20]; ItemNo: Code[20]; Quantity: Decimal; UnitPriceAmount: Decimal)
     begin
         LibraryCosting.CreateSalesPrice(SalesPrice, SalesPrice."Sales Type"::Customer, CustomerNo, ItemNo, WorkDate(), '', '', '', Quantity);
@@ -4989,6 +4989,7 @@ codeunit 134386 "ERM Sales Documents II"
         SalesPrice.Modify(true);
     end;
 #endif
+
     local procedure CreateAndModifySalesOrder(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
     begin
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomerInvDiscount(0));
@@ -5021,7 +5022,7 @@ codeunit 134386 "ERM Sales Documents II"
         PostCode.FindLast();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesLineDiscount(var SalesLineDiscount: Record "Sales Line Discount"; SalesPrice: Record "Sales Price")
     begin
         LibraryERM.CreateLineDiscForCustomer(
@@ -5101,6 +5102,7 @@ codeunit 134386 "ERM Sales Documents II"
           WorkDate());
     end;
 #endif
+
     local procedure CreateCustomer(): Code[20]
     var
         Customer: Record Customer;
@@ -5209,7 +5211,7 @@ codeunit 134386 "ERM Sales Documents II"
         exit(DetailedCustLedgEntry."Amount (LCY)");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CopyPricesScenarioOnSalesPricePage(var SalesPrice: Record "Sales Price"; var CopyToCustomerNo: Code[20]; var SalesPrices: TestPage "Sales Prices")
     var
         CopyFromCustomerNo: Code[20];
@@ -5224,6 +5226,7 @@ codeunit 134386 "ERM Sales Documents II"
         LibraryVariableStorage.Enqueue(CopyFromCustomerNo);
     end;
 #endif
+
     local procedure RunReccuringSalesIvoice(DocumentDate: Date; StandardSalesLine: Record "Standard Sales Line"): Code[20]
     var
         SalesLine: Record "Sales Line";
@@ -6014,7 +6017,7 @@ codeunit 134386 "ERM Sales Documents II"
         Assert.RecordIsEmpty(SalesHeader);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure VerifyCopiedSalesPrice(CopiedFromSalesPrice: Record "Sales Price"; CustNo: Code[20])
     var
         SalesPrice: Record "Sales Price";
@@ -6034,6 +6037,7 @@ codeunit 134386 "ERM Sales Documents II"
         Assert.RecordCount(SalesPrice, 1);
     end;
 #endif
+
     local procedure VerifyAmountInclVATOfCreditLimitDetails(ExpectedAmount: Decimal)
     begin
         Assert.AreEqual(
@@ -6064,7 +6068,7 @@ codeunit 134386 "ERM Sales Documents II"
         Assert.AreEqual(Format(ShipToOptions::"Default (Sell-to Address)"), Format(ShipToOptions), '');
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure VerifySalesPriceAndLineDiscBuff(var TempSalesPriceAndLineDiscBuff: Record "Sales Price and Line Disc Buff" temporary; ItemNo: Code[20]; AllowInvoiceDisc: Boolean; AllowLineDisc: Boolean)
     begin
         TempSalesPriceAndLineDiscBuff.SetRange("Sales Type", TempSalesPriceAndLineDiscBuff."Sales Type"::Customer);
@@ -6074,6 +6078,7 @@ codeunit 134386 "ERM Sales Documents II"
         TempSalesPriceAndLineDiscBuff.TestField("Allow Line Disc.", AllowLineDisc);
     end;
 #endif
+
     local procedure GetAmountTotalIncVAT(SalesHeader: Record "Sales Header"): Decimal
     var
         TotalSalesLine: Record "Sales Line";
@@ -6341,7 +6346,7 @@ codeunit 134386 "ERM Sales Documents II"
         Assert.IsFalse(CustomerLedgerEntries.Next(), 'There is more than one entry in Customer Ledger Entries page');
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure SalesPricesSelectPriceOfCustomerModalPageHandler(var SalesPrices: TestPage "Sales Prices")
@@ -6357,6 +6362,7 @@ codeunit 134386 "ERM Sales Documents II"
         SalesPrices.Cancel().Invoke();
     end;
 #endif
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ContactListPageHandler(var ContactList: TestPage "Contact List")

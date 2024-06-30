@@ -7,11 +7,11 @@ using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Pricing.Calculation;
 #endif
 using Microsoft.Pricing.PriceList;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -424,7 +424,7 @@ report 5855 "Implement Standard Cost Change"
         if IsHandled then
             exit;
 
-#if not CLEAN23
+#if not CLEAN25
         if UpdateOldResourceCost(StandardCostWorksheet, Resource) then
             exit;
 #endif
@@ -450,7 +450,7 @@ report 5855 "Implement Standard Cost Change"
         end;
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure UpdateOldResourceCost(StandardCostWorksheet: Record "Standard Cost Worksheet"; Resource: Record Resource): Boolean;
     var
         ResourceCost: Record "Resource Cost";

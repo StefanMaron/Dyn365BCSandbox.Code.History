@@ -4,12 +4,12 @@ using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Pricing.Calculation;
 #endif
 using Microsoft.Pricing.PriceList;
 using Microsoft.Sales.Customer;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Sales.Pricing;
 #endif
 using System.Utilities;
@@ -262,11 +262,11 @@ codeunit 7030 "Campaign Target Group Mgt"
     local procedure NoPriceDiscForCampaign(CampaignNo: Code[20]): Boolean
     var
         PriceListLine: Record "Price List Line";
-#if not CLEAN23
+#if not CLEAN25
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
 #endif
     begin
-#if not CLEAN23
+#if not CLEAN25
         if not PriceCalculationMgt.IsExtendedPriceCalculationEnabled() then
             exit(NoPriceDiscV15ForCampaign(CampaignNo));
 #endif
@@ -275,7 +275,7 @@ codeunit 7030 "Campaign Target Group Mgt"
         exit(PriceListLine.IsEmpty());
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by NoPriceDiscForCampaign', '17.0')]
     local procedure NoPriceDiscV15ForCampaign(CampaignNo: Code[20]): Boolean;
     var

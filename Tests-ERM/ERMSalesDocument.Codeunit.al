@@ -26,7 +26,7 @@
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
         ArchiveManagement: Codeunit ArchiveManagement;
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         LibraryMarketing: Codeunit "Library - Marketing";
@@ -369,7 +369,7 @@
         VerifyValueEntries(SalesHeader."No.", SalesHeader.Amount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnCreditMemo()
@@ -5177,7 +5177,7 @@
         CustInvoiceDisc.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscount(var SalesLineDiscount: Record "Sales Line Discount")
     var
         Item: Record Item;
