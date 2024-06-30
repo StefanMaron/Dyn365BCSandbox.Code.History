@@ -7,7 +7,7 @@ using Microsoft.Utilities;
 table 201 "Resource Price"
 {
     Caption = 'Resource Price';
-#if not CLEAN23
+#if not CLEAN25
     DrillDownPageID = "Resource Prices";
     LookupPageID = "Resource Prices";
     ObsoleteState = Pending;

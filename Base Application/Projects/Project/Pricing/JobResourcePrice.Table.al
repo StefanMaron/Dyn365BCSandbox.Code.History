@@ -12,7 +12,7 @@ using Microsoft.Utilities;
 table 1012 "Job Resource Price"
 {
     Caption = 'Project Resource Price';
-#if not CLEAN23
+#if not CLEAN25
     DrillDownPageID = "Job Resource Prices";
     LookupPageID = "Job Resource Prices";
     ObsoleteState = Pending;

@@ -9,7 +9,7 @@ using Microsoft.Inventory.Item.Attribute;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Setup;
 using Microsoft.Pricing.PriceList;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Pricing;
 #endif
@@ -138,7 +138,7 @@ codeunit 730 "Copy Item"
         CopyBOMComponents(SourceItem."No.", TargetItem."No.");
         CopyItemVendors(SourceItem."No.", TargetItem."No.");
         CopyItemPriceListLines(SourceItem."No.", TargetItem."No.");
-#if not CLEAN23
+#if not CLEAN25
         CopyItemSalesPrices(SourceItem."No.", TargetItem."No.");
         CopySalesLineDiscounts(SourceItem."No.", TargetItem."No.");
         CopyPurchasePrices(SourceItem."No.", TargetItem."No.");
@@ -392,7 +392,7 @@ codeunit 730 "Copy Item"
             until PriceListLine.Next() = 0;
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the method CopyItemPriceListLines()', '17.0')]
     local procedure CopyItemSalesPrices(FromItemNo: Code[20]; ToItemNo: Code[20])
     var
