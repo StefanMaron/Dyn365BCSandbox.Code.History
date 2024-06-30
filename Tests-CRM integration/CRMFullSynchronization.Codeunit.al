@@ -77,7 +77,7 @@ codeunit 139187 "CRM Full Synchronization"
         VerifyDependencyFilter('ITEM-PRODUCT', 'UNIT OF MEASURE');
         // [THEN] 'RESOURCE-PRODUCT' line, where "Dependency Filter" = 'UNIT OF MEASURE'
         VerifyDependencyFilter('RESOURCE-PRODUCT', 'UNIT OF MEASURE');
-#if not CLEAN23
+#if not CLEAN25
         // [THEN] 'CUSTPRCGRP-PRICE' line, where "Dependency Filter" = 'CURRENCY|ITEM-PRODUCT'
         VerifyDependencyFilter('CUSTPRCGRP-PRICE', 'CURRENCY|ITEM-PRODUCT');
         // [THEN] 'SALESPRC-PRODPRICE' line, where "Dependency Filter" = 'CUSTPRCGRP-PRICE|ITEM-PRODUCT'
@@ -143,7 +143,7 @@ codeunit 139187 "CRM Full Synchronization"
         VerifyDependencyFilter('ITEM-PRODUCT', 'ITEM UOM');
         // [THEN] 'RESOURCE-PRODUCT' line, where "Dependency Filter" = 'RESOURCE UOM'
         VerifyDependencyFilter('RESOURCE-PRODUCT', 'RESOURCE UOM');
-#if not CLEAN23
+#if not CLEAN25
         // [THEN] 'CUSTPRCGRP-PRICE' line, where "Dependency Filter" = 'CURRENCY|ITEM-PRODUCT'
         VerifyDependencyFilter('CUSTPRCGRP-PRICE', 'CURRENCY|ITEM-PRODUCT');
         // [THEN] 'SALESPRC-PRODPRICE' line, where "Dependency Filter" = 'CUSTPRCGRP-PRICE|ITEM-PRODUCT'
@@ -764,7 +764,7 @@ codeunit 139187 "CRM Full Synchronization"
         // [WHEN] Run "Start"
         CRMFullSynchReviewLine.Start();
 
-#if not CLEAN23
+#if not CLEAN25
         // [THEN] Lines 'CUSTPRCGRP-PRICE' and 'CUSTOMER' get "Status" = 'On Hold'
         OnHold := 3;
         CRMFullSynchReviewLine.SetFilter(Name, 'CUSTPRCGRP-PRICE|CUSTOMER|VENDOR');
@@ -805,7 +805,7 @@ codeunit 139187 "CRM Full Synchronization"
         SetStatus('PAYMENT TERMS', CRMFullSynchReviewLine."Job Queue Entry Status"::Finished);
         SetStatus('SHIPMENT METHOD', CRMFullSynchReviewLine."Job Queue Entry Status"::Finished);
         SetStatus('SHIPPING AGENT', CRMFullSynchReviewLine."Job Queue Entry Status"::Finished);
-#if not CLEAN23
+#if not CLEAN25
         SetStatus('CUSTPRCGRP-PRICE', CRMFullSynchReviewLine."Job Queue Entry Status"::Finished);
         Finished := 7;
 #else
@@ -815,7 +815,7 @@ codeunit 139187 "CRM Full Synchronization"
         // [WHEN] Run "Start"
         CRMFullSynchReviewLine.Start();
 
-#if not CLEAN23
+#if not CLEAN25
         // [THEN] Lines 'CUSTPRCGRP-PRICE','RESOURCE-PRODUCT','SALESPEOPLE' get "Job Queue Entry Status" = 'On Hold'
         OnHold := 3;
         CRMFullSynchReviewLine.SetFilter(Name, 'SALESPRC-PRODPRICE|RESOURCE-PRODUCT|SALESPEOPLE');

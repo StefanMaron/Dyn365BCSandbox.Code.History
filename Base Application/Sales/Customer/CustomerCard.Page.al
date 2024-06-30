@@ -1384,7 +1384,7 @@ page 21 "Customer Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN23
+#if not CLEAN25
                 action(PriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1405,7 +1405,7 @@ page 21 "Customer Card"
                     end;
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 action(Prices)
                 {
                     ApplicationArea = Basic, Suite;
@@ -2209,7 +2209,7 @@ page 21 "Customer Card"
             group(Category_Category7)
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 6.';
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Prices_Promoted; Prices)
                 {
                     ObsoleteState = Pending;
@@ -2217,7 +2217,7 @@ page 21 "Customer Card"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Line Discounts_Promoted"; "Line Discounts")
                 {
                     ObsoleteState = Pending;
@@ -2228,7 +2228,7 @@ page 21 "Customer Card"
                 actionref(PriceLists_Promoted; PriceLists)
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Prices and Discounts Overview_Promoted"; "Prices and Discounts Overview")
                 {
                     ObsoleteState = Pending;

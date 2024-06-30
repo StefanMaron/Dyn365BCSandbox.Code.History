@@ -201,7 +201,7 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
         ItemLedgerEntry.SetReservationEntry(ReservEntry);
         ReservEntry.CopyTrackingFromItemLedgEntry(ItemLedgerEntry);
         OnSetItemLedgEntryOnBeforeUpdateReservation(ReservEntry, ItemLedgerEntry);
-#if not CLEAN25
+#if not CLEAN24
         sender.RunOnSetItemLedgEntryOnBeforeUpdateReservation(ReservEntry, ItemLedgerEntry);
 #endif
         sender.UpdateReservation(Positive);
