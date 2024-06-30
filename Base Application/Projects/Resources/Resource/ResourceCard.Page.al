@@ -12,7 +12,7 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Analysis;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Utilities;
@@ -682,7 +682,7 @@ page 76 "Resource Card"
             {
                 Caption = '&Prices';
                 Image = Price;
-#if not CLEAN23
+#if not CLEAN25
                 action(Costs)
                 {
                     ApplicationArea = Jobs;
@@ -891,7 +891,7 @@ page 76 "Resource Card"
                 actionref("Units of Measure_Promoted"; "Units of Measure")
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Costs_Promoted; Costs)
                 {
                     ObsoleteState = Pending;
@@ -899,7 +899,7 @@ page 76 "Resource Card"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Prices_Promoted; Prices)
                 {
                     ObsoleteState = Pending;

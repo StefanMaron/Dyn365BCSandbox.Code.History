@@ -1,12 +1,12 @@
 namespace System.Environment.Configuration;
 
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Pricing.Calculation;
 #endif
 
 enumextension 2611 "Feature To Update - BaseApp" extends "Feature To Update"
 {
-#if not CLEAN23
+#if not CLEAN25
     value(7049; SalesPrices)
     {
         Implementation = "Feature Data Update" = "Feature - Price Calculation";

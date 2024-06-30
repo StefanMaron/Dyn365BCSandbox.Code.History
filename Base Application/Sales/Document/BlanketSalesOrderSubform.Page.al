@@ -882,7 +882,7 @@ page 508 "Blanket Sales Order Subform"
             {
                 Caption = 'F&unctions';
                 Image = "Action";
-#if not CLEAN23
+#if not CLEAN25
                 action("Get &Price")
                 {
                     AccessByPermission = TableData "Sales Price" = R;
