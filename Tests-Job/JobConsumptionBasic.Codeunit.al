@@ -47,7 +47,7 @@
     local procedure Initialize()
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
-#if not CLEAN23
+#if not CLEAN25
         PurchasePrice: Record "Purchase Price";
         SalesPrice: Record "Sales Price";
 #endif
@@ -61,7 +61,7 @@
 
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(Codeunit::"Job Consumption Basic");
 
-#if not CLEAN23
+#if not CLEAN25
         // Removing special prices
         PurchasePrice.DeleteAll(true);
         SalesPrice.DeleteAll(true);

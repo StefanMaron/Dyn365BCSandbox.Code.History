@@ -4231,7 +4231,7 @@ codeunit 134152 "ERM Intercompany II"
         SalesLine.TestField("Amount Including VAT", Round(AmtInclVAT, LibraryERM.GetAmountRoundingPrecision(), '<'));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesPriceIsNotOverriddenWhenSalesLineCreatedFromInbox()

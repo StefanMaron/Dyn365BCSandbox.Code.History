@@ -11,7 +11,7 @@ codeunit 134462 "ERM Copy Item"
 
     var
         Assert: Codeunit Assert;
-#if not CLEAN23
+#if not CLEAN25
         LibraryCosting: Codeunit "Library - Costing";
 #endif
         LibraryDimension: Codeunit "Library - Dimension";
@@ -403,7 +403,7 @@ codeunit 134462 "ERM Copy Item"
         NotificationLifecycleMgt.RecallAllNotifications();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('CopyItemPageHandler')]
     [Scope('OnPrem')]
@@ -1761,7 +1761,7 @@ codeunit 134462 "ERM Copy Item"
         LibraryResource.CreateResourceSkill(ResourceSkill, ResourceSkill.Type::Item, ItemNo, SkillCode.Code);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchasePriceWithLineDiscount(var PurchasePrice: Record "Purchase Price"; var PurchaseLineDiscount: Record "Purchase Line Discount"; Item: Record Item)
     begin
         LibraryCosting.CreatePurchasePrice(

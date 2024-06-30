@@ -15,7 +15,7 @@ using Microsoft.Pricing.Source;
 using Microsoft.Projects.Project.Analysis;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
 #endif
 using Microsoft.Projects.Project.Reports;
@@ -1196,7 +1196,7 @@ page 88 "Job Card"
                     ToolTip = 'View the project''s WIP G/L entries.';
                 }
             }
-#if not CLEAN23
+#if not CLEAN25
             group("&Prices")
             {
                 Caption = '&Prices';
@@ -1303,7 +1303,7 @@ page 88 "Job Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN23
+#if not CLEAN25
                 action(SalesPriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1378,7 +1378,7 @@ page 88 "Job Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN23
+#if not CLEAN25
                 action(PurchasePriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1776,7 +1776,7 @@ page 88 "Job Card"
                 actionref(PurchDiscountLines_Promoted; PurchDiscountLines)
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref(SalesPriceListsDiscounts_Promoted; SalesPriceListsDiscounts)
                 {
                     ObsoleteState = Pending;
@@ -1784,7 +1784,7 @@ page 88 "Job Card"
                     ObsoleteTag = '18.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref(PurchasePriceListsDiscounts_Promoted; PurchasePriceListsDiscounts)
                 {
                     ObsoleteState = Pending;
@@ -1792,7 +1792,7 @@ page 88 "Job Card"
                     ObsoleteTag = '18.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref("&Resource_Promoted"; "&Resource")
                 {
                     ObsoleteState = Pending;
@@ -1800,7 +1800,7 @@ page 88 "Job Card"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref("&Item_Promoted"; "&Item")
                 {
                     ObsoleteState = Pending;
@@ -1808,7 +1808,7 @@ page 88 "Job Card"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref("&G/L Account_Promoted"; "&G/L Account")
                 {
                     ObsoleteState = Pending;
