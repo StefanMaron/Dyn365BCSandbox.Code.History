@@ -4175,7 +4175,7 @@ codeunit 136101 "Service Orders"
             ServiceHeader."Document Type".AsInteger(), ServiceHeader."No.", 0);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CorrectCalculationLineDiscountForServiceLineWithSalesPrice()
@@ -7562,7 +7562,7 @@ codeunit 136101 "Service Orders"
         LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesLineDiscount(var SalesLineDiscount: Record "Sales Line Discount"; CustomerNo: Code[20]; ItemNo: Code[20])
     begin
         SalesLineDiscount.Init();

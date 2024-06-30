@@ -63,7 +63,7 @@ table 23 Vendor
     Permissions = TableData "Vendor Ledger Entry" = r,
                   TableData "Price List Header" = rd,
                   TableData "Price List Line" = rd,
-#if not CLEAN23
+#if not CLEAN25
                   TableData "Purchase Price" = rd,
                   TableData "Purchase Line Discount" = rd,
 #endif
@@ -2850,7 +2850,7 @@ table 23 Vendor
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '16.0')]
     [Scope('OnPrem')]
     procedure ValidatePricesIncludingVATOnAfterGetVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup")

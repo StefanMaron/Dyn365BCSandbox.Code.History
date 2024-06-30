@@ -1968,7 +1968,7 @@ codeunit 365 "Format Address"
     end;
 #endif
 
-#if not CLEAN24
+#if not CLEAN25
     internal procedure RunOnBeforeServiceOrderSellto(var AddrArray: array[8] of Text[100]; var ServHeader: Record Microsoft.Service.Document."Service Header"; var IsHandled: Boolean)
     begin
         OnBeforeServiceOrderSellto(AddrArray, ServHeader, IsHandled);

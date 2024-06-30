@@ -19,7 +19,7 @@
         LibraryPlanning: Codeunit "Library - Planning";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryManufacturing: Codeunit "Library - Manufacturing";
-#if not CLEAN23
+#if not CLEAN25
         LibraryMarketing: Codeunit "Library - Marketing";
 #endif
         LibraryUtility: Codeunit "Library - Utility";
@@ -44,7 +44,7 @@
         ReportQtyErr: Label 'Wrong Quantity on Report';
         ValueEntriesWerePostedTxt: Label 'value entries have been posted to the general ledger.';
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PriceListRequestPageHandler')]
     [Scope('OnPrem')]
@@ -872,7 +872,7 @@
         VerifyQtyToReceiveInPurchLine(PurchHeader[3]);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PriceListRequestPageHandler')]
     [Scope('OnPrem')]
@@ -1570,7 +1570,7 @@
           'Item_Journal_Batch_Name', ExtraItemJournalBatch.Name);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PriceListRequestPageHandler')]
     [Scope('OnPrem')]
@@ -1689,7 +1689,7 @@
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Inventory Reports - II");
         LibraryVariableStorage.Clear();
         LibrarySetupStorage.Restore();
-#if not CLEAN23
+#if not CLEAN25
         LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 15.0)");
 #else
         LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
@@ -1828,7 +1828,7 @@
         ProductionBOMVersion.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure RunPriceListReport(NoFilter: Text; SalesType: Option; SalesCode: Code[20]; CurrencyCode: Code[10])
     var
         Item: Record Item;
@@ -1903,7 +1903,7 @@
         ItemLedgerEntry.Insert();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesPriceForCampaign(var SalesPrice: Record "Sales Price"; ItemNo: Code[20]; CampaignNo: Code[20])
     begin
         // Create Sales Price with random unit price.
@@ -2709,7 +2709,7 @@
         // Dummy message Handler.
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure PriceListRequestPageHandler(var PriceList: TestRequestPage "Price List")

@@ -70,7 +70,7 @@ table 18 Customer
                   tabledata "Payment Terms" = R,
                   TableData "Price List Header" = rd,
                   TableData "Price List Line" = rd,
-#if not CLEAN23
+#if not CLEAN25
                   TableData "Sales Price" = rd,
                   TableData "Sales Line Discount" = rd,
 #endif
@@ -3720,5 +3720,3 @@ table 18 Customer
     begin
     end;
 }
-
-
