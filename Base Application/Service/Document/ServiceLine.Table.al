@@ -29,7 +29,7 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Resources.Journal;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -3817,7 +3817,7 @@ table 5902 "Service Line"
               DimMgt.EditDimensionSet(
                 Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', "Document Type", "Document No.", "Line No."),
                 "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-             OnAfterShowDimensions(Rec, xRec);   
+        OnAfterShowDimensions(Rec, xRec);
     end;
 
     procedure ShowReservation()
@@ -4425,7 +4425,7 @@ table 5902 "Service Line"
     end;
 
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     procedure AfterResourseFindCost(var ResourceCost: Record "Resource Cost");
     begin
@@ -6546,7 +6546,7 @@ table 5902 "Service Line"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterResourseFindCost(var ServiceLine: Record "Service Line"; var ResourceCost: Record "Resource Cost")

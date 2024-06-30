@@ -1,4 +1,4 @@
-﻿#if not CLEAN23
+﻿#if not CLEAN25
 namespace Microsoft.Sales.Pricing;
 
 using Microsoft.CRM.Campaign;
@@ -1110,8 +1110,8 @@ codeunit 7000 "Sales Price Calc. Mgt."
     procedure ServHeaderExchDate(ServHeader: Record "Service Header"): Date
     begin
         if (ServHeader."Document Type" = ServHeader."Document Type"::Quote) and
-   (ServHeader."Posting Date" = 0D)
-then
+           (ServHeader."Posting Date" = 0D)
+        then
             exit(WorkDate());
         exit(ServHeader."Posting Date");
     end;

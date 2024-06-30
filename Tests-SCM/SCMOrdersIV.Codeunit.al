@@ -27,7 +27,7 @@
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
-#if not CLEAN23
+#if not CLEAN25
         LibraryCosting: Codeunit "Library - Costing";
 #endif
         LibraryPlanning: Codeunit "Library - Planning";
@@ -36,7 +36,7 @@
         LibraryJob: Codeunit "Library - Job";
         LibraryAccountSchedule: Codeunit "Library - Account Schedule";
         LibraryDimension: Codeunit "Library - Dimension";
-#if not CLEAN23
+#if not CLEAN25
         LibrarySmallBusiness: Codeunit "Library - Small Business";
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
@@ -48,7 +48,7 @@
         UndoShipmentMsg: Label 'Do you really want to undo the selected Shipment lines?';
         UndoReturnReceiptMsg: Label 'Do you really want to undo the selected Return Receipt lines?';
         RecordMustBeDeletedTxt: Label 'Order must be deleted.';
-#if not CLEAN23
+#if not CLEAN25
         SalesLineDiscountMustBeDeletedErr: Label 'Sales Line Discount must be deleted.';
 #endif
         ConfirmTextForChangeOfSellToCustomerOrBuyFromVendorQst: Label 'Do you want to change';
@@ -69,7 +69,7 @@
         PurchInvLineQuantityErr: label 'Expected quantity of 1 on purchase invoice line but found %1';
         PurchInvLineVendorNoErr: label 'Expected "Buy-from Vendor No." to be %1 on purchase invoice line but found %2';
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CheckValueOfSalesTypeOnSalesPricesPage()
@@ -494,7 +494,7 @@
         Assert.ExpectedTestFieldError(Item.FieldCaption(Blocked), Format(false));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesLineDiscountDeletedAfterDeletingCustomerDiscountGroup()
@@ -625,7 +625,7 @@
         UpdateCreditWarningOnSalesAndReceivablesSetup(OldCreditWarning);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesOrderWithSpecialOrderAndCarryOutActionMsg()
@@ -801,7 +801,7 @@
         UpdateCreditWarningOnSalesAndReceivablesSetup(OldCreditWarning);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CreateSalesLineDiscountForTypeItem()
@@ -1251,7 +1251,7 @@
         VerifyQuantityOnWarehouseActivityLine(SalesHeaderNo, QtyToHandle + (QtyOnSalesLine - QtyOnPurchLine));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('MoveNegativeSalesLinesHandler,YesConfirmHandler,SalesOrderHandler')]
     [Scope('OnPrem')]
@@ -2346,7 +2346,7 @@
         SalesLine.TestField("Line Discount %", LineDiscPercent);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountPercIsZeroWhenAllowLineDiscDisabledOnCustomer()
@@ -3172,7 +3172,7 @@
         Item.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateCustomerDiscountGroupWithSalesLineDiscount(var CustomerDiscountGroup: Record "Customer Discount Group"; var SalesLineDiscount: Record "Sales Line Discount"; Item: Record Item)
     begin
         LibraryERM.CreateCustomerDiscountGroup(CustomerDiscountGroup);
@@ -3309,7 +3309,7 @@
         CreatePurchaseDocument(PurchaseHeader, PurchaseLine, PurchaseHeader."Document Type"::Order, Type, VendorNo, ItemNo, Quantity);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchaseLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount"; Item: Record Item; Quantity: Decimal)
     begin
         LibraryERM.CreateLineDiscForVendor(PurchaseLineDiscount, Item."No.", Item."Vendor No.", 0D, '', '', '', Quantity);
@@ -3334,7 +3334,7 @@
         PurchaseLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchasePriceForVendor(var PurchasePrice: Record "Purchase Price"; Item: Record Item; Quantity: Decimal)
     begin
         LibraryCosting.CreatePurchasePrice(PurchasePrice, Item."Vendor No.", Item."No.", 0D, '', '', '', Quantity);
@@ -3564,7 +3564,7 @@
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, LibraryRandom.RandDec(10, 2));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesLineDiscount(var SalesLineDiscount: Record "Sales Line Discount"; Item: Record Item; SalesType: Option; SalesCode: Code[20]; StartingDate: Date; Quantity: Decimal)
     begin
         LibraryERM.CreateLineDiscForCustomer(
@@ -3761,7 +3761,7 @@
         VerifyPurchaseOrdContainsTwoLines(SalesHeader, false);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CarryOutActionMessageOnRequisitionWorksheet(SpecialOrder: Boolean)
     var
         Item: Record Item;
@@ -3938,7 +3938,7 @@
         SalesLine.SetRange("No.", '');
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure FilterSalesLineDiscount(var SalesLineDiscount: Record "Sales Line Discount"; CustomerDiscountGroupCode: Code[20])
     begin
         SalesLineDiscount.SetRange("Sales Type", SalesLineDiscount."Sales Type"::"Customer Disc. Group");
@@ -4757,7 +4757,7 @@
         RegisteredWhseActivityLine.TestField(Quantity, Quantity);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure VerifySalesLineDiscount(SalesLineDiscount: Record "Sales Line Discount")
     var
         SalesLineDiscount2: Record "Sales Line Discount";

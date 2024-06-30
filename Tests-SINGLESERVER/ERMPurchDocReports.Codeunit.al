@@ -516,7 +516,7 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         asserterror LibraryReportDataset.AssertElementWithValueExists('', DocumentNo);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('ReportHandlerVendorItemCatalog')]
     [Scope('OnPrem')]
@@ -1997,7 +1997,7 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         PurchaseLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchasePrice(var PurchasePrice: Record "Purchase Price"; VendorNo: Code[20])
     var
         Item: Record Item;

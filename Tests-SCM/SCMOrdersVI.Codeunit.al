@@ -408,6 +408,8 @@
         Assert.ExpectedError(ExpectedReceiptDateErr);
     end;
 
+    // Purchase Price test skipped here
+
     [Test]
     [Scope('OnPrem')]
     procedure PostPurchaseReturnOrderWithExactCostReversingMandatoryTrue()

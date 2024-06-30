@@ -12,7 +12,7 @@ using Microsoft.Foundation.Navigate;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Attribute;
-#if CLEAN23
+#if CLEAN25
 using Microsoft.Pricing.Worksheet;
 #endif
 using Microsoft.Purchases.Vendor;
@@ -630,7 +630,7 @@ page 9026 "Sales & Relationship Mgr. RC"
             group("Sales Prices")
             {
                 Caption = 'Sales Prices';
-#if not CLEAN23
+#if not CLEAN25
                 action("Sales Price &Worksheet")
                 {
                     AccessByPermission = TableData "Sales Price Worksheet" = IMD;
