@@ -3315,7 +3315,7 @@ codeunit 136302 "Job Consumption Purchase"
 
     local procedure Initialize()
     var
-#if not CLEAN23
+#if not CLEAN25
         PurchasePrice: Record "Purchase Price";
         SalesPrice: Record "Sales Price";
 #endif
@@ -3337,7 +3337,7 @@ codeunit 136302 "Job Consumption Purchase"
         LibraryERMCountryData.UpdateGeneralPostingSetup();
         LibraryERMCountryData.UpdatePurchasesPayablesSetup();
         LibraryInventory.UpdateGenProdPostingSetup();
-#if not CLEAN23
+#if not CLEAN25
         // Removing special prices
         PurchasePrice.DeleteAll(true);
         SalesPrice.DeleteAll(true);

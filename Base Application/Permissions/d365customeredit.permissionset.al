@@ -118,7 +118,7 @@ permissionset 5729 "D365 CUSTOMER, EDIT"
                   tabledata "Sales Discount Access" = Rd,
                   tabledata "Sales Header Archive" = rm,
                   tabledata "Sales Invoice Line" = rm,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Line Discount" = Rd,
                   tabledata "Sales Price" = Rid,
 #endif
