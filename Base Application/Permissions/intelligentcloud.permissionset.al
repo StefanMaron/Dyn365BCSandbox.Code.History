@@ -16,7 +16,7 @@ using Microsoft.eServices.OnlineMap;
 using Microsoft.Finance.Payroll;
 using Microsoft.Inventory.Reconciliation;
 using Microsoft.Projects.Project.Journal;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
 #endif
 using Microsoft.Projects.Project.Ledger;
@@ -172,7 +172,7 @@ using Microsoft.Pricing.Worksheet;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -1036,7 +1036,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Job Cue" = RIMD,
                   tabledata "Job Difference Buffer" = R,
                   tabledata "Job Entry No." = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Job G/L Account Price" = R,
                   tabledata "Job Item Price" = R,
 #endif
@@ -1055,7 +1055,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Job Queue Entry Buffer" = R,
                   tabledata "Job Queue Log Entry" = R,
                   tabledata "Job Register" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Job Resource Price" = R,
 #endif
                   tabledata "Job Responsibility" = R,
@@ -1294,7 +1294,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Purch. Inv. Header" = R,
                   tabledata "Purch. Inv. Line" = R,
                   tabledata "Purch. Inv. Line Aggregate" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purch. Price Line Disc. Buff." = R,
 #endif
                   tabledata "Purch. Rcpt. Header" = R,
@@ -1305,12 +1305,12 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Purchase Header Archive" = R,
                   tabledata "Purchase Line" = R,
                   tabledata "Purchase Line Archive" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purchase Line Discount" = R,
 #endif
                   tabledata "Purchase Order Entity Buffer" = R,
                   tabledata "Purchase Prepayment %" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purchase Price" = R,
 #endif
                   tabledata "Purchase Price Access" = R,
@@ -1383,12 +1383,12 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Reservation Entry Buffer" = R,
                   tabledata "Resolution Code" = R,
                   tabledata Resource = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Resource Cost" = R,
 #endif
                   tabledata "Resource Group" = R,
                   tabledata "Resource Location" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Resource Price" = R,
                   tabledata "Resource Price Change" = R,
 #endif
@@ -1439,17 +1439,17 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Sales Invoice Line Aggregate" = R,
                   tabledata "Sales Line" = R,
                   tabledata "Sales Line Archive" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Line Discount" = R,
 #endif
                   tabledata "Sales Order Entity Buffer" = R,
                   tabledata "Sales Planning Line" = R,
                   tabledata "Sales Prepayment %" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price" = R,
 #endif
                   tabledata "Sales Price Access" = R,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price and Line Disc Buff" = R,
                   tabledata "Sales Price Worksheet" = R,
 #endif

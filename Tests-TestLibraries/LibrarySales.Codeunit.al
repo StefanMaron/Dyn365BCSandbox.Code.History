@@ -543,7 +543,7 @@ codeunit 130509 "Library - Sales"
         SalesCommentLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     procedure CreateSalesPrice(var SalesPrice: Record "Sales Price"; ItemNo: Code[20]; SalesType: Enum "Sales Price Type"; SalesCode: Code[20]; StartingDate: Date; CurrencyCode: Code[10]; VariantCode: Code[10]; UOMCode: Code[10]; MinQty: Decimal; UnitPrice: Decimal)
     begin
         Clear(SalesPrice);
@@ -1339,7 +1339,7 @@ codeunit 130509 "Library - Sales"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateSalesPrice(var SalesPrice: Record "Sales Price"; ItemNo: Code[20]; SalesType: Option; SalesCode: Code[20]; StartingDate: Date; CurrencyCode: Code[10]; VariantCode: Code[10]; UOMCode: Code[10]; MinQty: Decimal; UnitPrice: Decimal)
     begin

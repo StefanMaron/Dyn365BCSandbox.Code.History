@@ -28,13 +28,13 @@ codeunit 137096 "SCM Kitting - ATO"
         LibraryPatterns: Codeunit "Library - Patterns";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
-#if not CLEAN23
+#if not CLEAN25
         LibraryResource: Codeunit "Library - Resource";
 #endif
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryRandom: Codeunit "Library - Random";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         GenProdPostingGr: Code[20];
@@ -504,7 +504,7 @@ codeunit 137096 "SCM Kitting - ATO"
         exit(UnitCost);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure GetRollupPrice(AssemblyHeader: Record "Assembly Header") Price: Decimal
     var
         AssemblyLine: Record "Assembly Line";
@@ -3530,7 +3530,7 @@ codeunit 137096 "SCM Kitting - ATO"
           StrSubstNo(WrongUnitValueMsg, SalesLine.FieldCaption("Unit Cost")));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('ConfirmHandler')]
     [Scope('OnPrem')]
@@ -4858,7 +4858,7 @@ codeunit 137096 "SCM Kitting - ATO"
         ChangeCostAndPriceOnCompList(Item."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesAndResourcePricesOnCompList(ItemNo: Code[20])
     var
         BOMComponent: Record "BOM Component";

@@ -165,7 +165,7 @@ using Microsoft.Pricing.Worksheet;
 using Microsoft.Projects.Project.Archive;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Journal;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
 #endif
 using Microsoft.Projects.Project.Ledger;
@@ -176,7 +176,7 @@ using Microsoft.Projects.Project.Setup;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -1027,7 +1027,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Job Cue" = RM,
                   tabledata "Job Difference Buffer" = Rm,
                   tabledata "Job Entry No." = RM,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Job G/L Account Price" = RM,
                   tabledata "Job Item Price" = RM,
 #endif
@@ -1047,7 +1047,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Job Queue Entry Buffer" = RIMD,
                   tabledata "Job Queue Log Entry" = RIMD,
                   tabledata "Job Register" = Rm,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Job Resource Price" = RM,
 #endif
                   tabledata "Job Responsibility" = RM,
@@ -1260,7 +1260,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Purch. Inv. Header" = RimD,
                   tabledata "Purch. Inv. Line" = Rimd,
                   tabledata "Purch. Inv. Line Aggregate" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purch. Price Line Disc. Buff." = RM,
 #endif
                   tabledata "Purch. Rcpt. Header" = RIMD,
@@ -1271,12 +1271,12 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Purchase Header Archive" = RIMD,
                   tabledata "Purchase Line" = RIMD,
                   tabledata "Purchase Line Archive" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purchase Line Discount" = RM,
 #endif
                   tabledata "Purchase Order Entity Buffer" = RMID,
                   tabledata "Purchase Prepayment %" = RM,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Purchase Price" = RM,
 #endif
                   tabledata "Purchase Price Access" = RM,
@@ -1348,12 +1348,12 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Reservation Entry Buffer" = RIMD,
                   tabledata "Resolution Code" = RM,
                   tabledata Resource = RM,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Resource Cost" = R,
 #endif
                   tabledata "Resource Group" = RM,
                   tabledata "Resource Location" = RM,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Resource Price" = R,
                   tabledata "Resource Price Change" = RM,
 #endif
@@ -1396,17 +1396,17 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Sales Invoice Line Aggregate" = RIMD,
                   tabledata "Sales Line" = RIMD,
                   tabledata "Sales Line Archive" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Line Discount" = RIMD,
 #endif
                   tabledata "Sales Order Entity Buffer" = RIMD,
                   tabledata "Sales Planning Line" = Rimd,
                   tabledata "Sales Prepayment %" = RM,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price" = RIMD,
 #endif
                   tabledata "Sales Price Access" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price and Line Disc Buff" = RM,
                   tabledata "Sales Price Worksheet" = RIMD,
 #endif

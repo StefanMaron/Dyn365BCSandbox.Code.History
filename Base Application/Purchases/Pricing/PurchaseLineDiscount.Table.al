@@ -11,7 +11,7 @@ using Microsoft.Purchases.Vendor;
 table 7014 "Purchase Line Discount"
 {
     Caption = 'Purchase Line Discount';
-#if not CLEAN23
+#if not CLEAN25
     LookupPageID = "Purchase Line Discounts";
     ObsoleteState = Pending;
     ObsoleteTag = '16.0';
