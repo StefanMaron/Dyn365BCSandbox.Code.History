@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Test;
 
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Finance.Currency;
 #endif
 using Microsoft.Finance.GeneralLedger.Account;
@@ -14,7 +14,7 @@ using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Pricing.PriceList;
 #endif
 using Microsoft.Inventory.Setup;
@@ -23,7 +23,7 @@ using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Sales.Customer;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Sales.Pricing;
 #endif
 using Microsoft.Sales.Receivables;
@@ -53,7 +53,7 @@ codeunit 136125 "Service Posting Journals"
         LibraryUtility: Codeunit "Library - Utility";
         LibraryInventory: Codeunit "Library - Inventory";
         LibrarySales: Codeunit "Library - Sales";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         IsInitialized: Boolean;
@@ -308,7 +308,7 @@ codeunit 136125 "Service Posting Journals"
         UpdateAutomaticCostPosting(OldAutomaticCostPosting);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure ServiceOrderWithJob_Customer_PriceInclVAT()

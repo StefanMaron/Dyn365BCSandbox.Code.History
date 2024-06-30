@@ -14,12 +14,12 @@ codeunit 136502 "UT Time Sheets Posting"
         TimeSheetApprovalMgt: Codeunit "Time Sheet Approval Management";
         LibraryTimeSheet: Codeunit "Library - Time Sheet";
         LibraryJob: Codeunit "Library - Job";
-#if not CLEAN23
+#if not CLEAN25
         LibraryRandom: Codeunit "Library - Random";
 #endif
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         Text020: Label 'There is no Time Sheet';
@@ -480,7 +480,7 @@ codeunit 136502 "UT Time Sheets Posting"
         CheckTimeSheetPostingEntry(TimeSheetLine, PostedAssemblyLine."Document No.", PostedAssemblyLine.Quantity);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SuggestJobJournalLineTSLineDiscountPct()
@@ -545,7 +545,7 @@ codeunit 136502 "UT Time Sheets Posting"
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"UT Time Sheets Posting");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateJobResourcePriceWithLineDiscountPct(var JobResourcePrice: Record "Job Resource Price"; JobNo: Code[20]; JobTaskNo: Code[20]; Type: Option; "Code": Code[20])
     begin
         LibraryJob.CreateJobResourcePrice(

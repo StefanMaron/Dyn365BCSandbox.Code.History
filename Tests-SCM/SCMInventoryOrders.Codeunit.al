@@ -24,7 +24,7 @@ codeunit 137400 "SCM Inventory - Orders"
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         Assert: Codeunit Assert;
@@ -1118,7 +1118,7 @@ codeunit 137400 "SCM Inventory - Orders"
         VerifyPostedReturnReceipt(SalesLine);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesUnitPriceFromItemUnitPrice()
@@ -2486,7 +2486,7 @@ codeunit 137400 "SCM Inventory - Orders"
         Assert.ExpectedError(QtyToInvoiceMustHaveValueErr);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('GetLastUnitPriceHandler')]
     [Scope('OnPrem')]
@@ -3257,7 +3257,7 @@ codeunit 137400 "SCM Inventory - Orders"
         SalesLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateSalesPrice(var SalesPrice: Record "Sales Price"; Item: Record Item; SalesType: Enum "Sales Price Type"; SalesCode: Code[20]; UnitOfMeasureCode: Code[10]; MinimumQuantity: Decimal; StartingDate: Date)
     begin
         // Create Sales Price with random Unit Price.
@@ -3479,7 +3479,7 @@ codeunit 137400 "SCM Inventory - Orders"
         LibrarySales.GetShipmentLines(SalesLine);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure GetSalesPrice(No: Code[20])
     var
         SalesOrder: TestPage "Sales Order";
@@ -4032,7 +4032,7 @@ codeunit 137400 "SCM Inventory - Orders"
         PurchaseLine.TestField("Qty. to Invoice", PurchaseLine."Quantity Received");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SortUnitPriceInSalesOrderLineAndGetUpdatedUnitPrice(SalesHeader: Record "Sales Header"): Decimal
     var
         SalesOrder: TestPage "Sales Order";
@@ -4185,7 +4185,7 @@ codeunit 137400 "SCM Inventory - Orders"
         SalesList.OK().Invoke();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure GetSalesPriceHandler(var GetSalesPrice: TestPage "Get Sales Price") // V15
@@ -4281,7 +4281,7 @@ codeunit 137400 "SCM Inventory - Orders"
         SelectItemTemplList.OK().Invoke();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure GetLastUnitPriceHandler(var GetSalesPrice: TestPage "Get Sales Price")
