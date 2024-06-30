@@ -76,7 +76,7 @@ codeunit 5334 "CRM Setup Defaults"
         if PriceCalculationMgt.IsExtendedPriceCalculationEnabled() then begin
             ResetPriceListHeaderPricelevelMapping('PLHEADER-PRICE', EnqueueJobQueEntries);
             ResetPriceListLineProductPricelevelMapping('PLLINE-PRODPRICE', EnqueueJobQueEntries);
-#if not CLEAN23
+#if not CLEAN25
         end else begin
             ResetCustomerPriceGroupPricelevelMapping('CUSTPRCGRP-PRICE', EnqueueJobQueEntries);
             ResetSalesPriceProductPricelevelMapping('SALESPRC-PRODPRICE', EnqueueJobQueEntries);
@@ -1433,7 +1433,7 @@ codeunit 5334 "CRM Setup Defaults"
         end;
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '18.0')]
     [Scope('OnPrem')]
     procedure ResetCustomerPriceGroupPricelevelMapping(IntegrationTableMappingName: Code[20]; EnqueueJobQueEntry: Boolean)
@@ -2246,7 +2246,7 @@ codeunit 5334 "CRM Setup Defaults"
                 exit(DATABASE::"CRM Invoice");
             DATABASE::"Sales Invoice Line":
                 exit(DATABASE::"CRM Invoicedetail");
-#if not CLEAN23
+#if not CLEAN25
             DATABASE::"Sales Price",
 #endif
             DATABASE::"Price List Line":
@@ -2291,7 +2291,7 @@ codeunit 5334 "CRM Setup Defaults"
           DATABASE::"Price List Line",
           DATABASE::"Sales Invoice Header",
           DATABASE::"Sales Invoice Line",
-#if not CLEAN23
+#if not CLEAN25
           DATABASE::"Sales Price",
 #endif
           DATABASE::"Unit of Measure",
@@ -2717,7 +2717,7 @@ codeunit 5334 "CRM Setup Defaults"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '19.0')]
     [IntegrationEvent(false, false)]
     local procedure OnResetCustomerPriceGroupPricelevelMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])
@@ -2780,7 +2780,7 @@ codeunit 5334 "CRM Setup Defaults"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '19.0')]
     [IntegrationEvent(false, false)]
     local procedure OnResetSalesPriceProductPricelevelMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])

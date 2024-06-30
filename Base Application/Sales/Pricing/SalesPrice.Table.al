@@ -1,20 +1,20 @@
 ﻿namespace Microsoft.Sales.Pricing;
 
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.CRM.Campaign;
 #endif
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Inventory.Item;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Sales.Customer;
 #endif
 
 table 7002 "Sales Price"
 {
     Caption = 'Sales Price';
-#if not CLEAN23
+#if not CLEAN25
     LookupPageID = "Sales Prices";
     ObsoleteState = Pending;
     ObsoleteTag = '16.0';
@@ -33,7 +33,7 @@ table 7002 "Sales Price"
             NotBlank = true;
             TableRelation = Item;
 
-#if not CLEAN23
+#if not CLEAN25
             trigger OnValidate()
             var
                 IsHandled: Boolean;
@@ -62,7 +62,7 @@ table 7002 "Sales Price"
         field(2; "Sales Code"; Code[20])
         {
             Caption = 'Sales Code';
-#if not CLEAN23
+#if not CLEAN25
             TableRelation = if ("Sales Type" = const("Customer Price Group")) "Customer Price Group"
             else
             if ("Sales Type" = const(Customer)) Customer
@@ -155,7 +155,7 @@ table 7002 "Sales Price"
         {
             Caption = 'Sales Type';
 
-#if not CLEAN23
+#if not CLEAN25
             trigger OnValidate()
             begin
                 if "Sales Type" <> xRec."Sales Type" then begin
@@ -214,7 +214,7 @@ table 7002 "Sales Price"
 
             trigger OnValidate()
             begin
-#if not CLEAN23
+#if not CLEAN25
                 UpdateUnitPrice();
 #endif
             end;
@@ -251,7 +251,7 @@ table 7002 "Sales Price"
 
             trigger OnValidate()
             begin
-#if not CLEAN23
+#if not CLEAN25
                 UpdateUnitPrice();
 #endif
             end;
@@ -265,7 +265,7 @@ table 7002 "Sales Price"
 
             trigger OnValidate()
             begin
-#if not CLEAN23
+#if not CLEAN25
                 UpdateUnitPrice();
 #endif
             end;
@@ -318,7 +318,7 @@ table 7002 "Sales Price"
     end;
 
     var
-#if not CLEAN23
+#if not CLEAN25
         CustPriceGr: Record "Customer Price Group";
         Cust: Record Customer;
         Campaign: Record Campaign;
@@ -337,12 +337,12 @@ table 7002 "Sales Price"
 #pragma warning restore AA0470
 #pragma warning restore AA0074
 
-#if not CLEAN23
+#if not CLEAN25
     protected var
         Item: Record Item;
 #endif
 
-#if not CLEAN23
+#if not CLEAN25
     [Scope('OnPrem')]
     [Obsolete('Function is removed as implementation is replaced by (V16) of price calculation: table Price List Line', '22.0')]
     procedure UpdateUnitPrice()
@@ -375,7 +375,7 @@ table 7002 "Sales Price"
     end;
 #endif
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure UpdateValuesFromItem()
     begin
         if Item.Get("Item No.") then begin

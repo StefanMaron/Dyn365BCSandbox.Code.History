@@ -27,7 +27,7 @@ codeunit 136305 "Job Journal"
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryMarketing: Codeunit "Library - Marketing";
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
         FieldCodeError: Label '%1 cannot be specified when %2 is %3.';
         TestForBlankValuesPassed: Label 'It was expected a known failure for ''%1'', since it contains invalid blank field values.';
@@ -226,7 +226,7 @@ codeunit 136305 "Job Journal"
           JobJournalLine.FieldCaption("Unit of Measure Code"));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure UnitCostFactorOnJobGLJournalLine()
@@ -305,7 +305,7 @@ codeunit 136305 "Job Journal"
         DeleteJobJournalTemplate(JobJournalLine."Journal Template Name");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure JobItemPriceCreation()
@@ -511,7 +511,7 @@ codeunit 136305 "Job Journal"
         VerifyPostingGroupOnJobLedgerEntry(DocumentNo, JobTask."Job No.", JobPlanningLine."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure JobResourcePricesWithTypeResource()
@@ -769,7 +769,7 @@ codeunit 136305 "Job Journal"
         ChangeItemQuantityAndVerifyNoStockWarning(JobJournalLine);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure JobResourcePricesWithBlankTypeGroupResource()
@@ -1551,7 +1551,7 @@ codeunit 136305 "Job Journal"
         VerifyDifferentCostsInJobLedgerEntry(GenJournalLine, Amount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('JobJournalTemplateListPageHandler,JobCalcRemainingUsageRequestPageHandler,MessageHandler')]
     [Scope('OnPrem')]
@@ -2978,7 +2978,7 @@ codeunit 136305 "Job Journal"
         NoSeriesCode := '';
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateAndUpdateJobGLAccountPrice(var JobGLAccountPrice: Record "Job G/L Account Price"; JobTask: Record "Job Task")
     begin
         LibraryJob.CreateJobGLAccountPrice(
@@ -3137,7 +3137,7 @@ codeunit 136305 "Job Journal"
         exit(Resource."No.");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateJobItemPrice(var JobItemPrice: Record "Job Item Price")
     var
         Item: Record Item;
@@ -3371,7 +3371,7 @@ codeunit 136305 "Job Journal"
         ResourceUnitOfMeasure.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateJobResourcePrice(var JobResourcePrice: Record "Job Resource Price"; Type: Option; No: Code[20])
     var
         JobTask: Record "Job Task";
@@ -3470,7 +3470,7 @@ codeunit 136305 "Job Journal"
         SalesLine.FindFirst();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure ModifyJobItemPriceForUnitPrice(var JobItemPrice: Record "Job Item Price"; UnitPrice: Decimal)
     begin
         JobItemPrice.Validate("Unit Price", UnitPrice);
@@ -3560,7 +3560,7 @@ codeunit 136305 "Job Journal"
         JobPlanningLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure UpdateLineDiscountPctOnJobGLAccountPrice(var JobGLAccountPrice: Record "Job G/L Account Price")
     begin
         JobGLAccountPrice.Validate("Line Discount %", LibraryRandom.RandDec(10, 2));  // Taking Random value for Line Discount Percent.
@@ -3585,7 +3585,7 @@ codeunit 136305 "Job Journal"
         SourceCodeSetup.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure UpdateUnitCostFactorOnJobGLAccountPrice(var JobGLAccountPrice: Record "Job G/L Account Price")
     begin
         JobGLAccountPrice.Validate("Unit Cost Factor", LibraryRandom.RandDec(10, 2));  // Taking Random value for Unit Cost Factor.
