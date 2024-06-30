@@ -10,7 +10,7 @@ using Microsoft.Foundation.Enums;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -296,7 +296,7 @@ page 9237 "Resource Capacity Matrix"
             {
                 Caption = '&Prices';
                 Image = Price;
-#if not CLEAN23
+#if not CLEAN25
                 action(Costs)
                 {
                     ApplicationArea = Jobs;

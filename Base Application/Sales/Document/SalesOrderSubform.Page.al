@@ -1131,7 +1131,7 @@ page 46 "Sales Order Subform"
                 {
                     Caption = 'F&unctions';
                     Image = "Action";
-#if not CLEAN23
+#if not CLEAN25
                     action(GetPrice)
                     {
                         AccessByPermission = TableData "Sales Price" = R;

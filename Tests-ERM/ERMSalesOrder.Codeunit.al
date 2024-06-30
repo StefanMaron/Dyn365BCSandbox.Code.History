@@ -25,7 +25,7 @@ codeunit 134378 "ERM Sales Order"
         LibraryResource: Codeunit "Library - Resource";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
         LibraryApplicationArea: Codeunit "Library - Application Area";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         WorkflowSetup: Codeunit "Workflow Setup";
@@ -261,7 +261,7 @@ codeunit 134378 "ERM Sales Order"
         LibrarySales.SetStockoutWarning(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnSalesOrder()
@@ -1243,7 +1243,7 @@ codeunit 134378 "ERM Sales Order"
         VerifyValueEntry(SalesInvoiceHeader."No.", SalesHeader.Amount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnSalesInvoice()
@@ -6251,7 +6251,7 @@ codeunit 134378 "ERM Sales Order"
         CustInvoiceDisc.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscount(var SalesLineDiscount: Record "Sales Line Discount")
     var
         Item: Record Item;

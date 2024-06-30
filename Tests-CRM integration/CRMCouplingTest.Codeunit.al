@@ -728,7 +728,7 @@ codeunit 139182 "CRM Coupling Test"
         CRMCouplingRecord.OK().Invoke();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('SetCouplingRecordPageHandler,SyncStartedNotificationHandler,RecallNotificationHandler')]
     [Scope('OnPrem')]

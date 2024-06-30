@@ -29,7 +29,7 @@
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryJob: Codeunit "Library - Job";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         LibraryTemplates: Codeunit "Library - Templates";
@@ -168,7 +168,7 @@
         PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type");
         PurchaseLineCount := PurchaseLine.Count();
         DocumentNo := NoSeries.PeekNextNo(PurchaseHeader."Receiving No. Series");
-        
+
         // Exercise: Post Purchase Invoice.
         LibraryLowerPermissions.SetPurchDocsPost();
         PostedInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
@@ -315,7 +315,7 @@
         WarehouseEmployee.Delete();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnPurchaseInvoice()
@@ -1220,7 +1220,7 @@
         VerifyGLEntry(DocumentNo, PurchInvHeader."Amount Including VAT");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchInvoiceWithoutPriceInclVAT()
@@ -1503,7 +1503,7 @@
         Assert.AreEqual(0, PurchaseLine."Outstanding Amt. Ex. VAT (LCY)", 'should be zero');
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure UpdateUnitCostWithPurchPriceWhenChangeVendorNo()
@@ -3450,7 +3450,7 @@
               PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItem(), LibraryRandom.RandInt(10));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchInvWithPricesIncludingVAT(var PurchaseHeader: Record "Purchase Header"; PurchaseLineDiscount: Record "Purchase Line Discount"; PricesIncludingVAT: Boolean)
     var
         PurchaseLine: Record "Purchase Line";
@@ -3935,7 +3935,7 @@
         exit(VendorInvoiceDisc.Code);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount")
     var
         GeneralPostingSetup: Record "General Posting Setup";
@@ -4571,7 +4571,7 @@
         Reply := false;
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Scope('OnPrem')]
     procedure PostItemAndVerifyValueEntries(Item: Record Item; PurchaseLineDiscount: Record "Purchase Line Discount")
     var
