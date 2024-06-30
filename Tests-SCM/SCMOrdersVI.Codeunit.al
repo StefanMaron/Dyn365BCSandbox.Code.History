@@ -44,7 +44,7 @@
         UndoServiceShipmentQst: Label 'Do you want to undo the selected shipment line(s)?';
         RecordMustBeDeletedTxt: Label 'Order must be deleted.';
         ExpectedReceiptDateErr: Label 'The change leads to a date conflict with existing reservations.';
-#if not CLEAN23
+#if not CLEAN25
         NegativeValueErr: Label 'The value must be greater than or equal to 0.';
         StartingDateErr: Label 'Starting Date cannot be after Ending Date';
 #endif
@@ -411,7 +411,7 @@
         Assert.ExpectedError(ExpectedReceiptDateErr);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchasePriceNegativeQuantityError()
@@ -3884,7 +3884,7 @@
         SalesLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateVendorAndOpenPurchaseLineDiscountsPageFromVendorCard(var PurchaseLineDiscounts: TestPage "Purchase Line Discounts")
     var
         Vendor: Record Vendor;

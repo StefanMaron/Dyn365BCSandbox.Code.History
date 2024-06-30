@@ -9,7 +9,7 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Journal;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -450,7 +450,7 @@ table 207 "Res. Journal Line"
         OnAfterGetLineWithPrice(LineWithPrice);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     procedure AfterFindResUnitCost(var ResourceCost: Record "Resource Cost")
     begin
@@ -767,7 +767,7 @@ table 207 "Res. Journal Line"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     procedure AfterInitResourceCost(var ResourceCost: Record "Resource Cost")
     begin
@@ -858,7 +858,7 @@ table 207 "Res. Journal Line"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '19.0')]
     [IntegrationEvent(true, false)]
     local procedure OnBeforeFindResPrice(ResJournalLine: Record "Res. Journal Line"; var ResourcePrice: Record "Resource Price")
@@ -891,7 +891,7 @@ table 207 "Res. Journal Line"
     begin
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitResourceCost(var ResJournalLine: Record "Res. Journal Line"; var ResourceCost: Record "Resource Cost")

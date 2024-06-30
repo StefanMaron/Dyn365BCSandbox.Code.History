@@ -112,7 +112,7 @@ using Microsoft.Purchases.Setup;
 using Microsoft.Warehouse.Activity.History;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Projects.Resources.Journal;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using Microsoft.Projects.Resources.Resource;
@@ -506,7 +506,7 @@ permissionset 191 "D365 SETUP"
                   tabledata "Requisition Wksh. Name" = RIMD,
                   tabledata "Res. Journal Line" = D,
                   tabledata "Reservation Entry" = RimD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Resource Cost" = D,
                   tabledata "Resource Price" = D,
 #endif
@@ -530,12 +530,12 @@ permissionset 191 "D365 SETUP"
                   tabledata "Sales Invoice Line" = Rd,
                   tabledata "Sales Line" = RmD,
                   tabledata "Sales Line Archive" = RmD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Line Discount" = IM,
 #endif
                   tabledata "Sales Planning Line" = d,
                   tabledata "Sales Prepayment %" = RIMD,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Price Worksheet" = RIMD,
 #endif
                   tabledata "Sales Shipment Header" = RD,

@@ -413,7 +413,7 @@ page 5934 "Service Invoice Subform"
                         Rec.PickPrice();
                     end;
                 }
-#if not CLEAN23
+#if not CLEAN25
                 action("Get Li&ne Discount")
                 {
                     AccessByPermission = TableData "Sales Line Discount" = R;

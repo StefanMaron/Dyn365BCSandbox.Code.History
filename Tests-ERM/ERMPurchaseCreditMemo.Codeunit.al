@@ -11,7 +11,7 @@ codeunit 134330 "ERM Purchase Credit Memo"
 
     var
         Assert: Codeunit Assert;
-#if not CLEAN23
+#if not CLEAN25
         LibraryCosting: Codeunit "Library - Costing";
 #endif
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
@@ -23,7 +23,7 @@ codeunit 134330 "ERM Purchase Credit Memo"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryRandom: Codeunit "Library - Random";
-#if not CLEAN23
+#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
         DocumentNo2: Code[20];
@@ -270,7 +270,7 @@ codeunit 134330 "ERM Purchase Credit Memo"
         Location.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountPurchaseCreditMemo()
@@ -1125,7 +1125,7 @@ codeunit 134330 "ERM Purchase Credit Memo"
         // Verification done in handler PostedPurchaseDocumentLinesWithSpecificCrMemoValidationHandler
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PostedPurchaseDocumentLinesHandler')]
     [Scope('OnPrem')]
@@ -1270,7 +1270,7 @@ codeunit 134330 "ERM Purchase Credit Memo"
         Assert.AreEqual('Purchase Credit Memo', PurchaseHeader.GetFullDocTypeTxt(), 'The expected full document type is incorrect');
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [HandlerFunctions('PostedPurchaseDocumentLinesHandler')]
     [Scope('OnPrem')]
@@ -1579,7 +1579,7 @@ codeunit 134330 "ERM Purchase Credit Memo"
         PurchaseLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure SetupLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount")
     var
         Item: Record Item;

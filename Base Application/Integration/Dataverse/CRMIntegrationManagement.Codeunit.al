@@ -2361,7 +2361,7 @@ codeunit 5330 "CRM Integration Management"
                     Database::Resource:
                         if IntegrationTableMapping."Integration Table ID" = Database::"CRM Product" then
                             CRMSetupDefaults.ResetResourceProductMapping(IntegrationTableMapping.Name, EnqueueJobQueEntries);
-#if not CLEAN23
+#if not CLEAN25
                     Database::"Customer Price Group":
                         CRMSetupDefaults.ResetCustomerPriceGroupPricelevelMapping(IntegrationTableMapping.Name, EnqueueJobQueEntries);
 #endif

@@ -185,7 +185,7 @@ permissionset 9221 "Customer - Edit"
                   tabledata "Sales Invoice Header" = rm,
                   tabledata "Sales Invoice Line" = rm,
                   tabledata "Sales Line" = Rm,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Line Discount" = Rd,
                   tabledata "Sales Price" = Rid,
 #endif

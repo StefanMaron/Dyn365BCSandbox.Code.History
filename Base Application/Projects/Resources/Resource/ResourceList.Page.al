@@ -11,7 +11,7 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Reports;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN23
+#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
 #endif
 using System.Text;
@@ -571,7 +571,7 @@ page 77 "Resource List"
             {
                 Caption = '&Prices';
                 Image = Price;
-#if not CLEAN23
+#if not CLEAN25
                 action(Costs)
                 {
                     ApplicationArea = Jobs;
@@ -708,7 +708,7 @@ page 77 "Resource List"
                 RunObject = Report "Cost Breakdown";
                 ToolTip = 'View the direct unit costs and the total direct costs for each resource. Only usage postings are considered in this report. Resource usage can be posted in the resource journal or the project journal.';
             }
-#if not CLEAN23
+#if not CLEAN25
             action("Resource - Price List")
             {
                 ApplicationArea = Jobs;
@@ -820,7 +820,7 @@ page 77 "Resource List"
                 actionref("Units of Measure_Promoted"; "Units of Measure")
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Costs_Promoted; Costs)
                 {
                     ObsoleteState = Pending;
@@ -828,7 +828,7 @@ page 77 "Resource List"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN23
+#if not CLEAN25
                 actionref(Prices_Promoted; Prices)
                 {
                     ObsoleteState = Pending;
@@ -859,7 +859,7 @@ page 77 "Resource List"
                 actionref("Resource - Cost Breakdown_Promoted"; "Resource - Cost Breakdown")
                 {
                 }
-#if not CLEAN23
+#if not CLEAN25
                 actionref("Resource - Price List_Promoted"; "Resource - Price List")
                 {
                     ObsoleteState = Pending;
