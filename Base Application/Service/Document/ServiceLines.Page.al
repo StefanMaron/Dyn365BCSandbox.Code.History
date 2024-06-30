@@ -1119,7 +1119,7 @@ page 5905 "Service Lines"
                         end;
                     end;
                 }
-#if not CLEAN23
+#if not CLEAN25
                 action("Get Li&ne Discount")
                 {
                     AccessByPermission = TableData "Sales Line Discount" = R;
