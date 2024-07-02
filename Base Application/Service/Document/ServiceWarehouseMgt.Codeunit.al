@@ -332,6 +332,15 @@ codeunit 5995 "Service Warehouse Mgt."
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse. Management", 'OnAfterGetWhseRqstSourceDocument', '', false, false)]
+    local procedure OnAfterGetWhseRqstSourceDocument(WhseJournalSourceDocument: Enum "Warehouse Journal Source Document"; var SourceDocument: Enum "Warehouse Request Source Document")
+    begin
+        case WhseJournalSourceDocument of
+            WhseJournalSourceDocument::"Serv. Order":
+                SourceDocument := "Warehouse Request Source Document"::"Service Order";
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Report, Report::"Create Pick", 'OnCheckSourceDocument', '', false, false)]
     local procedure CreatePickOnCheckSourceDocument(var PickWhseWkshLine: Record "Whse. Worksheet Line")
     var
@@ -492,5 +501,29 @@ codeunit 5995 "Service Warehouse Mgt."
     local procedure OnAfterIsSalesShipmentLine(UndoType: Integer; var IsShipment: Boolean)
     begin
         IsShipment := IsShipment or (UndoType = Database::"Service Shipment Line");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Warehouse Source Filter", 'OnAfterCheckType', '', false, false)]
+    local procedure OnAfterCheckType(var WarehouseSourceFilter: Record "Warehouse Source Filter")
+    begin
+        if WarehouseSourceFilter.Type = WarehouseSourceFilter.Type::Inbound then
+            WarehouseSourceFilter."Service Orders" := false;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Warehouse Source Filter", 'OnSetFiltersOnAfterSetSourceFilters', '', false, false)]
+    local procedure OnSetFiltersOnAfterSetSourceFilters(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var WarehouseRequest: Record "Warehouse Request")
+    begin
+        if WarehouseSourceFilter."Service Orders" then begin
+            WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Service Order";
+            AddFilter(WarehouseSourceFilter."Source Document", Format(WarehouseRequest."Source Document"));
+        end;
+    end;
+
+    local procedure AddFilter(var CodeField: Code[250]; NewFilter: Text[100])
+    begin
+        if CodeField = '' then
+            CodeField := NewFilter
+        else
+            CodeField := CodeField + '|' + NewFilter;
     end;
 }
