@@ -255,9 +255,7 @@ report 5754 "Create Pick"
         Cust: Record Customer;
         LocationCode: Code[10];
         AssignedID: Code[50];
-        FirstPickNo: Code[20];
         FirstSetPickNo: Code[20];
-        LastPickNo: Code[20];
         MaxNoOfLines: Integer;
         TempNo: Integer;
 #pragma warning disable AA0074
@@ -281,6 +279,8 @@ report 5754 "Create Pick"
     protected var
         PickWhseWkshLine: Record "Whse. Worksheet Line";
         CreatePick: Codeunit "Create Pick";
+        FirstPickNo: Code[20];
+        LastPickNo: Code[20];
         PerDestination: Boolean;
         PerItem: Boolean;
         PerZone: Boolean;
