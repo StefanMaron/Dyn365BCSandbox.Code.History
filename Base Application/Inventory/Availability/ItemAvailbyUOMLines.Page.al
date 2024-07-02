@@ -135,23 +135,6 @@ page 5417 "Item Avail. by UOM Lines"
                     end;
                 }
 #pragma warning disable AA0100
-                field("Item.""Qty. on Service Order"""; AdjustQty(Item."Qty. on Service Order"))
-#pragma warning restore AA0100
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Qty. on Service Order';
-                    DecimalPlaces = 0 : 5;
-                    ToolTip = 'Specifies how many units of the item are allocated to service orders, meaning listed on outstanding service order lines.';
-                    Visible = false;
-
-                    trigger OnDrillDown()
-                    var
-                        ServAvailabilityMgt: Codeunit Microsoft.Service.Document."Serv. Availability Mgt.";
-                    begin
-                        ServAvailabilityMgt.ShowServiceLines(Item);
-                    end;
-                }
-#pragma warning disable AA0100
                 field("Item.""Qty. on Job Order"""; AdjustQty(Item."Qty. on Job Order"))
 #pragma warning restore AA0100
                 {
@@ -368,7 +351,7 @@ page 5417 "Item Avail. by UOM Lines"
         ScheduledRcpt: Decimal;
         ProjAvailableBalance: Decimal;
 
-    local procedure AdjustQty(QtyInUoM: Decimal): Decimal;
+    protected procedure AdjustQty(QtyInUoM: Decimal): Decimal;
     begin
         if Rec."Qty. per Unit of Measure" <> 0 then
             exit(QtyInUoM / Rec."Qty. per Unit of Measure");
