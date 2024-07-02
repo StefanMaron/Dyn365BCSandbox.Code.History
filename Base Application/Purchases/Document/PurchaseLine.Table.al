@@ -7997,6 +7997,7 @@ table 39 "Purchase Line"
                 "Qty. to Receive (Base)" := 0;
             end;
         end;
+        OnAfterClearQtyIfBlank(Rec, xRec, PurchSetup);
     end;
 
     /// <summary>
@@ -11709,6 +11710,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateDimensionsFromJobTask(var PurchaseLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterClearQtyIfBlank(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; PurchasePayablesSetup: Record "Purchases & Payables Setup")
     begin
     end;
 }
