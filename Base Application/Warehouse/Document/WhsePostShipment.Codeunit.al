@@ -159,7 +159,7 @@ codeunit 5763 "Whse.-Post Shipment"
 #if not CLEAN25
                 OnBeforePostSourceDocument(WhseShptLine, PurchHeader, SalesHeader, TransHeader, ServiceHeader, WhsePostParameters."Suppress Commit");
 #endif
-                PostSourceDocument(WhseShptLine, GlobalSourceHeader);            
+                PostSourceDocument(WhseShptLine, GlobalSourceHeader);
                 WhseJnlRegisterLine.LockIfLegacyPosting();
 
                 if WhseShptLine.FindLast() then;
@@ -437,8 +437,7 @@ codeunit 5763 "Whse.-Post Shipment"
         case PostedWhseShipmentLine."Source Document" of
             PostedWhseShipmentLine."Source Document"::"Purchase Order":
                 PostedWhseShipmentLine."Posted Source Document" := PostedWhseShipmentLine."Posted Source Document"::"Posted Receipt";
-            PostedWhseShipmentLine."Source Document"::"Service Order",
-          PostedWhseShipmentLine."Source Document"::"Sales Order":
+            PostedWhseShipmentLine."Source Document"::"Sales Order":
                 PostedWhseShipmentLine."Posted Source Document" := PostedWhseShipmentLine."Posted Source Document"::"Posted Shipment";
             PostedWhseShipmentLine."Source Document"::"Purchase Return Order":
                 PostedWhseShipmentLine."Posted Source Document" := PostedWhseShipmentLine."Posted Source Document"::"Posted Return Shipment";
