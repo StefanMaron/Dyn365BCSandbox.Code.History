@@ -346,8 +346,6 @@ table 5766 "Warehouse Activity Header"
                         end;
                     "Source Document"::"Job Usage":
                         "Source Type" := Database::Job;
-                    "Source Document"::"Service Order":
-                        Error(NotSupportedSourceDocumentTypeErr, "Source Document"::"Service Order");
                 end;
 
                 if "Source Document" = "Source Document"::" " then begin
@@ -488,7 +486,6 @@ table 5766 "Warehouse Activity Header"
         Text002: Label 'You cannot change %1 because one or more lines exist.';
 #pragma warning restore AA0470
 #pragma warning restore AA0074
-        NotSupportedSourceDocumentTypeErr: Label 'Source Document type %1 is not supported.', Comment = '%1 - source document type, like Sales Order.';
 
     procedure AssistEdit(OldWhseActivHeader: Record "Warehouse Activity Header"): Boolean
     begin
