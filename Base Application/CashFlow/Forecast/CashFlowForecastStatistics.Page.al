@@ -49,17 +49,6 @@ page 868 "Cash Flow Forecast Statistics"
                         Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Sales Orders");
                     end;
                 }
-                field(ServiceOrders; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Service Orders"))
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Service Orders';
-                    ToolTip = 'Specifies amounts related to service orders.';
-
-                    trigger OnDrillDown()
-                    begin
-                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Service Orders");
-                    end;
-                }
                 field(SalesofFixedAssets; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Fixed Assets Disposal"))
                 {
                     ApplicationArea = FixedAssets;
