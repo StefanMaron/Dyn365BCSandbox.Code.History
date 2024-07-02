@@ -81,7 +81,6 @@ page 99000902 "Item Availability Line List"
             Item.CalcFields(
               "Qty. on Purch. Order",
               "Qty. on Sales Order",
-              "Qty. on Service Order",
               "Qty. on Job Order",
               "Net Change",
               "Scheduled Receipt (Qty.)",

@@ -56,8 +56,9 @@ codeunit 353 "Item Availability Forms Mgt"
             TransOrdReceiptQty := Item."Trans. Ord. Receipt (Qty.)";
         end;
         GrossRequirement :=
-            Item."Qty. on Sales Order" + Item."Qty. on Service Order" + Item."Qty. on Job Order" + Item."Qty. on Component Lines" +
+            Item."Qty. on Sales Order" + Item."Qty. on Job Order" + Item."Qty. on Component Lines" +
             TransOrdShipmentQty + Item."Planning Issues (Qty.)" + Item."Qty. on Asm. Component" + Item."Qty. on Purch. Return";
+        OnCalculateNeedOnAfterCalcGrossRequirement(Item, GrossRequirement);
         PlannedOrderReceipt :=
             Item."Planned Order Receipt (Qty.)" + Item."Purch. Req. Receipt (Qty.)";
         ScheduledReceipt :=
@@ -1051,6 +1052,11 @@ codeunit 353 "Item Availability Forms Mgt"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowItemAvailabilityByVariant(var Item: Record Item; FieldCaption: Text; OldVariant: Code[10]; var NewVariant: Code[10]; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalculateNeedOnAfterCalcGrossRequirement(var Item: Record Item; var GrossRequirement: Decimal)
     begin
     end;
 
