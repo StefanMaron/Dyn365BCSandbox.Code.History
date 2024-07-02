@@ -51,8 +51,6 @@ codeunit 5775 "Whse. Management"
                 SourceDocument := "Warehouse Request Source Document"::"Prod. Consumption";
             WhseJournalSourceDocument::"Item Jnl.":
                 SourceDocument := "Warehouse Request Source Document"::"Prod. Output";
-            WhseJournalSourceDocument::"Serv. Order":
-                SourceDocument := "Warehouse Request Source Document"::"Service Order";
             WhseJournalSourceDocument::"Assembly Order":
                 SourceDocument := "Warehouse Request Source Document"::"Assembly Order";
             WhseJournalSourceDocument::"Assembly Consumption":
@@ -62,6 +60,8 @@ codeunit 5775 "Whse. Management"
             else
                 SourceDocument := WhseJournalSourceDocument;
         end;
+
+        OnAfterGetWhseRqstSourceDocument(WhseJournalSourceDocument, SourceDocument);
     end;
 
     procedure GetSourceDocumentType(SourceType: Integer; SourceSubtype: Integer): Enum "Warehouse Journal Source Document"
@@ -301,6 +301,11 @@ codeunit 5775 "Whse. Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetJournalSourceDocument(SourceType: Integer; SourceSubtype: Integer; var SourceDocument: Enum "Warehouse Journal Source Document"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetWhseRqstSourceDocument(WhseJournalSourceDocument: Enum "Warehouse Journal Source Document"; var SourceDocument: Enum "Warehouse Request Source Document")
     begin
     end;
 }
