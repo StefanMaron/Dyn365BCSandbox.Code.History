@@ -12,16 +12,18 @@ codeunit 7293 "Csv Handler" implements "File Handler"
     Access = Internal;
 
     var
-        CsvFileHandlerResult: Codeunit "File Handler Result";
         CsvFileStream: InStream;
         isIntialized: Boolean;
         FirstLineAsHash: Text;
         ConcatTwoLinesLbl: Label '%1\n%2', Comment = '%1 = first line, %2 = second line.';
         InvalidCsvDataErr: Label 'Cannot process input data. Either the data is not in a valid CSV format or data is missing.';
+        HandlerNotInitializedErr: Label 'Handler not initialized';
+        InvalidFileConfigurationErr: Label 'Invalid File Configuration';
 
-    internal procedure Process(var FileInputStream: InStream): Codeunit "File Handler Result"
+    internal procedure Process(var FileInputStream: InStream): Variant
     var
         MappingCacheManagement: Codeunit "Mapping Cache Management";
+        FileHandlerResult: Codeunit "File Handler Result";
         CsvInput: Text;
         FirstLine: Text;
         SavedMappingAsText: Text;
@@ -35,21 +37,22 @@ codeunit 7293 "Csv Handler" implements "File Handler"
 
         if MappingCacheManagement.GetMapping(FirstLineAsHash, SavedMappingAsText) then begin
             JsonObject.ReadFrom(SavedMappingAsText);
-            CsvFileHandlerResult.FromJson(JsonObject);
+            FileHandlerResult.FromJson(JsonObject);
             isIntialized := true;
-            exit(CsvFileHandlerResult);
+            exit(FileHandlerResult);
         end;
 
         // Else get LLM to generate mapping
         CsvInput := ReadLines(CsvFileStream, 11, true); // Read first 11 lines assuming first line is header line
-        GenerateCsvMappingSuggestionFromAttachment(CsvInput);
+        FileHandlerResult := GenerateCsvMappingSuggestionFromAttachment(CsvInput);
         isIntialized := true;
-        exit(CsvFileHandlerResult);
+        exit(FileHandlerResult);
     end;
 
-    internal procedure GetFileData(FileHandlerResult: Codeunit "File Handler Result"): List of [List of [Text]]
+    internal procedure GetFileData(FileHandlerResultVariant: Variant): List of [List of [Text]]
     var
         TempCSVBuffer: Record "CSV Buffer" temporary;
+        FileHandlerResult: Codeunit "File Handler Result";
         ColumnSeparatorChar: Char;
         Row: List of [Text];
         AllRows: List of [List of [Text]];
@@ -57,40 +60,52 @@ codeunit 7293 "Csv Handler" implements "File Handler"
         j: Integer;
     begin
         if not isIntialized then
-            Error('Handler not initialized');
-        begin
-            CsvFileStream.ResetPosition();
+            Error(HandlerNotInitializedErr);
 
-            ColumnSeparatorChar := CsvFileHandlerResult.GetColumnDelimiter() [1];
+        if not FileHandlerResultVariant.IsCodeunit() then
+            Error(InvalidFileConfigurationErr);
 
-            TempCSVBuffer.InitializeReaderFromStream(CsvFileStream, ColumnSeparatorChar);
+        FileHandlerResult := FileHandlerResultVariant;
 
-            if TempCSVBuffer.ReadLines(0) then begin // reads all lines
-                                                     // Assuming the first line is header.
-                                                     // Rows
-                for i := 1 to TempCSVBuffer.GetNumberOfLines() do begin
-                    Clear(Row);
+        CsvFileStream.ResetPosition();
 
-                    // Columns
-                    for j := 1 to TempCSVBuffer.GetNumberOfColumns() do
-                        Row.Add(TempCSVBuffer.GetValue(i, j));
-                    AllRows.Add(Row);
-                end;
+        ColumnSeparatorChar := FileHandlerResult.GetColumnDelimiter() [1];
 
-                if AllRows.Count <= 1 then
-                    Error(InvalidCsvDataErr);
-                exit(AllRows);
+        TempCSVBuffer.InitializeReaderFromStream(CsvFileStream, ColumnSeparatorChar);
+
+        if TempCSVBuffer.ReadLines(0) then begin // reads all lines
+                                                 // Assuming the first line is header.
+                                                 // Rows
+            for i := 1 to TempCSVBuffer.GetNumberOfLines() do begin
+                Clear(Row);
+
+                // Columns
+                for j := 1 to TempCSVBuffer.GetNumberOfColumns() do
+                    Row.Add(TempCSVBuffer.GetValue(i, j));
+                AllRows.Add(Row);
             end;
-        end;
 
+            if AllRows.Count <= 1 then
+                Error(InvalidCsvDataErr);
+            exit(AllRows);
+        end;
     end;
 
-    internal procedure Finalize(FileHandlerResult: Codeunit "File Handler Result")
+    internal procedure Finalize(FileHandlerResultVariant: Variant)
     var
         MappingCacheManagement: Codeunit "Mapping Cache Management";
+        FileHandlerResult: Codeunit "File Handler Result";
         JsonObject: JsonObject;
         JsonAsText: Text;
     begin
+        if not isIntialized then
+            Error(HandlerNotInitializedErr);
+
+        if not FileHandlerResultVariant.IsCodeunit() then
+            Error(InvalidFileConfigurationErr);
+
+        FileHandlerResult := FileHandlerResultVariant;
+
         if not FileHandlerResult.GetContainsHeaderRow() then
             exit;
         JsonObject := FileHandlerResult.ToJson();
@@ -121,15 +136,17 @@ codeunit 7293 "Csv Handler" implements "File Handler"
         exit(Lines);
     end;
 
-    local procedure GenerateCsvMappingSuggestionFromAttachment(CsvData: Text)
+    local procedure GenerateCsvMappingSuggestionFromAttachment(CsvData: Text): Codeunit "File Handler Result"
     var
         Prompt: Codeunit "SLS Prompts";
         LookupItemsFromCsvFunction: Codeunit "Lookup Items From Csv Function";
         SalesLineAISuggestionImpl: Codeunit "Sales Lines Suggestions Impl.";
+        FileHandlerResult: Codeunit "File Handler Result";
         UserInput: Text;
         CompletionText: Text;
     begin
         UserInput := StrSubstNo(Prompt.GetParsingCsvTemplateUserInputPrompt(), CsvData);
-        CsvFileHandlerResult := SalesLineAISuggestionImpl.AICall(Prompt.GetAttachmentSystemPrompt(), UserInput, LookupItemsFromCsvFunction, CompletionText);
+        FileHandlerResult := SalesLineAISuggestionImpl.AICall(Prompt.GetAttachmentSystemPrompt(), UserInput, LookupItemsFromCsvFunction, CompletionText);
+        exit(FileHandlerResult);
     end;
 }

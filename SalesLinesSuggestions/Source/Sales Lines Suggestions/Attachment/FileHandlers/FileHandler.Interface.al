@@ -16,18 +16,18 @@ interface "File Handler"
     /// </summary>
     /// <param name="FileInputStream">InStream pointing to the file content.</param>
     /// <returns>Result of the file processing.</returns>
-    procedure Process(var FileInputStream: InStream): Codeunit "File Handler Result"
+    procedure Process(var FileInputStream: InStream): Variant
 
     /// <summary>
     /// Gets the data as a table from the file based on the file handler result.
     /// </summary>
     /// <param name="FileHandlerResult">Result of the file processing.</param>
     /// <returns>List of rows where each row is a list of columns.</returns>
-    procedure GetFileData(FileHandlerResult: Codeunit "File Handler Result"): List of [List of [Text]]
+    procedure GetFileData(FileHandlerResultVariant: Variant): List of [List of [Text]]
 
     /// <summary>
     /// Finalizes the file handler.
     /// </summary>
     /// <param name="FileHandlerResult">Result of the file processing.</param>
-    procedure Finalize(FileHandlerResult: Codeunit "File Handler Result")
+    procedure Finalize(FileHandlerResultVariant: Variant)
 }

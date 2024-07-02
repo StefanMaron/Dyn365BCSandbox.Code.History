@@ -41,7 +41,7 @@ table 7277 "Attachment Mapping"
                     exit;
 
                 if Rec."Column Action" = Rec."Column Action"::"Quantity Info." then begin
-                    if not (Rec."Column Type" in [Rec."Column Type"::Decimal, Rec."Column Type"::Integer]) then
+                    if Rec."Column Type" <> Rec."Column Type"::Number then
                         if not Confirm(MismatchColumnTypeQst, false, Rec.FieldCaption("Column Type")) then
                             Error(''); // Cancel the action
                     TempAttachmentMapping.Copy(Rec, true);
@@ -53,7 +53,7 @@ table 7277 "Attachment Mapping"
                 if Rec."Column Action" = Rec."Column Action"::"UoM Info." then begin
                     TempAttachmentMapping.Copy(Rec, true);
                     TempAttachmentMapping.SetFilter("Entry No.", '<> %1', Rec."Entry No.");
-                    TempAttachmentMapping.SetRange("Column Action", TempAttachmentMapping."Column Action"::"Quantity Info.");
+                    TempAttachmentMapping.SetRange("Column Action", TempAttachmentMapping."Column Action"::"UoM Info.");
                     TempAttachmentMapping.ModifyAll("Column Action", Rec."Column Action"::Ignore);
                 end
             end;

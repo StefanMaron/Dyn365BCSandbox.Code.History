@@ -237,11 +237,17 @@ page 7290 "Sales Line From Attachment"
         QuantityColumnCaption: Text;
         UoMColumnCaption: Text;
         LoopIndex: Integer;
+        TabLbl: Label '<TAB>', Comment = 'Tab character.', Locked = true;
+        TabChar: Char;
     begin
         // GeneratedCaption will be of the format "Suggest sales lines from Sample.csv. Use ; as a column separator."
+        TabChar := 9;
         GeneratedCaption := StrSubstNo(PromptPart1Lbl, GlobalFileName);
         if GlobalFileHandlerResult.GetColumnDelimiter() <> '' then
-            GeneratedCaption := GeneratedCaption + StrSubstNo(PromptPart2Lbl, GlobalFileHandlerResult.GetColumnDelimiter());
+            if GlobalFileHandlerResult.GetColumnDelimiter() = TabChar then
+                GeneratedCaption := GeneratedCaption + StrSubstNo(PromptPart2Lbl, TabLbl)
+            else
+                GeneratedCaption := GeneratedCaption + StrSubstNo(PromptPart2Lbl, GlobalFileHandlerResult.GetColumnDelimiter());
 
         PageCaptionTxt := GeneratedCaption;
         if GlobalFileHandlerResult.GetProductColumnIndex().Count > 0 then begin

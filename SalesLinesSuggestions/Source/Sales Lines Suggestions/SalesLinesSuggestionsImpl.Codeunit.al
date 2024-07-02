@@ -215,7 +215,7 @@ codeunit 7275 "Sales Lines Suggestions Impl."
                         FileHandlerResult := AOAIFunctionResponse.GetResult()
                     else begin
                         MagicFunction.Execute(EmptyArguments);
-                        FeatureTelemetry.LogError('0000MZ8', GetFeatureName(), 'Process function_call', 'Function not supported, defaulting to magic_function');
+                        FeatureTelemetry.LogError('0000N6J', GetFeatureName(), 'Process function_call', 'Function not supported, defaulting to magic_function');
                     end;
                 end else begin
                     MagicFunction.Execute(EmptyArguments);

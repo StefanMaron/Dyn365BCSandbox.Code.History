@@ -116,7 +116,6 @@ page 7275 "Sales Line AI Suggestions"
 
                     GenerateSalesLineSuggestions(SearchQueryTxt, SearchStyle);
                 end;
-
             }
             systemaction(OK)
             {

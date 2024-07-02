@@ -19,22 +19,17 @@ enum 7280 "Column Type"
         Caption = 'Boolean';
     }
 
-    value(20; Integer)
+    value(20; Number)
     {
-        Caption = 'Integer';
+        Caption = 'Number';
     }
 
-    value(30; Decimal)
-    {
-        Caption = 'Decimal';
-    }
-
-    value(40; Text)
+    value(30; Text)
     {
         Caption = 'Text';
     }
 
-    value(50; Date)
+    value(40; Date)
     {
         Caption = 'Date';
     }

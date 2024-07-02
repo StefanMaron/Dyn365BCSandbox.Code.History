@@ -229,10 +229,8 @@ page 7289 "Attachment Mapping Part"
             case ColumnTypeTxt.ToLower() of
                 'text', 'string':
                     ColumnTypes.Add(Enum::"Column Type"::Text);
-                'integer', 'int':
-                    ColumnTypes.Add(Enum::"Column Type"::Integer);
-                'decimal', 'float', 'double':
-                    ColumnTypes.Add(Enum::"Column Type"::Decimal);
+                'number', 'numeric', 'num', 'integer', 'int', 'float', 'double', 'decimal':
+                    ColumnTypes.Add(Enum::"Column Type"::Number);
                 'date':
                     ColumnTypes.Add(Enum::"Column Type"::Date);
                 'boolean', 'bool':
