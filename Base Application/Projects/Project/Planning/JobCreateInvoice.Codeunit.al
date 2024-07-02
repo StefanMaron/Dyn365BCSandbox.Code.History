@@ -374,7 +374,7 @@ codeunit 1002 "Job Create-Invoice"
             TempJobPlanningLine.DeleteAll();
         end;
 
-        OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(SalesHeader, Job);
+        OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(SalesHeader, Job, InvoicePerTask, LastJobTask);
 
         if LastJobTask then begin
             if NoOfSalesLinesCreated = 0 then
@@ -1411,7 +1411,7 @@ codeunit 1002 "Job Create-Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(var SalesHeader: Record "Sales Header"; var Job: Record Job)
+    local procedure OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(var SalesHeader: Record "Sales Header"; var Job: Record Job; InvoicePerTask: Boolean; LastJobTask: Boolean)
     begin
     end;
 
