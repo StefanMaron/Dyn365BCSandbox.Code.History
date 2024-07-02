@@ -2412,26 +2412,27 @@ codeunit 99000854 "Inventory Profile Offsetting"
     begin
         IsHandled := false;
         OnBeforeCommitTracking(TempTrkgReservEntry, IsHandled);
-        if IsHandled then
-            exit;
+        if not IsHandled then begin
+            if not TempTrkgReservEntry.Find('-') then
+                exit;
 
-        if not TempTrkgReservEntry.Find('-') then
-            exit;
+            repeat
+                ReservEntry := TempTrkgReservEntry;
+                if TempTrkgReservEntry."Entry No." = PrevTempEntryNo then
+                    ReservEntry."Entry No." := PrevInsertedEntryNo
+                else
+                    ReservEntry."Entry No." := 0;
+                ReservEntry.UpdateItemTracking();
+                UpdateAppliedItemEntry(ReservEntry);
+                ReservEntry.Insert();
+                PrevTempEntryNo := TempTrkgReservEntry."Entry No.";
+                PrevInsertedEntryNo := ReservEntry."Entry No.";
+                TempTrkgReservEntry.Delete();
+            until TempTrkgReservEntry.Next() = 0;
+            Clear(TempTrkgReservEntry);
+        end;
 
-        repeat
-            ReservEntry := TempTrkgReservEntry;
-            if TempTrkgReservEntry."Entry No." = PrevTempEntryNo then
-                ReservEntry."Entry No." := PrevInsertedEntryNo
-            else
-                ReservEntry."Entry No." := 0;
-            ReservEntry.UpdateItemTracking();
-            UpdateAppliedItemEntry(ReservEntry);
-            ReservEntry.Insert();
-            PrevTempEntryNo := TempTrkgReservEntry."Entry No.";
-            PrevInsertedEntryNo := ReservEntry."Entry No.";
-            TempTrkgReservEntry.Delete();
-        until TempTrkgReservEntry.Next() = 0;
-        Clear(TempTrkgReservEntry);
+        OnAfterCommitTracking(TempItemTrkgEntry);
     end;
 
     procedure MaintainPlanningLine(var SupplyInvtProfile: Record "Inventory Profile"; DemandInvtProfile: Record "Inventory Profile"; NewPhase: Option " ","Line Created","Routing Created",Exploded,Obsolete; Direction: Option Forward,Backward)
@@ -6022,6 +6023,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetDemandPriority(var InventoryProfile: Record "Inventory Profile")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCommitTracking(var TempReservationEntryItemTrkgEntry: Record "Reservation Entry" temporary)
     begin
     end;
 }
