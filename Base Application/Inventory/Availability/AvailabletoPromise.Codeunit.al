@@ -106,7 +106,6 @@ codeunit 5790 "Available to Promise"
                 Item."Planning Issues (Qty.)" +
                 Item."Planning Transfer Ship. (Qty)." +
                 Item."Qty. on Sales Order" +
-                Item."Qty. on Service Order" +
                 Item."Qty. on Job Order" +
                 Item."Trans. Ord. Shipment (Qty.)" +
                 Item."Qty. on Asm. Component" +
@@ -127,7 +126,6 @@ codeunit 5790 "Available to Promise"
             ReservedRequirement :=
                 Item."Res. Qty. on Prod. Order Comp." +
                 Item."Reserved Qty. on Sales Orders" +
-                Item."Res. Qty. on Service Orders" +
                 Item."Res. Qty. on Job Order" +
                 Item."Res. Qty. on Outbound Transfer" +
                 Item."Res. Qty. on  Asm. Comp." +
@@ -497,18 +495,17 @@ codeunit 5790 "Available to Promise"
           "Planning Issues (Qty.)",
           "Planning Transfer Ship. (Qty).",
           "Qty. on Sales Order",
-          "Qty. on Service Order",
           "Qty. on Job Order",
           "Trans. Ord. Shipment (Qty.)",
           "Qty. on Asm. Component",
           "Qty. on Purch. Return",
           "Res. Qty. on Prod. Order Comp.",
           "Reserved Qty. on Sales Orders",
-          "Res. Qty. on Service Orders",
           "Res. Qty. on Job Order",
           "Res. Qty. on Outbound Transfer",
           "Res. Qty. on  Asm. Comp.",
           "Res. Qty. on Purch. Returns");
+
         // Max function parameters is 20, hence split in 2
         Item.CalcFields(
           "Scheduled Receipt (Qty.)",
@@ -523,6 +520,7 @@ codeunit 5790 "Available to Promise"
           "Res. Qty. on Assembly Order",
           "Res. Qty. on Sales Returns",
           "Reserved Qty. on Prod. Order");
+
         OnCalcAllItemFieldsOnAfterItemCalcFields(Item);
 
         AllFieldCalculated := true;

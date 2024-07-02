@@ -135,23 +135,6 @@ page 353 "Item Availability Lines"
                     end;
                 }
 #pragma warning disable AA0100
-                field("Item.""Qty. on Service Order"""; Rec."Qty. on Service Order")
-#pragma warning restore AA0100
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Qty. on Service Order';
-                    DecimalPlaces = 0 : 5;
-                    ToolTip = 'Specifies how many units of the item are allocated to service orders, meaning listed on outstanding service order lines.';
-                    Visible = false;
-
-                    trigger OnDrillDown()
-                    var
-                        ServAvailabilityMgt: Codeunit Microsoft.Service.Document."Serv. Availability Mgt.";
-                    begin
-                        ServAvailabilityMgt.ShowServiceLines(Item);
-                    end;
-                }
-#pragma warning disable AA0100
                 field("Item.""Qty. on Job Order"""; Rec."Qty. on Job Order")
 #pragma warning restore AA0100
                 {
@@ -423,7 +406,6 @@ page 353 "Item Availability Lines"
         Rec.Inventory := Item.Inventory;
         Rec."Qty. on Purch. Order" := Item."Qty. on Purch. Order";
         Rec."Qty. on Sales Order" := Item."Qty. on Sales Order";
-        Rec."Qty. on Service Order" := Item."Qty. on Service Order";
         Rec."Qty. on Job Order" := Item."Qty. on Job Order";
         Rec."Trans. Ord. Shipment (Qty.)" := Item."Trans. Ord. Shipment (Qty.)";
         Rec."Qty. in Transit" := Item."Qty. in Transit";
