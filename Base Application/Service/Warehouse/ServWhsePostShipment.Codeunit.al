@@ -6,6 +6,7 @@ using Microsoft.Service.History;
 using Microsoft.Service.Posting;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.History;
 
 codeunit 5749 "Serv. Whse Post-Shipment"
 {
@@ -333,5 +334,14 @@ codeunit 5749 "Serv. Whse Post-Shipment"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeHandleServiceLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ServiceLine: Record Microsoft.Service.Document."Service Line"; var ModifyLine: Boolean; var IsHandled: Boolean)
     begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse.-Post Shipment", 'OnCreatePostedShptLineOnBeforePostedWhseShptLineInsert', '', false, false)]
+    local procedure OnCreatePostedShptLineOnBeforePostedWhseShptLineInsert(var PostedWhseShptLine: Record "Posted Whse. Shipment Line");
+    begin
+        case PostedWhseShptLine."Source Document" of
+            PostedWhseShptLine."Source Document"::"Service Order":
+                PostedWhseShptLine."Posted Source Document" := PostedWhseShptLine."Posted Source Document"::"Posted Shipment";
+        end;
     end;
 }
