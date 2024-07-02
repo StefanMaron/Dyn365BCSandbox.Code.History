@@ -400,7 +400,6 @@ codeunit 5830 "Calc. Availability Overview"
           Item."Reserved Qty. on Prod. Order",
           Item."Res. Qty. on Inbound Transfer",
           Item."Reserved Qty. on Sales Orders",
-          Item."Res. Qty. on Service Orders",
           Item."Res. Qty. on Job Order",
           Item."Res. Qty. on Prod. Order Comp.",
           Item."Res. Qty. on Outbound Transfer",
@@ -415,7 +414,6 @@ codeunit 5830 "Calc. Availability Overview"
           Item."Planned Order Receipt (Qty.)",
           Item."Trans. Ord. Receipt (Qty.)",
           Item."Qty. on Sales Order",
-          Item."Qty. on Service Order",
           Item."Qty. on Job Order",
           Item."Qty. on Component Lines",
           Item."Trans. Ord. Shipment (Qty.)",
@@ -431,14 +429,17 @@ codeunit 5830 "Calc. Availability Overview"
           Item."Scheduled Receipt (Qty.)" + Item."Planned Order Receipt (Qty.)" - Item."Reserved Qty. on Prod. Order" +
           Item."Trans. Ord. Receipt (Qty.)" - Item."Res. Qty. on Inbound Transfer" +
           Item."Qty. on Assembly Order" - Item."Res. Qty. on Assembly Order";
+
         DemandRunningTotal :=
           -Item."Qty. on Sales Order" + Item."Reserved Qty. on Sales Orders" -
           Item."Qty. on Purch. Return" + Item."Res. Qty. on Purch. Returns" -
           Item."Qty. on Component Lines" + Item."Res. Qty. on Prod. Order Comp." -
-          Item."Qty. on Service Order" + Item."Res. Qty. on Service Orders" -
           Item."Qty. on Job Order" + Item."Res. Qty. on Job Order" -
           Item."Trans. Ord. Shipment (Qty.)" + Item."Res. Qty. on Outbound Transfer" -
           Item."Qty. on Asm. Component" + Item."Res. Qty. on  Asm. Comp.";
+
+        OnAfterCalcDemandRunningTotal(Item, DemandRunningTotal);
+
         InventoryRunningTotal := Item.Inventory - Item."Reserved Qty. on Inventory";
 
         RunningTotal := InventoryRunningTotal + SupplyRunningTotal + DemandRunningTotal;
@@ -604,6 +605,11 @@ codeunit 5830 "Calc. Availability Overview"
 
     [IntegrationEvent(false, false)]
     local procedure OnSupplyExist(var Item: Record Item; var Exists: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcDemandRunningTotal(var Item: Record Item; var DemandRunningTotal: Decimal)
     begin
     end;
 }
