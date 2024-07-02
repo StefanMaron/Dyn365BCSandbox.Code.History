@@ -2,6 +2,8 @@ namespace Microsoft.Utilities;
 
 using Microsoft.Foundation.Attachment;
 using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Availability;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Customer;
@@ -392,5 +394,93 @@ codeunit 6450 "Serv. Integration Mgt."
     begin
         if CertificateOfSupply."Document Type" = CertificateOfSupply."Document Type"::"Service Shipment" then
             Report.RunModal(Report::"Service Certificate of Supply", true, false, CertificateOfSupply);
+    end;
+
+    // Codeunit "Report Selection Mgt."
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Report Selection Mgt.", 'OnBeforeInitReportSelectionServ', '', false, false)]
+    local procedure OnBeforeInitReportSelectionServ()
+    var
+        ReportSelectionMgt: Codeunit "Report Selection Mgt.";
+    begin
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Quote");
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Order");
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Invoice");
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Credit Memo");
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Shipment");
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Contract Quote");
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Contract");
+        ReportSelectionMgt.InitReportSelection("Report Selection Usage"::"SM.Test");
+    end;
+
+    // Codeunit AvailabilityManagement
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::AvailabilityManagement, 'OnAfterShouldCalculateAvailableToPromise', '', false, false)]
+    local procedure OnAfterShouldCalculateAvailableToPromise(var OrderPromisingLine: Record "Order Promising Line"; var ShouldCalculate: Boolean)
+    begin
+        ShouldCalculate := ShouldCalculate or (OrderPromisingLine."Source Type" = OrderPromisingLine."Source Type"::"Service Order");
+    end;
+
+    // Codeunit "Available Management"
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Available Management", 'OnCalcAvailableQtyOnAfterCalculation', '', false, false)]
+    local procedure OnCalcAvailableQtyOnAfterCalculation(var CopyOfItem: Record Item; var AvailableQty: Decimal)
+    begin
+        CopyOfItem.CalcFields("Qty. on Service Order");
+        AvailableQty -= CopyOfItem."Qty. on Service Order";
+    end;
+
+    // Codeunit "Available To Promise"
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Available to Promise", 'OnAfterCalcGrossRequirement', '', false, false)]
+    local procedure OnAfterCalcGrossRequirement(var Item: Record Item; var GrossRequirement: Decimal)
+    begin
+        Item.CalcFields("Qty. on Service Order");
+        GrossRequirement += Item."Qty. on Service Order";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Available to Promise", 'OnAfterCalcReservedRequirement', '', false, false)]
+    local procedure OnAfterCalcReservedRequirement(var Item: Record Item; var ReservedRequirement: Decimal)
+    begin
+        Item.CalcFields("Res. Qty. on Service Orders");
+        ReservedRequirement += Item."Res. Qty. on Service Orders";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Available to Promise", 'OnAfterCalcReservedRequirement', '', false, false)]
+    local procedure OnCalcAllItemFieldsOnAfterItemCalcFields(var Item: Record Item)
+    begin
+        Item.CalcFields("Qty. on Service Order", "Res. Qty. on Service Orders");
+    end;
+
+    // Codeunit "Calc. Availability Overview"
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Calc. Availability Overview", 'OnAfterCalcDemandRunningTotal', '', false, false)]
+    local procedure OnAfterCalcDemandRunningTotal(var Item: Record Item; var DemandRunningTotal: Decimal)
+    begin
+        Item.CalcFields("Qty. on Service Order", "Res. Qty. on Service Orders");
+        DemandRunningTotal -= (Item."Qty. on Service Order" + Item."Res. Qty. on Service Orders");
+    end;
+
+    // Codeunit "Item Availability Forms Mgt"
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Availability Forms Mgt", 'OnCalculateNeedOnAfterCalcGrossRequirement', '', false, false)]
+    local procedure OnCalculateNeedOnAfterCalcGrossRequirement(var Item: Record Item; var GrossRequirement: Decimal)
+    begin
+        GrossRequirement += Item."Qty. on Service Order";
+    end;
+
+    // Page "Item Availability Line List"
+
+    [EventSubscriber(ObjectType::Page, Page::"Item Availability Line List", 'OnItemCalcFields', '', false, false)]
+    local procedure OnItemCalcFields(var Item: Record Item)
+    begin
+        Item.CalcFields("Qty. on Service Order");
+    end;
+
+    // Page "Item Availability Lines"
+
+    [EventSubscriber(ObjectType::Page, Page::"Item Availability Lines", 'OnAfterCalcAvailQuantities', '', false, false)]
+    local procedure OnAfterCalcAvailQuantities(var Item: Record Item; var ItemAvailabilityBuffer: Record "Item Availability Buffer")
+    begin
+        ItemAvailabilityBuffer."Qty. on Service Order" := Item."Qty. on Service Order";
     end;
 }

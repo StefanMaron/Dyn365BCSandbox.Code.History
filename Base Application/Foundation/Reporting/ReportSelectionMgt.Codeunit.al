@@ -141,15 +141,6 @@ codeunit 1901 "Report Selection Mgt."
     begin
         OnBeforeInitReportSelectionServ();
 
-        InitReportSelection("Report Selection Usage"::"SM.Quote");
-        InitReportSelection("Report Selection Usage"::"SM.Order");
-        InitReportSelection("Report Selection Usage"::"SM.Invoice");
-        InitReportSelection("Report Selection Usage"::"SM.Credit Memo");
-        InitReportSelection("Report Selection Usage"::"SM.Shipment");
-        InitReportSelection("Report Selection Usage"::"SM.Contract Quote");
-        InitReportSelection("Report Selection Usage"::"SM.Contract");
-        InitReportSelection("Report Selection Usage"::"SM.Test");
-
         OnAfterInitReportSelectionServ();
     end;
 

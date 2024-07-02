@@ -2,10 +2,10 @@ namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.UOM;
-using System.IO;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Setup;
+using System.IO;
 
 codeunit 99000889 AvailabilityManagement
 {
@@ -198,46 +198,48 @@ codeunit 99000889 AvailabilityManagement
         Item.SetRange("Variant Filter", OrderPromisingLine."Variant Code");
         Item.SetRange("Location Filter", OrderPromisingLine."Location Code");
         OnCalcAvailableToPromiseLineOnAfterSetFilters(Item, OrderPromisingLine);
-        case OrderPromisingLine."Source Type" of
-            OrderPromisingLine."Source Type"::Sales,
-            OrderPromisingLine."Source Type"::"Service Order",
-            OrderPromisingLine."Source Type"::Job:
-                begin
-                    if OrderPromisingLine."Requested Shipment Date" <> 0D then
-                        NeededDate := OrderPromisingLine."Requested Shipment Date"
-                    else
-                        NeededDate := WorkDate();
-                    AvailToPromise.SetOriginalShipmentDate(OrderPromisingLine);
+        if ShouldCalculateAvailableToPromise(OrderPromisingLine) then begin
+            if OrderPromisingLine."Requested Shipment Date" <> 0D then
+                NeededDate := OrderPromisingLine."Requested Shipment Date"
+            else
+                NeededDate := WorkDate();
+            AvailToPromise.SetOriginalShipmentDate(OrderPromisingLine);
 
-                    FeasibleDateFound := false;
-                    if OrderPromisingLine."Source Type" = OrderPromisingLine."Source Type"::Sales then
-                        if SourceSalesLine.Get(OrderPromisingLine."Source Subtype", OrderPromisingLine."Source ID", OrderPromisingLine."Source Line No.") then
-                            if SourceSalesLine."Special Order" then begin
-                                FeasibleDate := GetExpectedReceiptDateFromSpecialOrder(SourceSalesLine);
-                                FeasibleDateFound := true;
-                            end;
-
-                    if not FeasibleDateFound then
-                        if OrderPromisingLine."Required Quantity" = 0 then begin
-                            FeasibleDate := OrderPromisingLine."Original Shipment Date";
-                            FeasibleDateFound := true;
-                        end;
-
-                    if not FeasibleDateFound then begin
-                        GetCompanyInfo();
-                        FeasibleDate := AvailToPromise.CalcEarliestAvailabilityDate(
-                            Item, OrderPromisingLine.Quantity, NeededDate, OrderPromisingLine.Quantity, OrderPromisingLine."Original Shipment Date", AvailQty,
-                            CompanyInfo."Check-Avail. Time Bucket", CompanyInfo."Check-Avail. Period Calc.");
+            FeasibleDateFound := false;
+            if OrderPromisingLine."Source Type" = OrderPromisingLine."Source Type"::Sales then
+                if SourceSalesLine.Get(OrderPromisingLine."Source Subtype", OrderPromisingLine."Source ID", OrderPromisingLine."Source Line No.") then
+                    if SourceSalesLine."Special Order" then begin
+                        FeasibleDate := GetExpectedReceiptDateFromSpecialOrder(SourceSalesLine);
+                        FeasibleDateFound := true;
                     end;
 
-                    if (FeasibleDate <> 0D) and (FeasibleDate < OrderPromisingLine."Requested Shipment Date") then
-                        if GetRequestedDeliveryDate(OrderPromisingLine) <> 0D then
-                            FeasibleDate := OrderPromisingLine."Requested Shipment Date";
-                    OrderPromisingLine.Validate(OrderPromisingLine."Earliest Shipment Date", FeasibleDate);
+            if not FeasibleDateFound then
+                if OrderPromisingLine."Required Quantity" = 0 then begin
+                    FeasibleDate := OrderPromisingLine."Original Shipment Date";
+                    FeasibleDateFound := true;
                 end;
+
+            if not FeasibleDateFound then begin
+                GetCompanyInfo();
+                FeasibleDate := AvailToPromise.CalcEarliestAvailabilityDate(
+                    Item, OrderPromisingLine.Quantity, NeededDate, OrderPromisingLine.Quantity, OrderPromisingLine."Original Shipment Date", AvailQty,
+                    CompanyInfo."Check-Avail. Time Bucket", CompanyInfo."Check-Avail. Period Calc.");
+            end;
+
+            if (FeasibleDate <> 0D) and (FeasibleDate < OrderPromisingLine."Requested Shipment Date") then
+                if GetRequestedDeliveryDate(OrderPromisingLine) <> 0D then
+                    FeasibleDate := OrderPromisingLine."Requested Shipment Date";
+            OrderPromisingLine.Validate(OrderPromisingLine."Earliest Shipment Date", FeasibleDate);
         end;
         OnCalcAvailableToPromiseLineOnBeforeModify(OrderPromisingLine);
         OrderPromisingLine.Modify();
+    end;
+
+    local procedure ShouldCalculateAvailableToPromise(var OrderPromisingLine: Record "Order Promising Line") ShouldCalculate: Boolean
+    begin
+        ShouldCalculate := OrderPromisingLine."Source Type" in [OrderPromisingLine."Source Type"::Sales, OrderPromisingLine."Source Type"::Job];
+
+        OnAfterShouldCalculateAvailableToPromise(OrderPromisingLine, ShouldCalculate);
     end;
 
     local procedure GetExpectedReceiptDateFromSpecialOrder(SalesLine: Record Microsoft.Sales.Document."Sales Line"): Date
@@ -390,6 +392,11 @@ codeunit 99000889 AvailabilityManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCancelReservations(var TempRecordBuffer: Record "Record Buffer" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterShouldCalculateAvailableToPromise(var OrderPromisingLine: Record "Order Promising Line"; var ShouldCalculate: Boolean)
     begin
     end;
 }
