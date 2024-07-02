@@ -5323,10 +5323,13 @@ table 36 "Sales Header"
             "Sell-to County" := Cont.County;
             "Sell-to Country/Region Code" := Cont."Country/Region Code";
         end;
-        if ("Sell-to Customer No." = "Bill-to Customer No.") or
-           ("Bill-to Customer No." = '')
-        then
-            Validate("Bill-to Contact No.", "Sell-to Contact No.");
+        Clear(IsHandled);
+        OnUpdateSellToCustOnBeforeValidateBillToContactNo(Rec, IsHandled);
+        if not IsHandled then
+            if ("Sell-to Customer No." = "Bill-to Customer No.") or
+               ("Bill-to Customer No." = '')
+            then
+                Validate("Bill-to Contact No.", "Sell-to Contact No.");
 
         OnAfterUpdateSellToCust(Rec, Cont);
     end;
@@ -11283,6 +11286,11 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSendToPosting(var SalesHeader: Record "Sales Header"; var IsSuccess: Boolean; var IsHandled: Boolean; PostingCodeunitID: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateSellToCustOnBeforeValidateBillToContactNo(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }
