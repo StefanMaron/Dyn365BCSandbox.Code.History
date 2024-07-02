@@ -242,6 +242,14 @@ report 302 "Get Demand To Reserve"
         DateFilter := Format(StartDate) + '..' + Format(EndDate);
     end;
 
+    procedure SetParameters(NewBatchFiltersVisible: Boolean; NewDemandType: Enum "Reservation Demand Type"; NewReservedFromStock: Enum "Reservation From Stock"; NewAutoAllocate: Boolean)
+    begin
+        BatchFiltersVisible := NewBatchFiltersVisible;
+        DemandType := NewDemandType;
+        ReservedFromStock := NewReservedFromStock;
+        AutoAllocate := NewAutoAllocate;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnGetDemand(var FilterItem: Record Item; var ReservationWkshBatch: Record "Reservation Wksh. Batch"; DemandType: Enum "Reservation Demand Type"; DateFilter: Text; VariantFilterFromBatch: Text; LocationFilterFromBatch: Text; ItemFilterFromBatch: Text; ReservedFromStock: Enum "Reservation From Stock");
     begin
