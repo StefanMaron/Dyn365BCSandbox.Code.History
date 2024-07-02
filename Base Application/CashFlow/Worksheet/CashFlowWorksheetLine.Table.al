@@ -335,9 +335,7 @@ table 846 "Cash Flow Worksheet Line"
 
         PaymentTermsToApply := "Payment Terms Code";
         ApplyCFPaymentTerm := CashFlowForecast."Consider CF Payment Terms" and PaymentTerms.Get(PaymentTermsToApply);
-        if "Source Type" in ["Source Type"::"Sales Orders", "Source Type"::"Purchase Orders", "Source Type"::"Service Orders",
-                             "Source Type"::Job]
-        then
+        if "Source Type" in ["Source Type"::"Sales Orders", "Source Type"::"Purchase Orders", "Source Type"::Job] then
             ApplyCFPaymentTerm := true;
 
         IsHandled := false;
