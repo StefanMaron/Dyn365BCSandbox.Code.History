@@ -46,11 +46,6 @@ page 846 "Cash Flow Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sales order account number that is used in cash flow forecasts.';
                 }
-                field("Service CF Account No."; Rec."Service CF Account No.")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the service account number that is used in cash flow forecasts.';
-                }
                 field("Purch. Order CF Account No."; Rec."Purch. Order CF Account No.")
                 {
                     ApplicationArea = Basic, Suite;
